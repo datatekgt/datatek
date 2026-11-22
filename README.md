@@ -14,6 +14,7 @@ cada uno.
 | `docs/herramientas-dtekpro.md` | Catálogo de piezas de DtekPro (H-01 a H-33) y necesidades nuevas (N-01 a N-07). |
 | `docs/nichos/1-fuego.md` … `5-obra.md` | El machote de cada nicho. |
 | `docs/herramienta-cliente.md` | Lo que ve el cliente en cada nicho, qué se reutiliza del Garage de DtekPro y qué muestran otras plataformas. |
+| `docs/cliente-alcance.md` | Qué funciones del cliente entran en la primera versión, cuáles después y cuáles no. |
 | `docs/investigacion/` | La investigación de mercado que respalda la elección. |
 
 ## El código anterior
