@@ -1,8 +1,0 @@
-{
-  "extends": "@datatek/config/tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "types": ["node"]
-  },
-  "include": ["src", "generated"]
-}
