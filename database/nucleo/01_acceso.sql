@@ -133,12 +133,16 @@ returns text[] language sql immutable as $$
     when 'dueno' then array[
       'ver_panel','ver_clientes','crear_acceso','ver_calendario','mover_calendario','ver_dinero','cobrar','anular_cobro',
       'ver_resultados','importar','enviar_recordatorios','configurar_negocio']
-      || case p_producto when 'flota' then array['ver_ordenes','cotizar','registrar_trabajo','verificar_trabajo','escanear_unidad'] else '{}'::text[] end
+      || case p_producto when 'flota' then array['ver_ordenes','cotizar','registrar_trabajo','verificar_trabajo','escanear_unidad']
+                         when 'huella' then array['ver_agenda','registrar_consulta','registrar_dosis','corregir_dosis'] else '{}'::text[] end
     when 'jefe' then array['ver_panel','ver_clientes','crear_acceso','ver_calendario','mover_calendario','importar','enviar_recordatorios']
-      || case p_producto when 'flota' then array['ver_ordenes','cotizar','registrar_trabajo','verificar_trabajo','escanear_unidad'] else '{}'::text[] end
+      || case p_producto when 'flota' then array['ver_ordenes','cotizar','registrar_trabajo','verificar_trabajo','escanear_unidad']
+                         when 'huella' then array['ver_agenda','registrar_consulta','registrar_dosis','corregir_dosis'] else '{}'::text[] end
     when 'tecnico' then array['ver_calendario']
-      || case p_producto when 'flota' then array['ver_ordenes','registrar_trabajo','escanear_unidad'] else '{}'::text[] end
+      || case p_producto when 'flota' then array['ver_ordenes','registrar_trabajo','escanear_unidad']
+                         when 'huella' then array['ver_clientes','ver_agenda','registrar_consulta','registrar_dosis'] else '{}'::text[] end
     when 'caja' then array['ver_panel','ver_clientes','ver_calendario','ver_dinero','cobrar']
+      || case p_producto when 'huella' then array['ver_agenda'] else '{}'::text[] end
     else '{}'::text[] end
 $$;
 

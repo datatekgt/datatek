@@ -20,20 +20,28 @@ export const CAPACIDADES = {
   registrar_trabajo: 'Registrar trabajo',
   verificar_trabajo: 'Verificar trabajo',
   escanear_unidad: 'Escanear unidades',
+  ver_agenda: 'Ver la agenda',
+  registrar_consulta: 'Registrar consultas',
+  registrar_dosis: 'Registrar vacunas y desparasitantes',
+  corregir_dosis: 'Corregir una dosis (con motivo)',
 } as const
 export type Capacidad = keyof typeof CAPACIDADES
 
 const NUCLEO_DUENO: Capacidad[] = ['ver_panel', 'ver_clientes', 'crear_acceso', 'ver_calendario', 'mover_calendario', 'ver_dinero', 'cobrar', 'anular_cobro',
   'ver_resultados', 'importar', 'enviar_recordatorios', 'configurar_negocio']
 const TALLER_FLOTA: Capacidad[] = ['ver_ordenes', 'cotizar', 'registrar_trabajo', 'verificar_trabajo', 'escanear_unidad']
+const CLINICA_HUELLA: Capacidad[] = ['ver_agenda', 'registrar_consulta', 'registrar_dosis', 'corregir_dosis']
 
 export function capacidadesRol(producto: Producto, rol: string): Capacidad[] {
   const flota = producto === 'flota'
+  const huella = producto === 'huella'
+  const propias = flota ? TALLER_FLOTA : huella ? CLINICA_HUELLA : []
   switch (rol) {
-    case 'dueno': return [...NUCLEO_DUENO, ...(flota ? TALLER_FLOTA : [])]
-    case 'jefe': return ['ver_panel', 'ver_clientes', 'crear_acceso', 'ver_calendario', 'mover_calendario', 'importar', 'enviar_recordatorios', ...(flota ? TALLER_FLOTA : [])]
-    case 'tecnico': return ['ver_calendario', ...(flota ? (['ver_ordenes', 'registrar_trabajo', 'escanear_unidad'] as Capacidad[]) : [])]
-    case 'caja': return ['ver_panel', 'ver_clientes', 'ver_calendario', 'ver_dinero', 'cobrar']
+    case 'dueno': return [...NUCLEO_DUENO, ...propias]
+    case 'jefe': return ['ver_panel', 'ver_clientes', 'crear_acceso', 'ver_calendario', 'mover_calendario', 'importar', 'enviar_recordatorios', ...propias]
+    case 'tecnico': return ['ver_calendario', ...(flota ? (['ver_ordenes', 'registrar_trabajo', 'escanear_unidad'] as Capacidad[])
+      : huella ? (['ver_clientes', 'ver_agenda', 'registrar_consulta', 'registrar_dosis'] as Capacidad[]) : [])]
+    case 'caja': return ['ver_panel', 'ver_clientes', 'ver_calendario', 'ver_dinero', 'cobrar', ...(huella ? (['ver_agenda'] as Capacidad[]) : [])]
     default: return []
   }
 }
