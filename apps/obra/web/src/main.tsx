@@ -1,0 +1,18 @@
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
+import '@nucleo/estilos/base.css'
+import './estilos.css'
+import './gantt.css'
+import { ProveedorSesion } from '@nucleo/acceso/Sesion'
+import { App } from './App'
+
+createRoot(document.getElementById('raiz')!).render(
+  <StrictMode>
+    <ProveedorSesion producto="obra">
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ProveedorSesion>
+  </StrictMode>,
+)

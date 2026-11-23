@@ -38,6 +38,21 @@ Pruebas al cierre de Flota: núcleo 102 comprobaciones, Flota 194, 37 ataques (0
 25 combinaciones de capacidades iguales, funciones en verde, motor del importador 5/5, recorrido de pantallas en verde a
 1440, 1024, 390 y 375 px con el CSP de producción.
 
+## Etapa 5 · Obra (construida el 23 nov 2026; todavía no corrida en Supabase)
+
+| Paquete | Estado | Dónde |
+|---|---|---|
+| O-01 Obras, fases y presupuesto (D1) | Hecho | `apps/obra/database/500_obra_base.sql`, `505_obra_importar.sql` (plan desde Excel), `panel/Obras.tsx`, `panel/Plan.tsx` |
+| O-02 Gantt con fases que se abren | Hecho | `501_obra_gantt.sql` (`dt_obra_obra`, `dt_obra_fase`), `comun.tsx` (Gantt), `cliente/Avance.tsx`, `cliente/Fase.tsx` |
+| O-03 Visita y reporte semanal | Hecho | `502_obra_visitas.sql` (bucket privado `obra-fotos`), `panel/Visita.tsx`, `panel/Reportes.tsx`, `cliente/Reporte.tsx` |
+| O-04 Hitos de pago y cambios | Hecho | `500` (hitos), `503_obra_cambios.sql`, `cliente/MiObra.tsx` (decisión), `cliente/Pagos.tsx` |
+| O-05 Cobro por hito | Hecho | `504_obra_cobros.sql` (`dt_obra_recibir_fase` crea el cobro), `panel/Mas.tsx` |
+| O-SEG | Hecho | `apps/obra/tests/sql/590_ataques.sql` (comunes y 27–30), `ataque.mjs --estricto` en 0 |
+| Solo lectura en Obra | Hecho | `506_obra_solo_lectura.sql` |
+
+Pendiente en Obra: calendario de visitas en el panel (los eventos ya existen), asignar supervisor desde la pantalla (la función
+existe, falta listar el equipo con nombre), enlace del residente sin cuenta, plantillas `obra_*` en `whatsapp-enviar`.
+
 ## Lo que necesita a Dominic para publicar Flota
 
 1. ~~Crear el proyecto de Supabase y correr las migraciones~~ Hecho el 23 nov 2026.
