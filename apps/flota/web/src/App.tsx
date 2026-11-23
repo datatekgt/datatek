@@ -1,0 +1,107 @@
+// Una app, dos caras: /panel (taller D-TEK Flotas) y /mi (la empresa cliente). Se entra con teléfono y código.
+import { Navigate, NavLink, Outlet, Route, Routes, useLocation } from 'react-router-dom'
+import { Entrar } from '@nucleo/acceso/Entrar'
+import { useSesion } from '@nucleo/acceso/Sesion'
+import { lazy, Suspense } from 'react'
+
+// El panel y la herramienta del cliente se cargan por separado: la empresa no descarga el código del taller.
+const Flotas = lazy(() => import('./panel/Flotas').then((m) => ({ default: m.Flotas })))
+const Ordenes = lazy(() => import('./panel/Ordenes').then((m) => ({ default: m.Ordenes })))
+const OrdenPanel = lazy(() => import('./panel/Orden').then((m) => ({ default: m.OrdenPanel })))
+const Unidades = lazy(() => import('./panel/Unidades').then((m) => ({ default: m.Unidades })))
+const Calendario = lazy(() => import('./panel/Calendario').then((m) => ({ default: m.Calendario })))
+const Mas = lazy(() => import('./panel/Mas').then((m) => ({ default: m.Mas })))
+const MiFlota = lazy(() => import('./cliente/MiFlota').then((m) => ({ default: m.MiFlota })))
+const UnidadCliente = lazy(() => import('./cliente/Unidad').then((m) => ({ default: m.UnidadCliente })))
+const OrdenCliente = lazy(() => import('./cliente/Orden').then((m) => ({ default: m.OrdenCliente })))
+const OrdenesCliente = lazy(() => import('./cliente/Ordenes').then((m) => ({ default: m.OrdenesCliente })))
+const Cuenta = lazy(() => import('./cliente/Cuenta').then((m) => ({ default: m.Cuenta })))
+const Cargando = () => <p className="cargando">Cargando…</p>
+
+const ICONOS = {
+  flota: 'M2 6h12v10H2zM14 10h4l3 3v3h-7M7 19a2 2 0 100-4 2 2 0 000 4zM17 19a2 2 0 100-4 2 2 0 000 4z',
+  orden: 'M14 7l3-3 3 3-3 3M14 7L4 17l3 3 10-10',
+  cuenta: 'M3 7h18v10H3zM12 15a3 3 0 100-6 3 3 0 000 6z',
+  doc: 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7',
+}
+const Icono = ({ d }: { d: string }) => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d} /></svg>
+
+function MarcoPanel() {
+  const { negocio, negocios, elegir, puede } = useSesion()
+  const pestanas = [
+    { a: '/panel/flotas', t: 'Flotas', cap: 'ver_clientes' as const },
+    { a: '/panel/ordenes', t: 'Órdenes', cap: 'ver_ordenes' as const },
+    { a: '/panel/unidades', t: 'Unidades', cap: 'ver_clientes' as const },
+    { a: '/panel/calendario', t: 'Calendario', cap: 'ver_calendario' as const },
+    { a: '/panel/mas', t: 'Más', cap: null },
+  ].filter((p) => !p.cap || puede(p.cap))
+  return (
+    <>
+      <header className="cabecera">
+        <span className="marca">D-TEK <b>Flotas</b></span>
+        <nav className="pestanas" aria-label="Secciones">
+          {pestanas.map((p) => <NavLink key={p.a} to={p.a} className={({ isActive }) => (isActive ? 'activa' : '')}>{p.t}</NavLink>)}
+        </nav>
+        <div className="derecha">
+          {negocios.filter((n) => n.como === 'miembro').length > 1 ? (
+            <select className="entrada solo-ancho" aria-label="Negocio" value={negocio?.negocio_id} onChange={(e) => elegir(e.target.value)} style={{ minHeight: 36, width: 'auto' }}>
+              {negocios.filter((n) => n.como === 'miembro').map((n) => <option key={n.negocio_id} value={n.negocio_id}>{n.nombre}</option>)}
+            </select>
+          ) : <span className="suave solo-ancho">{negocio?.nombre}</span>}
+        </div>
+      </header>
+      <div className="contenido"><Suspense fallback={<Cargando />}><Outlet /></Suspense></div>
+    </>
+  )
+}
+
+function MarcoCliente() {
+  const { negocio } = useSesion()
+  const nav = [
+    { a: '/mi', t: 'Mi flota', d: ICONOS.flota, fin: true },
+    { a: '/mi/ordenes', t: 'Órdenes', d: ICONOS.orden },
+    { a: '/mi/cuenta', t: 'Cuenta', d: ICONOS.cuenta },
+  ]
+  return (
+    <div className="app-cliente">
+      <header className="arriba"><div><strong>{negocio?.nombre}</strong><span className="suave chico">Tu flota · D-TEK Flotas</span></div></header>
+      <main><Suspense fallback={<Cargando />}><Outlet /></Suspense></main>
+      <nav className="barra-abajo" aria-label="Secciones">
+        {nav.map((n) => <NavLink key={n.a} to={n.a} end={n.fin} className={({ isActive }) => (isActive ? 'activa' : '')}><Icono d={n.d} />{n.t}</NavLink>)}
+      </nav>
+    </div>
+  )
+}
+
+export function App() {
+  const { cargando, sesion, negocio, negocios } = useSesion()
+  const lugar = useLocation()
+  if (cargando) return <p className="cargando">Cargando…</p>
+  if (!sesion) return <Entrar marca="D-TEK Flotas" sub="El taller de tu flota, en tu teléfono." />
+  if (!negocios.length) return (
+    <main className="entrar"><div className="tarjeta entrar-caja"><h1 style={{ fontSize: 18 }}>Todavía no tenés acceso</h1><p className="suave">Pedile al taller que te invite con este número de teléfono.</p></div></main>
+  )
+  const inicio = negocio?.como === 'miembro' ? '/panel/ordenes' : '/mi'
+  if (lugar.pathname === '/') return <Navigate to={inicio} replace />
+  return (
+    <Routes>
+      <Route path="/panel" element={negocio?.como === 'miembro' ? <MarcoPanel /> : <Navigate to="/mi" replace />}>
+        <Route path="flotas" element={<Flotas />} />
+        <Route path="ordenes" element={<Ordenes />} />
+        <Route path="ordenes/:id" element={<OrdenPanel />} />
+        <Route path="unidades" element={<Unidades />} />
+        <Route path="calendario" element={<Calendario />} />
+        <Route path="mas" element={<Mas />} />
+        <Route index element={<Navigate to="ordenes" replace />} />
+      </Route>
+      <Route path="/mi" element={negocio?.como === 'cliente' ? <MarcoCliente /> : <Navigate to="/panel" replace />}>
+        <Route index element={<MiFlota />} />
+        <Route path="unidad/:id" element={<UnidadCliente />} />
+        <Route path="ordenes" element={<OrdenesCliente />} />
+        <Route path="orden/:id" element={<OrdenCliente />} />
+        <Route path="cuenta" element={<Cuenta />} />
+      </Route>
+      <Route path="*" element={<Navigate to={inicio} replace />} />
+    </Routes>
+  )
+}

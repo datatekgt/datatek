@@ -18,7 +18,7 @@ select public.dt_flota_crear(:'neg', :'cli2', 'Flota Transportes', 0, 0) as flot
 select public.dt_flota_agregar_unidad(:'flota', 'p-123 abc', 'Toyota', 'Hilux', 2019, 148200) as ua \gset
 select public.dt_flota_agregar_unidad(:'flota', 'C-789GHI', 'Isuzu', 'NPR', 2017, 212400) as ub \gset
 select public.dt_flota_agregar_unidad(:'flota2', 'P-999ZZZ', 'Nissan', 'Frontier', 2020, 50000) as uc \gset
-select prueba.afirmar((select placa from public.unidades where id = :'ua') = 'P123ABC', 'la placa se guarda normalizada');
+select prueba.afirmar((select placa from public.unidades where id = :'ua') = 'P-123ABC', 'la placa se guarda en su forma de siempre (P-123ABC)');
 select prueba.debe_fallar($$ select public.dt_flota_agregar_unidad('$$ || :'flota' || $$', 'P-123ABC', 'Toyota', 'Hilux', 2019, 1) $$, 'la misma placa no se duplica en la flota (prueba 10)');
 select public.dt_flota_agregar_piloto(:'flota', 'Luis Ramírez', '55550011', :'ua', 'B', '2028-01-01');
 select public.dt_flota_agregar_piloto(:'flota', 'Mario López', '55550012', :'ub', 'C', '2027-05-01');

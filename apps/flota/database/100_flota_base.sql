@@ -114,6 +114,15 @@ create table if not exists public.componentes_unidad (
 );
 create index if not exists componentes_unidad_idx on public.componentes_unidad (unidad_id, componente, realizado_en desc);
 
+-- Placa de Guatemala en su forma de siempre: letra(s), guion, 3 números y 3 letras («P-123ABC»). Sin ese patrón, en mayúsculas sin signos.
+create or replace function public.dt_flota_placa(p text)
+returns text language sql immutable as $$
+  select case when x ~ '^[A-Z]{1,2}[0-9]{3}[A-Z]{3}$' then regexp_replace(x, '^([A-Z]{1,2})([0-9]{3}[A-Z]{3})$', '\1-\2') else x end
+  from (select upper(regexp_replace(coalesce(p, ''), '[^A-Za-z0-9]', '', 'g')) as x) t
+$$;
+revoke execute on function public.dt_flota_placa(text) from public, anon;
+grant execute on function public.dt_flota_placa(text) to authenticated;
+
 -- ---------------------------------------------------------------------
 -- Quién puede qué sobre una unidad
 -- ---------------------------------------------------------------------
@@ -199,7 +208,7 @@ end $$;
 
 create or replace function public.dt_flota_agregar_unidad(p_flota uuid, p_placa text, p_marca text, p_linea text, p_anio integer, p_km integer, p_vin text default null)
 returns uuid language plpgsql security definer set search_path = public as $$
-declare v_neg uuid; v_id uuid; v_placa text := upper(regexp_replace(coalesce(p_placa, ''), '[^A-Za-z0-9]', '', 'g'));
+declare v_neg uuid; v_id uuid; v_placa text := public.dt_flota_placa(p_placa);
 begin
   select negocio_id into v_neg from public.flotas where id = p_flota;
   if v_neg is null then raise exception 'no_existe'; end if;
@@ -273,7 +282,7 @@ end $$;
 -- Unidades con su salud (taller o empresa cliente).
 create or replace function public.dt_flota_unidades(p_flota uuid)
 returns table (id uuid, placa text, marca text, linea text, anio integer, km_actual integer, km_reportado_en timestamptz, estado text,
-  piloto text, puntaje integer, ahora integer, cerca integer, proximo text, documento_vence date, documento_tipo text)
+  piloto text, puntaje integer, ahora integer, cerca integer, conocidas integer, proximo text, documento_vence date, documento_tipo text)
 language plpgsql stable security definer set search_path = public as $$
 #variable_conflict use_column
 declare v_neg uuid; v_cli uuid;
@@ -286,7 +295,7 @@ begin
   return query
     select u.id, u.placa, u.marca, u.linea, u.anio, u.km_actual, u.km_reportado_en, u.estado,
       (select p.nombre from public.pilotos p where p.unidad_id = u.id and p.activo limit 1),
-      s.puntaje, s.ahora, s.cerca, s.proximo_nombre,
+      s.puntaje, s.ahora, s.cerca, s.conocidas, s.proximo_nombre,
       (select d.vence from public.documentos_unidad d where d.unidad_id = u.id order by d.vence limit 1),
       (select d.tipo from public.documentos_unidad d where d.unidad_id = u.id order by d.vence limit 1)
     from public.unidades u cross join lateral public.dt_flota_salud(u.id) s

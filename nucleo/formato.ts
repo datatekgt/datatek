@@ -1,0 +1,30 @@
+// Formato en español de Guatemala. Toda fecha se muestra en America/Guatemala (D10).
+export const ZONA = 'America/Guatemala'
+
+export const dinero = (n: number | string | null | undefined) =>
+  'Q ' + Number(n ?? 0).toLocaleString('en-US', { minimumFractionDigits: Number(n ?? 0) % 1 ? 2 : 0, maximumFractionDigits: 2 })
+
+export const fechaCorta = (v?: string | Date | null) =>
+  v ? new Date(v).toLocaleDateString('es-GT', { timeZone: ZONA, day: 'numeric', month: 'short' }) : ''
+
+export const fechaLarga = (v?: string | Date | null) =>
+  v ? new Date(v).toLocaleDateString('es-GT', { timeZone: ZONA, weekday: 'long', day: 'numeric', month: 'long' }) : ''
+
+export const hora = (v?: string | Date | null) =>
+  v ? new Date(v).toLocaleTimeString('es-GT', { timeZone: ZONA, hour: 'numeric', minute: '2-digit' }) : ''
+
+export const km = (n?: number | null) => (n == null ? '' : `${Math.round(n).toLocaleString('en-US')} km`)
+
+// Día de hoy en Guatemala como 'YYYY-MM-DD'.
+export function hoyGT(): string {
+  const p = new Intl.DateTimeFormat('en-CA', { timeZone: ZONA, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
+  return p
+}
+
+export function haceCuanto(v?: string | null): string {
+  if (!v) return 'nunca'
+  const dias = Math.floor((Date.now() - new Date(v).getTime()) / 86400000)
+  if (dias <= 0) return 'hoy'
+  if (dias === 1) return 'ayer'
+  return `hace ${dias} días`
+}
