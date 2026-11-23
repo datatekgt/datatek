@@ -1,4 +1,7 @@
 // Entrar con el teléfono y un código (D4). Sin contraseñas.
+// Mientras no hay proveedor de WhatsApp en Supabase, VITE_ENTRAR_CON_CORREO=1 (apps/<x>/web/.env.production) muestra además
+// «correo y contraseña» para cuentas de prueba que Dominic crea en Supabase. Esa cuenta solo ve algo si se le liga un teléfono
+// confirmado (la persona sale de auth.users.phone): una cuenta de correo cualquiera no tiene acceso a nada.
 import { useState, type FormEvent } from 'react'
 import { supabase } from '../datos/supabase'
 
@@ -7,7 +10,10 @@ const soloDigitos = (s: string) => s.replace(/\D/g, '')
 export function Entrar({ marca, sub }: { marca: string; sub: string }) {
   const [tel, setTel] = useState('')
   const [codigo, setCodigo] = useState('')
-  const [paso, setPaso] = useState<'tel' | 'codigo'>('tel')
+  const [paso, setPaso] = useState<'tel' | 'codigo' | 'correo'>('tel')
+  const [correo, setCorreo] = useState('')
+  const [clave, setClave] = useState('')
+  const conCorreo = import.meta.env.VITE_ENTRAR_CON_CORREO === '1'
   const [error, setError] = useState('')
   const [ocupado, setOcupado] = useState(false)
   const telefono = '+502' + soloDigitos(tel).slice(-8)
@@ -31,6 +37,15 @@ export function Entrar({ marca, sub }: { marca: string; sub: string }) {
     if (err) setError('El código no es correcto o ya venció.')
   }
 
+  async function entrarConCorreo(e: FormEvent) {
+    e.preventDefault(); setError('')
+    if (!correo.includes('@') || !clave) { setError('Escribí tu correo y tu contraseña.'); return }
+    setOcupado(true)
+    const { error: err } = await supabase.auth.signInWithPassword({ email: correo.trim(), password: clave })
+    setOcupado(false)
+    if (err) setError('El correo o la contraseña no son correctos.')
+  }
+
   return (
     <main className="entrar">
       <div className="tarjeta entrar-caja">
@@ -50,6 +65,21 @@ export function Entrar({ marca, sub }: { marca: string; sub: string }) {
             </div>
             {error && <p className="error-texto" role="alert">{error}</p>}
             <button className="btn" disabled={ocupado}>{ocupado ? 'Enviando…' : 'Mandarme el código'}</button>
+            {conCorreo && <button type="button" className="btn-texto" onClick={() => { setPaso('correo'); setError('') }}>Entrar con correo y contraseña</button>}
+          </form>
+        ) : paso === 'correo' ? (
+          <form className="columna" onSubmit={entrarConCorreo}>
+            <div className="campo">
+              <label htmlFor="correo">Correo</label>
+              <input id="correo" className="entrada" type="email" autoComplete="username" value={correo} onChange={(e) => setCorreo(e.target.value)} />
+            </div>
+            <div className="campo">
+              <label htmlFor="clave">Contraseña</label>
+              <input id="clave" className="entrada" type="password" autoComplete="current-password" value={clave} onChange={(e) => setClave(e.target.value)} />
+            </div>
+            {error && <p className="error-texto" role="alert">{error}</p>}
+            <button className="btn" disabled={ocupado}>{ocupado ? 'Revisando…' : 'Entrar'}</button>
+            <button type="button" className="btn-texto" onClick={() => { setPaso('tel'); setError('') }}>Entrar con mi teléfono</button>
           </form>
         ) : (
           <form className="columna" onSubmit={verificar}>
