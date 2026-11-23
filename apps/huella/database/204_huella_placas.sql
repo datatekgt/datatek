@@ -186,4 +186,5 @@ grant execute on function public.dt_placa_ver(text), public.dt_placa_avisar(text
 --   (select count(*) from pg_tables where schemaname = 'public' and tablename in ('placas','placa_escaneos')) = 2 as tablas,
 --   (select bool_and(relrowsecurity) from pg_class where relnamespace = 'public'::regnamespace and relname in ('placas','placa_escaneos')) as rls,
 --   has_function_privilege('anon', 'public.dt_placa_ver(text)', 'execute') as placa_publica,
---   (select count(*) from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname like 'dt\_%' and has_function_privilege('anon', p.oid, 'execute')) = 2 as solo_dos_publicas;
+--   (select coalesce(array_agg(p.proname::text), '{}') from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname like 'dt\_%'
+--      and has_function_privilege('anon', p.oid, 'execute')) <@ array['dt_placa_ver', 'dt_placa_avisar', 'dt_qr_ver', 'dt_qr_reportar'] as solo_lista_blanca;

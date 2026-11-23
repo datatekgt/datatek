@@ -6,7 +6,14 @@
 // Secretos: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, WHATSAPP_TOKEN (token de la app de Meta), WHATSAPP_NUMERO_ID (id del número).
 // Se prueba sin red: node scripts/probar-funciones.mjs
 
-export type Entorno = { SUPABASE_URL?: string; SUPABASE_SERVICE_ROLE_KEY?: string; WHATSAPP_TOKEN?: string; WHATSAPP_NUMERO_ID?: string; DATATEK_APP_URL?: string };
+export type Entorno = { SUPABASE_URL?: string; SUPABASE_SERVICE_ROLE_KEY?: string; WHATSAPP_TOKEN?: string; WHATSAPP_NUMERO_ID?: string; DATATEK_APP_URL?: string; DATATEK_APP_URLS?: string };
+
+// Los cinco productos comparten una base: cada mensaje abre la app de SU producto. DATATEK_APP_URLS es un JSON como
+// {"flota":"https://flota.datatek.gt","huella":"https://huella.datatek.gt"}; DATATEK_APP_URL queda como respaldo.
+export function baseDe(entorno: Entorno, producto: string | undefined): string {
+  try { const m = JSON.parse(entorno.DATATEK_APP_URLS || "{}"); if (producto && m[producto]) return m[producto]; } catch (_) { /* JSON mal escrito: respaldo */ }
+  return entorno.DATATEK_APP_URL || "";
+}
 
 // El enlace de cada aviso lleva a la pantalla de lo avisado (siempre con sesión: el mensaje no trae datos sensibles).
 export function enlaceDe(base: string, objeto: string | null, id: string | null): string {
@@ -72,8 +79,16 @@ export async function manejar(req: Request, entorno: Entorno, f: typeof fetch = 
   if (!entorno.WHATSAPP_TOKEN || !entorno.WHATSAPP_NUMERO_ID) return json(503, { error: "WhatsApp no activado." });
   const pendientes: any[] = (await rpc(entorno, f, "dt_recordatorios_por_enviar", { p_limite: 50 })) || [];
   let enviados = 0, fallos = 0;
+  const productos: Record<string, string> = {};
+  const negocios = [...new Set(pendientes.map((p) => p.negocio_id).filter(Boolean))];
+  if (negocios.length) {
+    const r = await f(`${entorno.SUPABASE_URL}/rest/v1/negocios?select=id,producto&id=in.(${negocios.join(",")})`, {
+      headers: { apikey: entorno.SUPABASE_SERVICE_ROLE_KEY || "", authorization: `Bearer ${entorno.SUPABASE_SERVICE_ROLE_KEY}` },
+    }).catch(() => null);
+    for (const n of ((await r?.json().catch(() => [])) || []) as { id: string; producto: string }[]) productos[n.id] = n.producto;
+  }
   for (const p of pendientes) {
-    const msg = armarMensaje(p, entorno.DATATEK_APP_URL || "");
+    const msg = armarMensaje(p, baseDe(entorno, productos[p.negocio_id]));
     if (!msg) { await rpc(entorno, f, "dt_recordatorio_marcar", { p_id: p.id, p_estado: "fallo", p_motivo: "plantilla_sin_mapa" }); fallos++; continue; }
     let ok = false, motivo = "";
     try {
@@ -90,5 +105,5 @@ export async function manejar(req: Request, entorno: Entorno, f: typeof fetch = 
 const deno = (globalThis as any).Deno;
 if (deno?.serve) deno.serve((req: Request) => manejar(req, {
   SUPABASE_URL: deno.env.get("SUPABASE_URL"), SUPABASE_SERVICE_ROLE_KEY: deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),
-  WHATSAPP_TOKEN: deno.env.get("WHATSAPP_TOKEN"), WHATSAPP_NUMERO_ID: deno.env.get("WHATSAPP_NUMERO_ID"), DATATEK_APP_URL: deno.env.get("DATATEK_APP_URL"),
+  WHATSAPP_TOKEN: deno.env.get("WHATSAPP_TOKEN"), WHATSAPP_NUMERO_ID: deno.env.get("WHATSAPP_NUMERO_ID"), DATATEK_APP_URL: deno.env.get("DATATEK_APP_URL"), DATATEK_APP_URLS: deno.env.get("DATATEK_APP_URLS"),
 }));

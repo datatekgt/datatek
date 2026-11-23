@@ -42,6 +42,11 @@ let recurrenteResponde = (n) => ({ status: 200, cuerpo: { id: 'ch_' + n, checkou
 async function falsoFetch(url, init = {}) {
   const u = new URL(url)
   const h = new Headers(init.headers || {})
+  // Lectura de tabla con la llave de servicio (whatsapp-enviar pide el producto de cada negocio)
+  if (u.origin === SUPA && u.pathname === '/rest/v1/negocios' && (h.get('authorization') || '').endsWith(SERVICIO)) {
+    const ids = (u.searchParams.get('id') || '').replace(/^in\.\(|\)$/g, '').split(',').filter(Boolean)
+    return new Response(JSON.stringify(await q('select id, producto from public.negocios where id = any($1::uuid[])', [ids])), { status: 200 })
+  }
   if (u.origin === SUPA && u.pathname.startsWith('/rest/v1/rpc/')) {
     const fn = u.pathname.split('/').pop()
     const args = JSON.parse(init.body || '{}')
@@ -120,7 +125,7 @@ const [cb] = await q('select c.estado, p.factura_url from public.cobros c join p
 ok(cb.estado === 'cobrado' && cb.factura_url === 'https://fel.ejemplo/77', 'el cobro queda cobrado con su factura de Recurrente')
 
 console.log('whatsapp-enviar')
-const envWa = { SUPABASE_URL: SUPA, SUPABASE_SERVICE_ROLE_KEY: SERVICIO, WHATSAPP_TOKEN: 'tok', WHATSAPP_NUMERO_ID: '123', DATATEK_APP_URL: 'https://flota.datatek.gt' }
+const envWa = { SUPABASE_URL: SUPA, SUPABASE_SERVICE_ROLE_KEY: SERVICIO, WHATSAPP_TOKEN: 'tok', WHATSAPP_NUMERO_ID: '123', DATATEK_APP_URL: 'https://respaldo.datatek.gt', DATATEK_APP_URLS: '{"flota":"https://flota.datatek.gt","huella":"https://huella.datatek.gt"}' }
 r = await wa.manejar(new Request('http://f/wa', { method: 'POST' }), envWa, falsoFetch)
 ok(r.status === 401, 'solo el cron (llave de servicio) dispara el envío')
 r = await wa.manejar(new Request('http://f/wa', { method: 'POST', headers: { authorization: 'Bearer ' + SERVICIO } }), envWa, falsoFetch)
@@ -130,7 +135,8 @@ ok(res.enviados === 1, 'manda el recordatorio pendiente')
 ok(msg?.cuerpo.type === 'template' && msg.cuerpo.template.name === 'flota_cotizacion', 'siempre como plantilla aprobada, nunca texto libre')
 const pars = msg?.cuerpo.template.components[0].parameters.map((p) => p.text)
 ok(JSON.stringify(pars?.slice(0, 4)) === JSON.stringify(['Taller D-TEK Flotas', 'C-789GHI', '2', 'Q 5,550']), 'las variables van en el orden de la plantilla, con el nombre del negocio')
-ok(pars?.[4].startsWith('https://flota.datatek.gt/mi/orden/'), 'el enlace lleva a la orden (con sesión)')
+ok(pars?.[4].startsWith('https://flota.datatek.gt/mi/orden/'), 'el enlace lleva a la orden, en la app de SU producto (base compartida)')
+ok(wa.baseDe({ DATATEK_APP_URL: 'https://r', DATATEK_APP_URLS: 'no es json' }, 'huella') === 'https://r', 'con la lista mal escrita usa la dirección de respaldo')
 ok(msg?.cuerpo.to === '50255550099', 'al teléfono del cliente')
 ok((await q(`select estado from public.recordatorios`))[0].estado === 'enviado', 'queda marcado enviado')
 ok(wa.enlaceDe('https://flota.app/', 'vehiculo', 'u1') === 'https://flota.app/mi/unidad/u1', 'el aviso de documento abre el Garage de la unidad')

@@ -71,10 +71,9 @@ reset role;
 select prueba.como(:'dueno');
 select public.dt_recordatorio_encolar(:'neg', 'flota_cotizacion', '55550099', '{}', 'orden', :'orden');
 select prueba.afirmar((select count(*) from public.recordatorios where objeto_id = :'orden' and estado = 'pendiente') = 1, '8 · el mismo aviso no se repite y no gasta el tope');
--- 9. Funciones abiertas a anon (lista blanca vacía en Flota)
-select prueba.afirmar(not exists (
-  select 1 from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname like 'dt\_%' and has_function_privilege('anon', p.oid, 'execute')),
-  '9 · ninguna función dt_ abierta a anon');
+-- 9. Funciones abiertas a anon: Flota no abre ninguna; en la base compartida solo pueden estar las de la lista blanca común.
+select prueba.afirmar(prueba.abiertas_a_anon() <@ prueba.lista_blanca_anon() and not exists (select 1 from unnest(prueba.abiertas_a_anon()) f where f like 'dt\_flota%'),
+  '9 · ninguna función dt_ abierta a anon fuera de la lista blanca (y ninguna de Flota)');
 select prueba.afirmar(not exists (
   select 1 from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname in ('dt_bitacora_anotar', 'dt_cobro_crear', 'dt_cobro_registrar_pago', 'dt_recordatorio_encolar', 'dt_evento_crear', 'dt_flota_total_aprobado')
     and has_function_privilege('authenticated', p.oid, 'execute')),

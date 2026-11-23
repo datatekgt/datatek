@@ -66,8 +66,8 @@ select public.dt_huella_avisar(array[:'canela']::uuid[]);
 select prueba.afirmar((public.dt_huella_avisar(array[:'canela']::uuid[]) ->> 'enviados')::int = 0, '8 · el mismo aviso no se repite y no gasta el tope');
 reset role;
 -- 9. Funciones abiertas a anon: solo la lista blanca de la placa
-select prueba.afirmar((select array_agg(p.proname::text order by p.proname) from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname like 'dt\_%'
-  and has_function_privilege('anon', p.oid, 'execute')) = array['dt_placa_avisar', 'dt_placa_ver'], '9 · solo dt_placa_ver y dt_placa_avisar están abiertas a anon');
+select prueba.afirmar(prueba.abiertas_a_anon() <@ prueba.lista_blanca_anon() and array['dt_placa_avisar', 'dt_placa_ver'] <@ prueba.abiertas_a_anon()
+  and not exists (select 1 from unnest(prueba.abiertas_a_anon()) f where f like 'dt\_huella%'), '9 · de Huella solo dt_placa_ver y dt_placa_avisar están abiertas a anon (y nada fuera de la lista blanca)');
 -- 10. XSS: lo que escribe la gente se guarda como texto y vuelve igual (la pantalla de React lo escapa; nunca se arma HTML en la base)
 select prueba.como(:'dueno'); set role authenticated;
 select public.dt_huella_editar_mascota(:'canela', '{"alergias": "<img src=x onerror=alert(1)>"}');

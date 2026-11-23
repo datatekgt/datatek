@@ -1,4 +1,11 @@
-# Despliegue de Flota
+# Despliegue
+
+**Hoy los cinco productos comparten un Supabase** (`xlhaktvymmbnpotkmdct`, decisión del 23 nov 2026). Lo ya corrido está en
+`database/corridas-en-supabase.txt`; `npm run supabase:pendientes` arma un solo archivo con lo que falta (probado encima de lo
+ya corrido, dos veces) y su verificación al final. Cuando haya más proyectos (cuentas datatek01–03, hasta 6), cada producto se
+lleva a su propio proyecto corriendo «núcleo + su producto»: las pruebas corren también así, cada producto solo.
+
+## Flota
 
 Lo hace Dominic una vez por producto; el código ya está listo. Nada de esto corre solo.
 
@@ -11,8 +18,9 @@ Lo hace Dominic una vez por producto; el código ya está listo. Nada de esto co
    es el que se pega en el chat.
 3. Authentication → Phone: activar el proveedor de SMS/WhatsApp (D4).
 4. Edge Functions: desplegar `recurrente-cobro`, `recurrente-aviso` y `whatsapp-enviar` (carpeta `supabase/functions`).
-   Secretos: `DATATEK_APP_URL` (la dirección pública de Flota, para los enlaces de WhatsApp), `DATATEK_ORIGENES` (esa misma
-   dirección: quién puede pedir enlaces de pago), `WHATSAPP_TOKEN` y `WHATSAPP_NUMERO_ID`. Las llaves de Recurrente no van
+   Secretos: `DATATEK_APP_URL` (la dirección pública de Flota, para los enlaces de WhatsApp), `DATATEK_ORIGENES` (las direcciones
+   de las apps, separadas por coma: quién puede pedir enlaces de pago), `DATATEK_APP_URLS` (JSON con la dirección de cada
+   producto, p. ej. `{"flota":"https://…","huella":"https://…"}`: cada WhatsApp abre la app de su producto), `WHATSAPP_TOKEN` y `WHATSAPP_NUMERO_ID`. Las llaves de Recurrente no van
    aquí: cada taller conecta la suya desde Más.
 5. Programar a diario `dt_suscripciones_revisar()` (pg_cron o un programador que llame la función con service_role) y cada
    minuto `whatsapp-enviar`.

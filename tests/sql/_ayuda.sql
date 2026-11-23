@@ -52,4 +52,14 @@ begin
   raise exception 'FALLA: % (no dio error y debía)', p_mensaje;
 end $$;
 
+-- La lista blanca pública de TODOS los productos (ataque 9). Los cinco viven en la misma base: cada producto comprueba que
+-- lo abierto a anon esté dentro de esta lista. Agregar aquí es una decisión de seguridad: solo páginas públicas del plan.
+create or replace function prueba.lista_blanca_anon() returns text[] language sql immutable as $$
+  select array['dt_placa_ver', 'dt_placa_avisar', 'dt_qr_ver', 'dt_qr_reportar']
+$$;
+create or replace function prueba.abiertas_a_anon() returns text[] language sql stable as $$
+  select coalesce(array_agg(p.proname::text order by p.proname), '{}') from pg_proc p
+  where p.pronamespace = 'public'::regnamespace and p.proname like 'dt\_%' and has_function_privilege('anon', p.oid, 'execute')
+$$;
+
 grant execute on all functions in schema prueba to anon, authenticated, service_role;

@@ -11,10 +11,14 @@ export function migraciones(raiz, app) {
   const lista = []
   const dn = path.join(raiz, 'database/nucleo')
   for (const f of fs.readdirSync(dn).filter((x) => x.endsWith('.sql')).sort(ordenar)) lista.push(path.join(dn, f))
-  if (app) {
-    const da = path.join(raiz, 'apps', app, 'database')
-    for (const f of fs.readdirSync(da).filter((x) => x.endsWith('.sql')).sort(ordenar)) lista.push(path.join(da, f))
+  // app '*' = todos los productos en la misma base (como el Supabase compartido), en orden de numeración (100, 200, 300…).
+  const apps = app === '*' ? fs.readdirSync(path.join(raiz, 'apps')).filter((x) => fs.existsSync(path.join(raiz, 'apps', x, 'database'))) : app ? [app] : []
+  const deApps = []
+  for (const a of apps) {
+    const da = path.join(raiz, 'apps', a, 'database')
+    for (const f of fs.readdirSync(da).filter((x) => x.endsWith('.sql'))) deApps.push(path.join(da, f))
   }
+  lista.push(...deApps.sort((x, y) => ordenar(path.basename(x), path.basename(y))))
   return lista
 }
 

@@ -1,0 +1,16 @@
+# Migraciones ya corridas en el Supabase compartido (proyecto xlhaktvymmbnpotkmdct). Una por línea, en el orden en que se
+# corrieron. Estas ya NO se editan: los cambios van en archivos nuevos. scripts/juntar-migraciones.mjs arma solo las que faltan.
+# 23 nov 2026 · verificación pegada por Dominic, todo true
+01_acceso.sql
+02_bitacora.sql
+03_cobros.sql
+04_recordatorios_eventos.sql
+05_importaciones.sql
+06_suscripcion.sql
+100_flota_base.sql
+101_flota_ordenes.sql
+102_flota_piloto.sql
+103_flota_importar.sql
+104_flota_panel.sql
+105_flota_cortes.sql
+106_flota_solo_lectura.sql
