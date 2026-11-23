@@ -5,9 +5,9 @@ import { useSearchParams } from 'react-router-dom'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { BotonesSel, Chip, Fecha } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { fechaCorta, hora, hoyGT } from '@nucleo/formato'
+import { hora, hoyGT } from '@nucleo/formato'
 import { Colonia, PASO_TEXTO, PASO_TONO, type Paso, type ReporteFila } from '../datos'
-import { Error, Estrellas, PasosReporte, VerArchivo, instanteGT, useCondominio } from '../comun'
+import { Error, Estrellas, PasosReporte, VerArchivo, instanteGT, useCondominio, fechaCorta } from '../comun'
 
 const COLUMNAS: { paso: Paso; t: string }[] = [{ paso: 'recibido', t: 'Recibido' }, { paso: 'asignado', t: 'Asignado' }, { paso: 'visita', t: 'En visita' }, { paso: 'resuelto', t: 'Resuelto · 60 días' }]
 const FRANJAS = [['07:00', '09:00'], ['09:00', '11:00'], ['11:00', '13:00'], ['14:00', '16:00']]

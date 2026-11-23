@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Chip } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { fechaCorta, hora } from '@nucleo/formato'
+import { hora } from '@nucleo/formato'
 import { Colonia, PASO_TEXTO, PASO_TONO, QUIEN_PAGA } from '../datos'
-import { Error, Estrellas, PasosReporte, VerArchivo } from '../comun'
+import { Error, Estrellas, PasosReporte, VerArchivo, fechaCorta } from '../comun'
 
 export function ReporteVecino() {
   const { id } = useParams()

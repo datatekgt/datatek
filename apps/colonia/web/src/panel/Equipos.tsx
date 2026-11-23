@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { BotonesSel, Chip, Fecha } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { dinero, fechaCorta, hora, hoyGT } from '@nucleo/formato'
+import { dinero, hora, hoyGT } from '@nucleo/formato'
 import { Colonia, ESTADO_EQUIPO, type Equipo } from '../datos'
-import { Error, instanteGT, sumarDias, useCondominio } from '../comun'
+import { Error, instanteGT, sumarDias, useCondominio, fechaCorta } from '../comun'
 import { Importar } from './Importar'
 
 export function Equipos() {

@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { Chip } from '@nucleo/controles'
 import { useCarga } from '@nucleo/datos/useCarga'
-import { dinero, fechaCorta, hora } from '@nucleo/formato'
+import { dinero, hora } from '@nucleo/formato'
 import { Colonia, PASO_TEXTO, RUBRO, type MiCasa } from '../datos'
-import { Error, PasosReporte, useMisCasas } from '../comun'
+import { Error, PasosReporte, useMisCasas, fechaCorta } from '../comun'
 
 export function MiCasaPagina() {
   const { casa } = useMisCasas()
@@ -48,7 +48,7 @@ function MiReporte() {
       <div className="fila-entre"><h2>Mi reporte</h2><Link to={`/mi/reporte/${abierto.id}`}>Ver</Link></div>
       <b>{abierto.titulo}</b>
       {d && <PasosReporte r={d} />}
-      {d?.visita_desde && <span className="chico">{d.proveedor || 'El proveedor'} viene el {fechaCorta(d.visita_desde)} a las {hora(d.visita_desde)}.</span>}
+      {d?.visita_desde && <span className="chico">{d.proveedor || 'El proveedor'} viene el {fechaCorta(d.visita_desde)} a las {hora(d.visita_desde)}</span>}
       {!d && <span className="suave chico">{PASO_TEXTO[abierto.paso]}</span>}
     </section>
   )

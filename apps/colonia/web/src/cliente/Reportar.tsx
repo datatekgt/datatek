@@ -5,9 +5,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { BotonesSel, Chip } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { fechaCorta } from '@nucleo/formato'
 import { Colonia, PASO_TEXTO, PASO_TONO } from '../datos'
-import { Error, Estrellas, useMisCasas } from '../comun'
+import { Error, Estrellas, useMisCasas, fechaCorta } from '../comun'
 
 const QUE = ['No abre', 'No cierra', 'No funciona', 'Hace ruido', 'Fuga de agua', 'Luz fundida', 'Otro']
 

@@ -1,9 +1,9 @@
 // En qué se va mi cuota (maqueta Colonia-C2): el mes publicado contra el presupuesto, presupuesto contra gasto de 6 meses, por
 // rubro con lo que toca de MI cuota, y los trabajos con su factura. Solo lo publicado; de la morosidad, solo el total.
 import { useCarga } from '@nucleo/datos/useCarga'
-import { dinero, fechaCorta } from '@nucleo/formato'
+import { dinero } from '@nucleo/formato'
 import { Colonia, RUBRO } from '../datos'
-import { Error, VerArchivo, mesCorto, useMisCasas } from '../comun'
+import { Error, VerArchivo, mesCorto, useMisCasas, fechaCorta } from '../comun'
 
 export function EnQueSeVaPagina() {
   const { casa } = useMisCasas()

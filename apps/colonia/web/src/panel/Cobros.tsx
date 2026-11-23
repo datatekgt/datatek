@@ -4,10 +4,10 @@ import { useState } from 'react'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { Chip, Filtros } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { dinero, fechaCorta, hoyGT } from '@nucleo/formato'
+import { dinero, hoyGT } from '@nucleo/formato'
 import { Cobros } from '@nucleo/panel/Cobros'
 import { Colonia } from '../datos'
-import { Error, mesActual, mesTexto, sumarDias, sumarMeses, useCondominio } from '../comun'
+import { Error, mesActual, mesTexto, sumarDias, sumarMeses, useCondominio, fechaCorta } from '../comun'
 
 const ESTADO: Record<string, { t: string; tono: 'bien' | 'aviso' | 'mal' | 'neutro' }> = {
   sin_generar: { t: 'Sin generar', tono: 'neutro' }, por_cobrar: { t: 'Por cobrar', tono: 'aviso' }, vencido: { t: 'Vencido', tono: 'mal' },

@@ -5,10 +5,10 @@ import { Link } from 'react-router-dom'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { BotonesSel, Chip } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { dinero, fechaCorta } from '@nucleo/formato'
+import { dinero } from '@nucleo/formato'
 import { Nucleo } from '@nucleo/datos/nucleo'
 import { Colonia } from '../datos'
-import { Error, mesCorto, useMisCasas } from '../comun'
+import { Error, mesCorto, useMisCasas, fechaCorta } from '../comun'
 
 export function MiCuota() {
   const { negocio, salir } = useSesion()

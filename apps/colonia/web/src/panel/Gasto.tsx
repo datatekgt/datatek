@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { BotonesSel, Chip, Fecha } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { dinero, fechaCorta, hoyGT } from '@nucleo/formato'
+import { dinero, hoyGT } from '@nucleo/formato'
 import { Colonia, RUBRO, RUBROS, type Gasto, type Rubro } from '../datos'
-import { Error, VerArchivo, mesActual, mesTexto, sumarMeses, useCondominio } from '../comun'
+import { Error, VerArchivo, mesActual, mesTexto, sumarMeses, useCondominio, fechaCorta } from '../comun'
 
 const ESTADO_PUB: Record<string, { t: string; tono: 'bien' | 'aviso' | 'mal' | 'neutro' }> = {
   borrador: { t: 'Cargando facturas', tono: 'neutro' }, en_revision: { t: 'Con la junta', tono: 'aviso' }, aprobada: { t: 'Aprobado por la junta', tono: 'bien' },

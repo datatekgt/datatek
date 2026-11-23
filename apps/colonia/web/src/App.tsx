@@ -4,7 +4,7 @@ import { Entrar } from '@nucleo/acceso/Entrar'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { lazy, Suspense } from 'react'
 import { FranjaSuscripcion } from '@nucleo/panel/FranjaSuscripcion'
-import { ProveedorCondominio, useCondominio, useMisCasas } from './comun'
+import { ProveedorCondominio, ProveedorVecino, useCondominio, useMisCasas } from './comun'
 
 // El panel y la herramienta del vecino se cargan por separado: el vecino no descarga el código de la administración.
 const Inicio = lazy(() => import('./panel/Inicio').then((m) => ({ default: m.Inicio })))
@@ -120,7 +120,7 @@ export function App() {
         <Route path="mas" element={<Mas />} />
         <Route index element={<Navigate to={inicioPanel} replace />} />
       </Route>
-      <Route path="/mi" element={negocio?.como === 'cliente' ? <MarcoVecino /> : <Navigate to="/panel" replace />}>
+      <Route path="/mi" element={negocio?.como === 'cliente' ? <ProveedorVecino><MarcoVecino /></ProveedorVecino> : <Navigate to="/panel" replace />}>
         <Route index element={<MiCasaPagina />} />
         <Route path="cuenta" element={<MiCuota />} />
         <Route path="gasto" element={<EnQueSeVa />} />

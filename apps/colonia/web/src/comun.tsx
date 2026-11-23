@@ -2,11 +2,14 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { useCarga } from '@nucleo/datos/useCarga'
-import { hoyGT } from '@nucleo/formato'
+import { fechaCorta as fechaCortaNucleo, hoyGT } from '@nucleo/formato'
 import { Pasos, type PasoVivo } from '@nucleo/controles'
 import { Colonia, PASOS, PASO_TEXTO, type Condominio, type MiCasa, type Reporte } from './datos'
 
 export { Error } from '@nucleo/controles'
+
+// Una fecha sin hora ('YYYY-MM-DD', como vence o la fecha de una factura) es un día de Guatemala: no se corre al día anterior.
+export const fechaCorta = (v?: string | null) => fechaCortaNucleo(v && v.length === 10 ? `${v}T12:00:00-06:00` : v)
 
 // Primer día del mes de Guatemala: 'YYYY-MM-01'.
 export const mesDe = (dia: string) => dia.slice(0, 7) + '-01'
@@ -38,11 +41,18 @@ export function useCondominio() {
   return c
 }
 
-// Las casas del vecino (casi siempre una). La primera es la que se muestra.
-export function useMisCasas() {
+// Las casas del vecino (casi siempre una), cargadas una vez para toda su herramienta. La primera es la que se muestra.
+type CtxVecino = { datos: MiCasa[] | null; casa: MiCasa | null; cargando: boolean; error: string; recargar: () => void }
+const VecinoCtx = createContext<CtxVecino | null>(null)
+export function ProveedorVecino({ children }: { children: ReactNode }) {
   const { negocio } = useSesion()
   const r = useCarga(() => Colonia.misCasas(negocio!.negocio_id), [negocio!.negocio_id])
-  return { ...r, casa: (r.datos?.[0] ?? null) as MiCasa | null }
+  return <VecinoCtx.Provider value={{ datos: r.datos, casa: r.datos?.[0] ?? null, cargando: r.cargando, error: r.error, recargar: r.recargar }}>{children}</VecinoCtx.Provider>
+}
+export function useMisCasas() {
+  const c = useContext(VecinoCtx)
+  if (!c) throw new globalThis.Error('useMisCasas fuera de ProveedorVecino')
+  return c
 }
 
 // Los pasos en vivo de un reporte (forma de OrdenEnVivo), con la hora sacada de su historia.

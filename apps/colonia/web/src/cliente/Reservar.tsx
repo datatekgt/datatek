@@ -5,10 +5,10 @@ import { Link, useParams } from 'react-router-dom'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { Fecha } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { dinero, fechaCorta, hoyGT } from '@nucleo/formato'
+import { dinero, hoyGT } from '@nucleo/formato'
 import { Nucleo } from '@nucleo/datos/nucleo'
 import { Colonia } from '../datos'
-import { Error, sumarDias, useMisCasas } from '../comun'
+import { Error, sumarDias, useMisCasas, fechaCorta } from '../comun'
 
 export function Reservar() {
   const { area: areaId } = useParams()

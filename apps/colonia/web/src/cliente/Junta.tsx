@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { Chip } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { dinero, fechaCorta } from '@nucleo/formato'
+import { dinero } from '@nucleo/formato'
 import { Colonia, RUBRO, type PendienteJunta } from '../datos'
-import { Error, VerArchivo, useMisCasas } from '../comun'
+import { Error, VerArchivo, useMisCasas, fechaCorta } from '../comun'
 
 export function Junta() {
   const { negocio } = useSesion()
@@ -37,7 +37,7 @@ function Revision({ p, alCambiar }: { p: PendienteJunta; alCambiar: () => void }
       ))}</div>
       {p.estado === 'en_revision' && (
         <>
-          <input className="entrada" aria-label="Comentario para la administración" placeholder="Comentario (para pedir cambios es obligatorio)" value={comentario} onChange={(e) => setComentario(e.target.value)} />
+          <input className="entrada" aria-label="Comentario para la administración" placeholder="Comentario (obligatorio para pedir cambios)" value={comentario} onChange={(e) => setComentario(e.target.value)} />
           <div className="fila envolver"><button className="btn" disabled={acc.ocupado} onClick={() => decidir(true)}>Aprobar para publicar</button><button className="btn btn-sec" disabled={acc.ocupado || comentario.trim().length < 5} onClick={() => decidir(false)}>Pedir cambios</button></div>
         </>
       )}
