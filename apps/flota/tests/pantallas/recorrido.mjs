@@ -152,6 +152,27 @@ console.log('Gerente de la empresa (390 px)')
   await ctx.close()
 }
 
+// ---------------- Piloto ----------------
+console.log('Piloto (375 px)')
+{
+  const { ctx, pagina, errores } = await contexto(375, 760)
+  await entrar(pagina, '55550011')
+  await pagina.waitForURL('**/piloto')
+  await pagina.getByRole('heading', { name: /P-123ABC/ }).waitFor()
+  ok(true, 'el piloto entra directo a su unidad')
+  await pagina.getByRole('button', { name: 'Más Kilometraje' }).click()
+  await pagina.getByRole('button', { name: 'Guardar kilometraje' }).click()
+  await pagina.getByText('Kilometraje guardado').waitFor()
+  ok(await pagina.getByText('148,210 km').first().isVisible(), 'el + suma 10 km y se guarda')
+  await pagina.getByRole('button', { name: 'Ruido al frenar' }).click()
+  await pagina.getByRole('button', { name: 'Avisar al taller' }).click()
+  await pagina.getByText('Le avisamos al taller').waitFor()
+  ok(true, 'avisa una falla con un toque')
+  await foto(pagina, '12-piloto')
+  ok(errores.length === 0, `sin errores en la consola${errores.length ? ': ' + errores.slice(0, 3).join(' | ') : ''}`)
+  await ctx.close()
+}
+
 await navegador.close()
 const fallos = registro.filter((r) => r.tipo === 'error')
 ok(fallos.length === 0, `la base no rechazó ninguna llamada${fallos.length ? ': ' + fallos.map((f) => f.ruta + ' ' + f.mensaje).slice(0, 3).join(' | ') : ''}`)

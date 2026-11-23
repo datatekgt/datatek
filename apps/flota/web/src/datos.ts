@@ -44,6 +44,8 @@ export const Flota = {
   salud: async (unidad: string) => (await rpc<Salud[]>('dt_flota_salud', { p_unidad: unidad }))[0],
   piezas: (unidad: string) => rpc<Pieza[]>('dt_flota_piezas', { p_unidad: unidad }),
   reportarKm: (unidad: string, km: number) => rpc<string>('dt_flota_reportar_km', { p_unidad: unidad, p_km: km }),
+  miUnidad: async (negocio: string) => (await rpc<{ unidad_id: string; placa: string; marca: string; linea: string; anio: number | null; km_actual: number; km_reportado_en: string | null; flota: string }[]>('dt_flota_mi_unidad', { p_negocio: negocio }))[0] ?? null,
+  reportarFalla: (unidad: string, texto: string) => rpc<string>('dt_flota_reportar_falla', { p_unidad: unidad, p_texto: texto }),
   ordenes: (negocio: string, abiertas = true) => rpc<OrdenFila[]>('dt_flota_ordenes', { p_negocio: negocio, p_abiertas: abiertas }),
   orden: (id: string) => rpc<Orden>('dt_flota_orden', { p_orden: id }),
   crearOrden: (unidad: string, motivo: string, prioridad: string, entrega: string | null) =>

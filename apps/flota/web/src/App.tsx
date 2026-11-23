@@ -16,6 +16,7 @@ const UnidadCliente = lazy(() => import('./cliente/Unidad').then((m) => ({ defau
 const OrdenCliente = lazy(() => import('./cliente/Orden').then((m) => ({ default: m.OrdenCliente })))
 const OrdenesCliente = lazy(() => import('./cliente/Ordenes').then((m) => ({ default: m.OrdenesCliente })))
 const Cuenta = lazy(() => import('./cliente/Cuenta').then((m) => ({ default: m.Cuenta })))
+const Piloto = lazy(() => import('./cliente/Piloto').then((m) => ({ default: m.Piloto })))
 const Cargando = () => <p className="cargando">Cargando…</p>
 
 const ICONOS = {
@@ -81,7 +82,7 @@ export function App() {
   if (!negocios.length) return (
     <main className="entrar"><div className="tarjeta entrar-caja"><h1 style={{ fontSize: 18 }}>Todavía no tenés acceso</h1><p className="suave">Pedile al taller que te invite con este número de teléfono.</p></div></main>
   )
-  const inicio = negocio?.como === 'miembro' ? '/panel/ordenes' : '/mi'
+  const inicio = negocio?.como === 'miembro' ? '/panel/ordenes' : negocio?.como === 'piloto' ? '/piloto' : '/mi'
   if (lugar.pathname === '/') return <Navigate to={inicio} replace />
   return (
     <Routes>
@@ -101,6 +102,7 @@ export function App() {
         <Route path="orden/:id" element={<OrdenCliente />} />
         <Route path="cuenta" element={<Cuenta />} />
       </Route>
+      <Route path="/piloto" element={negocio?.como === 'piloto' ? <div className="app-cliente" style={{ paddingBottom: 16 }}><header className="arriba"><div><strong>{negocio.nombre}</strong><span className="suave chico">Tu unidad · D-TEK Flotas</span></div></header><main><Suspense fallback={<Cargando />}><Piloto /></Suspense></main></div> : <Navigate to={inicio} replace />} />
       <Route path="*" element={<Navigate to={inicio} replace />} />
     </Routes>
   )

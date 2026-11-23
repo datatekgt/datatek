@@ -4,7 +4,7 @@ import type { Session } from '@supabase/supabase-js'
 import { rpc, supabase } from '../datos/supabase'
 import type { Capacidad, Producto } from './capacidades'
 
-export type NegocioMio = { negocio_id: string; nombre: string; producto: Producto; como: 'miembro' | 'cliente'; rol: string; capacidades: Capacidad[] }
+export type NegocioMio = { negocio_id: string; nombre: string; producto: Producto; como: 'miembro' | 'cliente' | 'piloto'; rol: string; capacidades: Capacidad[] }
 
 type Ctx = {
   cargando: boolean
