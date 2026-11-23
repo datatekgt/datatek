@@ -74,3 +74,9 @@ begin
 end $$;
 revoke execute on function public.dt_flota_reportar_falla(uuid, text) from public, anon;
 grant execute on function public.dt_flota_reportar_falla(uuid, text) to authenticated;
+
+-- Verificación (correr después de aplicar en Supabase; todo debe dar true)
+-- select
+--   exists (select 1 from pg_trigger where tgname like '%ligar_piloto%') as liga_piloto,
+--   to_regprocedure('public.dt_flota_reportar_falla(uuid,text)') is not null as falla,
+--   not has_function_privilege('anon', 'public.dt_flota_mi_unidad(uuid)', 'execute') as anon_cerrado;

@@ -325,3 +325,11 @@ revoke execute on function public.dt_cobro_pagado(uuid), public.dt_cobro_crear(u
 grant execute on function public.dt_cobro_anotar_pago(uuid, numeric, text, text, text), public.dt_cobro_anular(uuid, text),
   public.dt_cobros(uuid, text), public.dt_mis_cobros(uuid), public.dt_recurrente_pedir_enlace(uuid), public.dt_recurrente_conectar(uuid, text, text) to authenticated;
 grant execute on function public.dt_recurrente_guardar_enlace(uuid, text, text), public.dt_recurrente_aviso(text, uuid, jsonb), public.dt_recurrente_llaves_de(uuid) to service_role;
+
+-- Verificación (correr después de aplicar en Supabase; todo debe dar true)
+-- select
+--   (select count(*) from pg_tables where schemaname = 'public' and tablename in ('cobros','cobro_pagos','pagos_cuenta','recurrente_enlaces','recurrente_avisos','recurrente_llaves')) = 6 as tablas,
+--   (select bool_and(relrowsecurity) from pg_class where relnamespace = 'public'::regnamespace and relname in ('cobros','cobro_pagos','pagos_cuenta','recurrente_enlaces','recurrente_avisos','recurrente_llaves')) as rls,
+--   not has_function_privilege('authenticated', 'public.dt_cobro_crear(uuid,uuid,text,uuid,text,numeric,date)', 'execute') as crear_interna,
+--   not has_function_privilege('authenticated', 'public.dt_recurrente_llaves_de(uuid)', 'execute') as llaves_solo_servicio,
+--   not has_table_privilege('authenticated', 'public.recurrente_llaves', 'select') or not exists (select 1 from pg_policies where tablename = 'recurrente_llaves') as llaves_ocultas;

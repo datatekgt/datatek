@@ -91,3 +91,9 @@ create policy necesidades_ver on public.necesidades for select to authenticated 
 
 revoke execute on function public.dt_necesidades(uuid), public.dt_necesidad_resolver(uuid), public.dt_importaciones(uuid) from public, anon;
 grant execute on function public.dt_necesidades(uuid), public.dt_necesidad_resolver(uuid), public.dt_importaciones(uuid) to authenticated;
+
+-- Verificación (correr después de aplicar en Supabase; todo debe dar true)
+-- select
+--   (select count(*) from pg_tables where schemaname = 'public' and tablename in ('importaciones','importacion_registros','necesidades')) = 3 as tablas,
+--   (select bool_and(relrowsecurity) from pg_class where relnamespace = 'public'::regnamespace and relname in ('importaciones','importacion_registros','necesidades')) as rls,
+--   not has_function_privilege('anon', 'public.dt_necesidades(uuid)', 'execute') as anon_cerrado;

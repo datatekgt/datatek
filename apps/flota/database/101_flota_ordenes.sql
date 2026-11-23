@@ -347,3 +347,10 @@ grant execute on function public.dt_flota_soy_aprobador(uuid), public.dt_flota_p
   public.dt_flota_cotizar_linea(uuid, text, text, text, numeric, numeric, text), public.dt_flota_quitar_linea(uuid), public.dt_flota_enviar_cotizacion(uuid),
   public.dt_flota_responder_linea(uuid, boolean), public.dt_flota_marcar_linea(uuid, boolean), public.dt_flota_mover_orden(uuid, text, text),
   public.dt_flota_ordenes(uuid, boolean), public.dt_flota_orden(uuid), public.dt_flota_estado_cuenta(uuid) to authenticated;
+
+-- Verificación (correr después de aplicar en Supabase; todo debe dar true)
+-- select
+--   (select count(*) from pg_tables where schemaname = 'public' and tablename in ('ordenes','orden_lineas','orden_recepciones')) = 3 as tablas,
+--   (select bool_and(relrowsecurity) from pg_class where relnamespace = 'public'::regnamespace and relname in ('ordenes','orden_lineas','orden_recepciones')) as rls,
+--   not has_function_privilege('authenticated', 'public.dt_flota_total_aprobado(uuid)', 'execute') as total_interna,
+--   not has_table_privilege('authenticated', 'public.ordenes', 'insert') as ordenes_solo_lectura;

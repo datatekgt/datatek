@@ -362,3 +362,11 @@ begin
 end $$;
 revoke execute on function public.dt_flota_piezas(uuid) from public, anon;
 grant execute on function public.dt_flota_piezas(uuid) to authenticated;
+
+-- Verificación (correr después de aplicar en Supabase; todo debe dar true)
+-- select
+--   (select count(*) from pg_tables where schemaname = 'public' and tablename in ('flota_componentes','flotas','unidades','pilotos','documentos_unidad','km_reportes','componentes_unidad')) = 7 as tablas,
+--   (select bool_and(relrowsecurity) from pg_class where relnamespace = 'public'::regnamespace and relname in ('flota_componentes','flotas','unidades','pilotos','documentos_unidad','km_reportes','componentes_unidad')) as rls,
+--   (select count(*) from public.flota_componentes) = 16 as catalogo,
+--   public.dt_flota_placa('p 123abc') = 'P-123ABC' as placa,
+--   not has_function_privilege('anon', 'public.dt_flota_unidades(uuid)', 'execute') as anon_cerrado;

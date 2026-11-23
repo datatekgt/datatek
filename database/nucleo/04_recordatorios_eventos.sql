@@ -166,3 +166,10 @@ revoke execute on function public.dt_plantillas(), public.dt_recordatorio_encola
   public.dt_evento_mover(uuid, timestamptz, boolean) from public, anon, authenticated;
 grant execute on function public.dt_mensajes_del_mes(uuid), public.dt_eventos(uuid, date, date), public.dt_evento_mover(uuid, timestamptz, boolean) to authenticated;
 grant execute on function public.dt_recordatorios_por_enviar(integer), public.dt_recordatorio_marcar(uuid, text, text) to service_role;
+
+-- Verificación (correr después de aplicar en Supabase; todo debe dar true)
+-- select
+--   (select count(*) from pg_tables where schemaname = 'public' and tablename in ('recordatorios','eventos')) = 2 as tablas,
+--   (select bool_and(relrowsecurity) from pg_class where relnamespace = 'public'::regnamespace and relname in ('recordatorios','eventos')) as rls,
+--   array_length(public.dt_plantillas(), 1) = 29 as plantillas,
+--   not has_function_privilege('authenticated', 'public.dt_recordatorio_encolar(uuid,text,text,jsonb,text,uuid,timestamptz)', 'execute') as encolar_interna;

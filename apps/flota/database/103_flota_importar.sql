@@ -128,3 +128,8 @@ end $$;
 
 revoke execute on function public.dt_flota_importar(uuid, jsonb, text, jsonb), public.dt_flota_deshacer_importacion(uuid) from public, anon;
 grant execute on function public.dt_flota_importar(uuid, jsonb, text, jsonb), public.dt_flota_deshacer_importacion(uuid) to authenticated;
+
+-- Verificación (correr después de aplicar en Supabase; todo debe dar true)
+-- select
+--   to_regprocedure('public.dt_flota_importar(uuid,jsonb,text,jsonb)') is not null as importar,
+--   not has_function_privilege('anon', 'public.dt_flota_importar(uuid,jsonb,text,jsonb)', 'execute') as anon_cerrado;

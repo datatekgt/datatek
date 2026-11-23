@@ -97,5 +97,7 @@ revoke execute on function public.dt_bitacora_hash(text, uuid, text, uuid, text,
   from public, anon, authenticated;
 grant execute on function public.dt_bitacora_verificar(uuid) to authenticated;
 
--- Verificación: select (select count(*) from pg_trigger where tgname like 'dt_bitacora_%') = 3 as triggers,
+-- Verificación (correr después de aplicar en Supabase; todo debe dar true)
+-- select
+--   (select count(*) from pg_trigger where tgname like 'dt_bitacora_%') = 3 as triggers,
 --   not has_function_privilege('authenticated', 'public.dt_bitacora_anotar(uuid,text,uuid,text,jsonb)', 'execute') as anotar_cerrado;
