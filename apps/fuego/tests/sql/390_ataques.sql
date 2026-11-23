@@ -153,7 +153,7 @@ reset role;
 -- 11. Recorrer códigos QR y listar clientes
 select prueba.anonimo(); set role anon;
 select prueba.afirmar((select count(*) from generate_series(1, 300) g where public.dt_qr_ver(encode(gen_random_bytes(18), 'hex')) is not null) = 0, '11a · 300 códigos al azar no dan nada');
-select prueba.afirmar(public.dt_qr_ver(upper(:'cod1')) is null and public.dt_qr_ver(left(:'cod1', 35) || '0') is distinct from public.dt_qr_ver(:'cod1'), '11b · no se adivina cambiando mayúsculas ni el último dígito');
+select prueba.afirmar(public.dt_qr_ver(upper(:'cod1')) is null and public.dt_qr_ver(left(:'cod1', 35) || case when right(:'cod1', 1) = '0' then '1' else '0' end) is null, '11b · no se adivina cambiando mayúsculas ni el último dígito');
 select prueba.afirmar(position('Bodegas' in public.dt_qr_ver(:'cod1')::text) = 0 and position('Villa Nueva' in public.dt_qr_ver(:'cod1')::text) = 0
   and position('Ceiba' in public.dt_qr_ver(:'cod3')::text) = 0 and position('5555' in public.dt_qr_ver(:'cod3')::text) = 0, '11c · con un código válido no sale el cliente, el local ni teléfonos');
 select prueba.debe_fallar($$ select * from public.dt_fuego_locales('$$ || :'neg' || $$') $$, '11d · anon no llama la lista de locales');
