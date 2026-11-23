@@ -15,6 +15,8 @@ export function enlaceDe(base: string, objeto: string | null, id: string | null)
   if (objeto === "cobro") return `${b}/mi/cuenta`;
   if (objeto === "unidad") return `${b}/piloto`;
   if (objeto === "vehiculo" && id) return `${b}/mi/unidad/${id}`;
+  if (objeto === "mascota" && id) return `${b}/mi/mascota/${id}`;
+  if (objeto === "cita") return `${b}/mi/citas`;
   return `${b}/`;
 }
 
@@ -31,6 +33,12 @@ export const PLANTILLAS: Record<string, string[]> = {
   flota_pedir_km: ["piloto", "placa", "enlace"],
   flota_documento: ["documento", "placa", "fecha", "enlace"],
   flota_servicio: ["placa", "servicio", "enlace"],
+  huella_vacuna_antes: ["nombre", "mascota", "vacuna", "fecha", "enlace"],
+  huella_vacuna_atrasada: ["mascota", "vacuna", "tiempo", "enlace"],
+  huella_carne: ["mascota", "enlace"],
+  huella_cita: ["mascota", "fecha", "hora", "lugar", "enlace"],
+  huella_placa_escaneada: ["mascota", "zona", "enlace"],
+  huella_jornada: ["negocio", "fecha", "mascota", "enlace"],
 };
 
 const API = "https://graph.facebook.com/v21.0";

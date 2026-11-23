@@ -135,6 +135,9 @@ ok(msg?.cuerpo.to === '50255550099', 'al teléfono del cliente')
 ok((await q(`select estado from public.recordatorios`))[0].estado === 'enviado', 'queda marcado enviado')
 ok(wa.enlaceDe('https://flota.app/', 'vehiculo', 'u1') === 'https://flota.app/mi/unidad/u1', 'el aviso de documento abre el Garage de la unidad')
 ok(wa.enlaceDe('https://flota.app', 'unidad', 'u1') === 'https://flota.app/piloto', 'el pedido de km abre el enlace del piloto')
+ok(wa.enlaceDe('https://huella.app', 'mascota', 'm1') === 'https://huella.app/mi/mascota/m1', 'el aviso de vacuna abre el expediente de la mascota')
+{ const m = wa.armarMensaje({ plantilla: 'huella_vacuna_antes', telefono: '+50255550099', variables: { nombre: 'Ana', mascota: 'Canela', vacuna: 'antirrábica', fecha: '03/02' }, objeto: 'mascota', objeto_id: 'm1' }, 'https://huella.app')
+  ok(m.template.components[0].parameters.map((x) => x.text).join('|') === 'Ana|Canela|antirrábica|03/02|https://huella.app/mi/mascota/m1', 'las variables de Huella salen en el orden de la plantilla') }
 
 await db.close()
 console.log(fallas ? `${fallas} comprobaciones fallaron` : 'Funciones en verde')
