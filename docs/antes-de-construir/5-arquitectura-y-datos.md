@@ -69,7 +69,7 @@ DATATEK/
 | `componentes_unidad` | `vehicle_component_events` | salud por pieza con el catálogo de `saludVehiculo.ts` |
 | `lecturas_obd` | `vehicle_obd_readings` | si el técnico escanea |
 
-Capacidades: `ver_ordenes`, `cotizar`, `registrar_trabajo`, `verificar_trabajo`, `escanear_unidad`. Funciones principales:
+Capacidades del taller: `ver_ordenes`, `cotizar`, `registrar_trabajo`, `verificar_trabajo`, `escanear_unidad`. Del lado de la empresa cliente: `aprobar_cotizacion` (quien decide en la flota) y `ver_estado_cuenta`. Detalle completo en `7-flota-especificacion.md`. Funciones principales:
 `dt_flota_crear_orden`, `dt_flota_cotizar_linea`, `dt_flota_responder_linea` (cliente), `dt_flota_mover_orden` (como `moveOrder`),
 `dt_flota_reportar_km` (piloto), `dt_flota_salud_unidad`.
 
