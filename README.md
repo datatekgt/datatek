@@ -16,6 +16,7 @@ cada uno.
 | `docs/herramienta-cliente.md` | Lo que ve el cliente en cada nicho, qué se reutiliza del Garage de DtekPro y qué muestran otras plataformas. |
 | `docs/cliente-alcance.md` | Qué funciones del cliente entran en la primera versión, cuáles después y cuáles no. |
 | `docs/auditoria-usabilidad.md` | Qué controles se usan para cada tipo de dato y qué cambió en cada pantalla para que sea fácil de usar. |
+| `docs/antes-de-construir/` | Antes de escribir código: errores corregidos y decisiones abiertas, seguridad y ataques, cobro y facturación, importador. |
 | `docs/investigacion/` | La investigación de mercado que respalda la elección. |
 
 ## El código anterior
