@@ -5,6 +5,7 @@ import { useSesion } from '@nucleo/acceso/Sesion'
 import { BotonesSel, Chip } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
 import { dinero, fechaCorta } from '@nucleo/formato'
+import { Nucleo } from '@nucleo/datos/nucleo'
 import { Flota } from '../datos'
 import { Error } from '../comun'
 
@@ -64,7 +65,7 @@ export function Cuenta() {
           <BotonesSel valor={metodo} alCambiar={setMetodo} opciones={[{ valor: 'tarjeta', texto: 'Tarjeta', sub: 'con Recurrente' }, { valor: 'transferencia', texto: 'Transferencia', sub: 'sin costo' }]} />
           <Error texto={acc.error} />
           {metodo === 'tarjeta' ? (
-            <button className="btn" disabled={acc.ocupado} onClick={() => acc.correr(async () => { const url = await Flota.pagar(primero.cobro_id); window.location.href = url })}>Pagar {dinero(primero.saldo)}{primero.origen === 'corte' ? ' del corte' : pendientes.length > 1 ? ' (el más antiguo)' : ''}</button>
+            <button className="btn" disabled={acc.ocupado} onClick={() => acc.correr(async () => { const url = await Nucleo.pagar(primero.cobro_id); window.location.href = url })}>Pagar {dinero(primero.saldo)}{primero.origen === 'corte' ? ' del corte' : pendientes.length > 1 ? ' (el más antiguo)' : ''}</button>
           ) : <p className="chico" style={{ margin: 0 }}>Pedile al taller los datos de su cuenta. Cuando reciban la transferencia la anotan y aquí aparece pagado.</p>}
           <p className="suave chico" style={{ margin: 0 }}>✓ El pago va directo a la cuenta del taller. La factura electrónica te llega al correo y queda aquí.</p>
         </section>

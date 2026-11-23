@@ -4,6 +4,7 @@ import { useSesion } from '@nucleo/acceso/Sesion'
 import { Ayuda, BotonesSel, Contador } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
 import { dinero } from '@nucleo/formato'
+import { Nucleo } from '@nucleo/datos/nucleo'
 import { Flota } from '../datos'
 import { Error } from '../comun'
 
@@ -77,7 +78,7 @@ function InvitarAprobador({ negocio, cliente }: { negocio: string; cliente: stri
       <input className="entrada" aria-label="Teléfono" inputMode="numeric" placeholder="Teléfono" value={tel} onChange={(e) => setTel(e.target.value)} />
       <BotonesSel valor={rol} alCambiar={setRol} opciones={[{ valor: 'aprobador', texto: 'Aprueba' }, { valor: 'consulta', texto: 'Solo mira' }]} />
       <Error texto={acc.error} />
-      {codigo ? <span className="chico">Invitación creada. Se manda por WhatsApp con su enlace.</span> : <button className="btn btn-chico" disabled={acc.ocupado} onClick={() => acc.correr(async () => setCodigo(await Flota.invitar(negocio, 'cliente', cliente, rol, tel)))}>Invitar</button>}
+      {codigo ? <span className="chico">Invitación creada. Se manda por WhatsApp con su enlace.</span> : <button className="btn btn-chico" disabled={acc.ocupado} onClick={() => acc.correr(async () => setCodigo(await Nucleo.invitar(negocio, 'cliente', cliente, rol, tel)))}>Invitar</button>}
     </div>
   )
 }

@@ -28,6 +28,4 @@ export const TONO_PIEZA: Record<string, { texto: string; tono: Tono }> = {
 
 export const DOC: Record<string, string> = { seguro: 'Seguro', tarjeta_circulacion: 'Tarjeta de circulación', licencia: 'Licencia', otro: 'Documento' }
 
-export function Error({ texto }: { texto: string }) {
-  return texto ? <p className="error-texto" role="alert">{texto}</p> : null
-}
+export { Error } from '@nucleo/controles'

@@ -151,3 +151,8 @@ export function useAvisoDeshacer() {
   ) : null
   return { mostrar, nodo }
 }
+
+// Mensaje de error de una acción o una carga (ya viene en español desde nucleo/datos/supabase).
+export function Error({ texto }: { texto: string }) {
+  return texto ? <p className="error-texto" role="alert">{texto}</p> : null
+}

@@ -6,7 +6,8 @@ import { useSesion } from '@nucleo/acceso/Sesion'
 import { BotonesSel, Chip, useAvisoDeshacer } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
 import { dinero, fechaCorta, hoyGT } from '@nucleo/formato'
-import { Flota, type Necesidad } from '../datos'
+import { Flota } from '../datos'
+import { Nucleo, type Necesidad } from '@nucleo/datos/nucleo'
 import { DOC, Error } from '../comun'
 
 const mesDe = (corrimiento: number) => { const [a, m] = hoyGT().split('-').map(Number); const d = new Date(Date.UTC(a, m - 1 + corrimiento, 1)); return d.toISOString().slice(0, 10) }
@@ -33,7 +34,7 @@ export function Inicio() {
   const { negocio, puede } = useSesion()
   const neg = negocio!.negocio_id
   const panel = useCarga(() => Flota.panel(neg), [neg])
-  const necesidades = useCarga(() => Flota.necesidades(neg), [neg])
+  const necesidades = useCarga(() => Nucleo.necesidades(neg), [neg])
   const flotas = useCarga(() => Flota.flotas(neg), [neg])
   const [flota, setFlota] = useState<string | null>(null)
   const [mes, setMes] = useState(mesDe(0))
@@ -54,7 +55,7 @@ export function Inicio() {
       const r = await Flota.avisarDocumentos(n.objetos)
       aviso.mostrar(r.enviados ? `Le avisamos a la empresa de ${r.enviados} ${r.enviados === 1 ? 'documento' : 'documentos'}.` : 'Ya se había avisado en las últimas 4 horas.')
     }
-    await Flota.resolverNecesidad(n.id)
+    await Nucleo.resolverNecesidad(n.id)
     necesidades.recargar()
   })
   const avisarUno = (unidad: string) => acc.correr(async () => {
@@ -90,7 +91,7 @@ export function Inicio() {
                 {n.accion === 'avisar' && puede('enviar_recordatorios') && <button className="btn btn-chico" disabled={acc.ocupado} onClick={() => hacer(n)}>Avisar a la empresa</button>}
                 {n.accion === 'agendar' && <Link className="btn btn-chico" to="/panel/unidades">Ver unidades</Link>}
                 {n.accion === 'completar' && <Link className="btn btn-chico" to="/panel/flotas">Completar pilotos</Link>}
-                <button className="btn btn-chico btn-sec" disabled={acc.ocupado} onClick={() => acc.correr(async () => { await Flota.resolverNecesidad(n.id); necesidades.recargar() })}>Ya está</button>
+                <button className="btn btn-chico btn-sec" disabled={acc.ocupado} onClick={() => acc.correr(async () => { await Nucleo.resolverNecesidad(n.id); necesidades.recargar() })}>Ya está</button>
               </div>
             </div>
           ))}
