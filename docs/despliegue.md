@@ -5,6 +5,20 @@
 ya corrido, dos veces) y su verificación al final. Cuando haya más proyectos (cuentas datatek01–03, hasta 6), cada producto se
 lleva a su propio proyecto corriendo «núcleo + su producto»: las pruebas corren también así, cada producto solo.
 
+## Direcciones publicadas (Vercel, equipo datatek, repo datatekgt/datatek rama main) — 23 nov 2026
+
+| Producto | Dirección |
+|---|---|
+| Flota | https://flota-ochre.vercel.app |
+| Huella | https://huella-self.vercel.app |
+| Fuego | https://fuego-psi.vercel.app |
+| Colonia | https://colonia-ebon.vercel.app |
+| Obra | https://obra-two-wheat.vercel.app |
+
+La dirección y la llave publicable de Supabase van en `apps/<x>/web/.env.production`: Vercel no necesita variables.
+Secreto `DATATEK_APP_URLS` de las Edge Functions:
+`{"flota":"https://flota-ochre.vercel.app","huella":"https://huella-self.vercel.app","fuego":"https://fuego-psi.vercel.app","colonia":"https://colonia-ebon.vercel.app","obra":"https://obra-two-wheat.vercel.app"}`
+
 ## Flota
 
 Lo hace Dominic una vez por producto; el código ya está listo. Nada de esto corre solo.
