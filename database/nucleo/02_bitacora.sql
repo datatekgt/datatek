@@ -29,8 +29,10 @@ create index if not exists bitacora_objeto on public.bitacora (negocio_id, objet
 
 create or replace function public.dt_bitacora_hash(p_previo text, p_negocio uuid, p_objeto text, p_objeto_id uuid, p_accion text, p_datos jsonb, p_persona uuid, p_en timestamptz)
 returns text language sql immutable as $$
-  select encode(digest(coalesce(p_previo, '') || '|' || p_negocio || '|' || p_objeto || '|' || p_objeto_id || '|' || p_accion || '|' ||
-    coalesce(p_datos::text, '') || '|' || coalesce(p_persona::text, '') || '|' || to_char(p_en at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US'), 'sha256'), 'hex')
+  -- sha256() viene con Postgres (11+): no depende de pgcrypto, que en Supabase vive en el esquema «extensions» y no se ve
+  -- desde funciones con search_path = public.
+  select encode(sha256(convert_to(coalesce(p_previo, '') || '|' || p_negocio || '|' || p_objeto || '|' || p_objeto_id || '|' || p_accion || '|' ||
+    coalesce(p_datos::text, '') || '|' || coalesce(p_persona::text, '') || '|' || to_char(p_en at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US'), 'UTF8')), 'hex')
 $$;
 
 create or replace function public.dt_bitacora_sellar()

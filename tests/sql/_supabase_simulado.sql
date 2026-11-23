@@ -23,6 +23,14 @@ begin
 end $$;
 
 grant usage on schema public to anon, authenticated, service_role;
+
+-- Como en Supabase: las extensiones viven en el esquema «extensions» y la sesión las ve por su search_path, pero una
+-- función con «set search_path = public» NO las ve. Así una migración que dependa de pgcrypto dentro de una función falla
+-- aquí igual que fallaría en Supabase.
+create schema if not exists extensions;
+create extension if not exists pgcrypto with schema extensions;
+grant usage on schema extensions to anon, authenticated, service_role;
+set search_path to "$user", public, extensions;
 alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
 alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
 alter default privileges in schema public grant execute on functions to anon, authenticated, service_role;

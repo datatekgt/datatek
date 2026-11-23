@@ -310,6 +310,21 @@ begin
 end $$;
 
 -- Alta de cliente desde el panel (el importador usa la misma regla en lote).
+-- Lista y búsqueda de clientes del negocio (por nombre o teléfono), con si ya tienen acceso a su herramienta.
+create or replace function public.dt_clientes(p_negocio uuid, p_buscar text default null)
+returns table (id uuid, nombre text, telefono text, nit text, tipo text, tiene_acceso boolean)
+language plpgsql stable security definer set search_path = public as $$
+#variable_conflict use_column
+declare v_b text := lower(trim(coalesce(p_buscar, ''))); v_tel text := public.dt_normalizar_telefono(p_buscar);
+begin
+  perform public.dt_exigir(p_negocio, 'ver_clientes');
+  return query select c.id, c.nombre, c.telefono, c.nit, c.tipo,
+      c.persona_id is not null or exists (select 1 from public.cliente_personas cp where cp.cliente_id = c.id)
+    from public.clientes c where c.negocio_id = p_negocio
+      and (v_b = '' or lower(c.nombre) like '%' || v_b || '%' or (v_tel is not null and c.telefono = v_tel))
+    order by c.nombre limit 100;
+end $$;
+
 create or replace function public.dt_crear_cliente(p_negocio uuid, p_nombre text, p_telefono text, p_nit text default null, p_tipo text default 'persona')
 returns uuid language plpgsql security definer set search_path = public as $$
 declare v_id uuid; v_tel text := public.dt_normalizar_telefono(p_telefono);
@@ -327,12 +342,12 @@ end $$;
 -- Puertas: nada para anon ni public; authenticated solo lo que la app usa.
 -- ---------------------------------------------------------------------
 revoke execute on function public.dt_normalizar_telefono(text), public.dt_persona_desde_auth(), public.dt_capacidades_rol(text, text),
-  public.dt_tengo_capacidad(uuid, text), public.dt_exigir(uuid, text), public.dt_soy_miembro(uuid), public.dt_mis_clientes(), public.dt_mis_clientes_titulares(),
+  public.dt_tengo_capacidad(uuid, text), public.dt_exigir(uuid, text), public.dt_soy_miembro(uuid), public.dt_mis_clientes(), public.dt_mis_clientes_titulares(), public.dt_clientes(uuid, text),
   public.dt_crear_negocio(text, text, text), public.dt_mis_negocios(), public.dt_invitar(uuid, text, uuid, text, text),
   public.dt_aceptar_invitacion(text), public.dt_reclamar_clientes(), public.dt_crear_cliente(uuid, text, text, text, text)
   from public, anon;
 grant execute on function public.dt_normalizar_telefono(text), public.dt_capacidades_rol(text, text), public.dt_tengo_capacidad(uuid, text),
-  public.dt_exigir(uuid, text), public.dt_soy_miembro(uuid), public.dt_mis_clientes(), public.dt_mis_clientes_titulares(), public.dt_crear_negocio(text, text, text),
+  public.dt_exigir(uuid, text), public.dt_soy_miembro(uuid), public.dt_mis_clientes(), public.dt_mis_clientes_titulares(), public.dt_clientes(uuid, text), public.dt_crear_negocio(text, text, text),
   public.dt_mis_negocios(), public.dt_invitar(uuid, text, uuid, text, text), public.dt_aceptar_invitacion(text),
   public.dt_reclamar_clientes(), public.dt_crear_cliente(uuid, text, text, text, text)
   to authenticated;

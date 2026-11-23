@@ -31,6 +31,8 @@ select prueba.afirmar((select count(*) from public.negocios) = 1, 've solo su ne
 select public.dt_invitar(:'neg', 'miembro', null, 'tecnico', '55550003') as cod_tec \gset
 select prueba.debe_fallar($$ select public.dt_invitar('$$ || :'neg' || $$', 'miembro', null, 'dueno', '55550003') $$, 'no se invita a otro dueño');
 select public.dt_crear_cliente(:'neg', 'Distribuidora Ejemplo', '55550099', '1234567-8', 'empresa') as cli \gset
+select prueba.afirmar((select count(*) from public.dt_clientes(:'neg', 'distri')) = 1 and (select count(*) from public.dt_clientes(:'neg', '5555-0099')) = 1, 'busca clientes por nombre o teléfono');
+select prueba.afirmar(not (select tiene_acceso from public.dt_clientes(:'neg')), 'y dice si todavía no tiene acceso');
 reset role;
 
 -- El intruso no acepta la invitación del técnico
@@ -38,6 +40,7 @@ select prueba.como(:'intruso'); set role authenticated;
 select prueba.debe_fallar($$ select public.dt_aceptar_invitacion('$$ || :'cod_tec' || $$') $$, 'una invitación solo la acepta el teléfono invitado');
 select prueba.debe_fallar($$ insert into public.miembros values ('$$ || :'neg' || $$', '$$ || :'intruso' || $$', 'dueno') $$, 'nadie se mete como miembro escribiendo la tabla');
 select prueba.afirmar((select count(*) from public.clientes) = 0, 'el intruso no ve clientes de otros');
+select prueba.debe_fallar($$ select * from public.dt_clientes('$$ || :'neg' || $$') $$, 'ni los lista con la función');
 reset role;
 
 select prueba.como(:'tec'); set role authenticated;
