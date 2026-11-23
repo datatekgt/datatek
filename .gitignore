@@ -7,3 +7,4 @@ para-supabase/
 .claude/worktrees/
 apps/obra/tests/pantallas/capturas/
 *.tsbuildinfo
+apps/colonia/tests/pantallas/capturas/
