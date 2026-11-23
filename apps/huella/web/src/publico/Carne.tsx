@@ -2,9 +2,8 @@
 // navegador; el CSS de impresión esconde los botones. Solo dosis válidas (las corregidas no salen), con fecha REAL y lote.
 import { useParams, useNavigate } from 'react-router-dom'
 import { useCarga } from '@nucleo/datos/useCarga'
-import { fechaCorta } from '@nucleo/formato'
 import { Huella } from '../datos'
-import { Avatar, ESPECIE, Error, estadoVacuna } from '../comun'
+import { Avatar, ESPECIE, Error, estadoVacuna, dia } from '../comun'
 
 const fechaCompleta = (iso: string | null) => (iso ? new Date(iso.slice(0, 10) + 'T12:00:00').toLocaleDateString('es-GT', { day: 'numeric', month: 'short', year: 'numeric' }) : '—')
 
@@ -45,7 +44,7 @@ export function Carne() {
         {c.proximas.length > 0 && (
           <>
             <h2 className="carne-titulo">Próximas</h2>
-            <ul className="carne-proximas">{c.proximas.map((p) => <li key={p.nombre}><b>{p.nombre}</b> · {fechaCorta(p.proxima)} <span className="suave">({estadoVacuna(p.estado, p.proxima).t.toLowerCase()})</span></li>)}</ul>
+            <ul className="carne-proximas">{c.proximas.map((p) => <li key={p.nombre}><b>{p.nombre}</b> · {dia(p.proxima)} <span className="suave">({estadoVacuna(p.estado, p.proxima).t.toLowerCase()})</span></li>)}</ul>
           </>
         )}
         <p className="suave chico" style={{ marginTop: 16 }}>Cada fecha es la del día en que se aplicó la dosis. Documento emitido por {c.clinica} con D-TEK Huella.</p>

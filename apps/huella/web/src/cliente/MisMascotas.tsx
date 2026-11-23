@@ -2,9 +2,8 @@
 import { Link } from 'react-router-dom'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { useCarga } from '@nucleo/datos/useCarga'
-import { fechaCorta } from '@nucleo/formato'
 import { Huella } from '../datos'
-import { Avatar, ChipVacuna, ESPECIE, Error, estadoVacuna, useFamiliaDecide } from '../comun'
+import { Avatar, ChipVacuna, ESPECIE, Error, estadoVacuna, useFamiliaDecide, dia } from '../comun'
 
 export function MisMascotas() {
   const { negocio } = useSesion()
@@ -21,7 +20,7 @@ export function MisMascotas() {
         <section className={`aviso-caja${urgente.proxima_estado === 'vencida' ? ' mal' : ''}`}>
           <span className="etiqueta">Lo que toca primero</span>
           <strong>{urgente.nombre}: {urgente.proxima_nombre}</strong>
-          <span className="chico">{estadoVacuna(urgente.proxima_estado, urgente.proxima).t} · {fechaCorta(urgente.proxima)}</span>
+          <span className="chico">{estadoVacuna(urgente.proxima_estado, urgente.proxima).t} · {dia(urgente.proxima)}</span>
           {decide && <Link to={`/mi/citas?mascota=${urgente.id}`} className="btn" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>Agendar la vacuna</Link>}
         </section>
       )}

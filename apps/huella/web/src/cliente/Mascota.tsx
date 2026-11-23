@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Chip } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { fechaCorta, hora } from '@nucleo/formato'
+import { hora } from '@nucleo/formato'
 import { Huella } from '../datos'
-import { Avatar, ChipVacuna, ESPECIE, Error, useFamiliaDecide } from '../comun'
+import { Avatar, ChipVacuna, ESPECIE, Error, useFamiliaDecide, dia } from '../comun'
 
 export function MascotaFamilia() {
   const { id = '' } = useParams()
@@ -40,7 +40,7 @@ export function MascotaFamilia() {
           <h2>Medicamentos de hoy</h2>
           <div className="lista-filas">
             {(meds.datos || []).map((x, i) => (
-              <div key={i} className="fila-dato"><div style={{ minWidth: 0 }}><div className="titulo">{x.nombre}</div><div className="sub">{[x.dosis, x.cada_horas && `cada ${x.cada_horas} h`, x.hasta && `hasta el ${fechaCorta(x.hasta)}`].filter(Boolean).join(' · ')}</div>{x.indicaciones && <div className="sub">{x.indicaciones}</div>}</div></div>
+              <div key={i} className="fila-dato"><div style={{ minWidth: 0 }}><div className="titulo">{x.nombre}</div><div className="sub">{[x.dosis, x.cada_horas && `cada ${x.cada_horas} h`, x.hasta && `hasta el ${dia(x.hasta)}`].filter(Boolean).join(' · ')}</div>{x.indicaciones && <div className="sub">{x.indicaciones}</div>}</div></div>
             ))}
           </div>
         </section>
@@ -52,7 +52,7 @@ export function MascotaFamilia() {
           <div className="lista-filas">
             {m.vacunas.map((v) => (
               <div key={v.vacuna_id} className="fila-dato envolver">
-                <div style={{ minWidth: 0, flex: '1 1 160px' }}><div className="titulo">{v.nombre}</div><div className="sub">{v.ultima ? `Última: ${fechaCorta(v.ultima)}` : 'Sin dosis registradas'}</div></div>
+                <div style={{ minWidth: 0, flex: '1 1 160px' }}><div className="titulo">{v.nombre}</div><div className="sub">{v.ultima ? `Última: ${dia(v.ultima)}` : 'Sin dosis registradas'}</div></div>
                 <ChipVacuna estado={v.estado} proxima={v.proxima} />
               </div>
             ))}
@@ -69,8 +69,8 @@ export function MascotaFamilia() {
           <ol className="linea-tiempo">
             {(linea.datos || []).map((e) => (
               <li key={e.tipo + e.id} className={`evento evento-${e.tipo}`}>
-                <span className="evento-fecha">{fechaCorta(e.cuando)}</span>
-                <div style={{ minWidth: 0 }}><div className="titulo">{e.tipo === 'consulta' ? 'Consulta: ' : e.tipo === 'peso' ? 'Peso: ' : e.tipo === 'medicamento' ? 'Medicamento: ' : 'Vacuna: '}{e.titulo}</div>{e.detalle && <div className="sub">{e.detalle}</div>}</div>
+                <span className="evento-fecha">{dia(e.cuando)}</span>
+                <div style={{ minWidth: 0 }}><div className="titulo">{e.tipo === 'consulta' ? 'Consulta: ' : e.tipo === 'peso' ? 'Peso: ' : e.tipo === 'medicamento' ? 'Medicamento: ' : 'Vacuna: '}{e.tipo === 'peso' ? `${Number(e.extra.kg)} kg` : e.titulo}</div>{e.detalle && <div className="sub">{e.detalle}</div>}</div>
               </li>
             ))}
           </ol>
@@ -97,7 +97,7 @@ function PlacaFamilia({ mascota, nombre }: { mascota: string; nombre: string }) 
       <div className="fila-entre"><h2>Placa del collar</h2><Chip tono={p.modo_perdido ? 'mal' : 'bien'}>{p.modo_perdido ? 'Modo perdido' : 'Activa'}</Chip></div>
       {p.modo_perdido ? (
         <>
-          <span className="chico">Desde el {fechaCorta(p.perdido_desde)}. Quien escanee la placa ve tu teléfono y puede avisarte con su ubicación.{p.mensaje_perdido ? ` Tu mensaje: «${p.mensaje_perdido}».` : ''}</span>
+          <span className="chico">Desde el {dia(p.perdido_desde)}. Quien escanee la placa ve tu teléfono y puede avisarte con su ubicación.{p.mensaje_perdido ? ` Tu mensaje: «${p.mensaje_perdido}».` : ''}</span>
           <button className="btn" disabled={acc.ocupado} onClick={() => cambiar(false)}>¡Ya apareció! Quitar modo perdido</button>
         </>
       ) : activando ? (
@@ -119,7 +119,7 @@ function PlacaFamilia({ mascota, nombre }: { mascota: string; nombre: string }) 
           <div className="lista-filas">
             {(escaneos.datos || []).slice(0, 5).map((e, i) => (
               <div key={i} className="fila-dato">
-                <span className="chico">{fechaCorta(e.en)} a las {hora(e.en)}</span>
+                <span className="chico">{dia(e.en)} a las {hora(e.en)}</span>
                 {e.lat != null && e.lng != null ? <a className="chico" href={`https://www.openstreetmap.org/?mlat=${e.lat}&mlon=${e.lng}#map=17/${e.lat}/${e.lng}`} target="_blank" rel="noreferrer">Ver en el mapa</a> : <span className="suave chico">sin ubicación</span>}
               </div>
             ))}

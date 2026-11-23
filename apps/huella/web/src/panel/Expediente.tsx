@@ -7,9 +7,9 @@ import { useSesion } from '@nucleo/acceso/Sesion'
 import { BotonesSel, Chip, Contador, Fecha, useAvisoDeshacer } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
 import { Nucleo } from '@nucleo/datos/nucleo'
-import { fechaCorta, hoyGT } from '@nucleo/formato'
+import { hoyGT } from '@nucleo/formato'
 import { Huella, type Dosis, type Expediente as TExp, type Medicamento, type VacunaEstado } from '../datos'
-import { AgendarCita, Avatar, ChipVacuna, ESPECIE, Error } from '../comun'
+import { AgendarCita, Avatar, ChipVacuna, ESPECIE, Error, dia } from '../comun'
 
 export function Expediente() {
   const { id = '' } = useParams()
@@ -29,7 +29,7 @@ export function Expediente() {
         <div className="fila" style={{ gap: 14 }}>
           <Avatar nombre={m.nombre} foto={m.foto} tam={64} />
           <div style={{ minWidth: 0 }}>
-            <h1>{m.nombre}{m.fallecida_en && <span className="suave chico" style={{ marginLeft: 8 }}>falleció el {fechaCorta(m.fallecida_en)}</span>}</h1>
+            <h1>{m.nombre}{m.fallecida_en && <span className="suave chico" style={{ marginLeft: 8 }}>falleció el {dia(m.fallecida_en)}</span>}</h1>
             <span className="suave">{[ESPECIE[m.especie], m.raza, m.sexo === 'hembra' ? 'hembra' : m.sexo === 'macho' ? 'macho' : null, m.edad].filter(Boolean).join(' · ')}</span>
             <div className="chico">{m.dueno.nombre}{m.dueno.telefono ? ` · ${m.dueno.telefono.replace(/^\+502/, '')}` : ' · sin teléfono'}</div>
           </div>
@@ -52,9 +52,9 @@ export function Expediente() {
               <ol className="linea-tiempo">
                 {(linea.datos || []).map((e) => (
                   <li key={e.tipo + e.id} className={`evento evento-${e.tipo}${e.extra?.anulada ? ' anulado' : ''}`}>
-                    <span className="evento-fecha">{fechaCorta(e.cuando)}</span>
+                    <span className="evento-fecha">{dia(e.cuando)}</span>
                     <div style={{ minWidth: 0 }}>
-                      <div className="titulo">{e.tipo === 'consulta' ? 'Consulta: ' : e.tipo === 'peso' ? 'Peso: ' : e.tipo === 'medicamento' ? 'Medicamento: ' : ''}{e.titulo}</div>
+                      <div className="titulo">{e.tipo === 'consulta' ? 'Consulta: ' : e.tipo === 'peso' ? 'Peso: ' : e.tipo === 'medicamento' ? 'Medicamento: ' : ''}{e.tipo === 'peso' ? `${Number(e.extra.kg)} kg` : e.titulo}</div>
                       {e.detalle && <div className="sub">{e.detalle}</div>}
                       {e.tipo === 'consulta' && typeof e.extra?.notas_internas === 'string' && <div className="sub"><b>Nota interna:</b> {e.extra.notas_internas}</div>}
                       {e.tipo === 'consulta' && typeof e.extra?.mensaje_familia === 'string' && <div className="sub"><b>A la familia:</b> {e.extra.mensaje_familia}</div>}
@@ -91,7 +91,7 @@ function Vacunas({ m, alCambiar }: { m: TExp; alCambiar: (t: string) => void }) 
           {m.vacunas.map((v) => (
             <div key={v.vacuna_id}>
               <div className="fila-dato envolver">
-                <div style={{ minWidth: 0, flex: '1 1 180px' }}><div className="titulo">{v.nombre}</div><div className="sub">{v.ultima ? `Última ${fechaCorta(v.ultima)} · ${v.dosis_puestas} ${Number(v.dosis_puestas) === 1 ? 'dosis' : 'dosis'}` : 'Sin dosis registradas'}{v.proxima ? ` · próxima ${fechaCorta(v.proxima)}` : ''}</div></div>
+                <div style={{ minWidth: 0, flex: '1 1 180px' }}><div className="titulo">{v.nombre}</div><div className="sub">{v.ultima ? `Última ${dia(v.ultima)} · ${v.dosis_puestas} ${Number(v.dosis_puestas) === 1 ? 'dosis' : 'dosis'}` : 'Sin dosis registradas'}{v.proxima ? ` · próxima ${dia(v.proxima)}` : ''}</div></div>
                 <div className="fila envolver" style={{ justifyContent: 'flex-end' }}>
                   <ChipVacuna estado={v.estado} proxima={v.proxima} />
                   {puede('registrar_dosis') && !m.fallecida_en && aplicando?.vacuna_id !== v.vacuna_id && <button className="btn btn-chico" aria-label={`Aplicar ${v.nombre}`} onClick={() => setAplicando(v)}>Aplicar</button>}
@@ -109,8 +109,8 @@ function Vacunas({ m, alCambiar }: { m: TExp; alCambiar: (t: string) => void }) 
             {dosis.map((d) => (
               <div key={d.id}>
                 <div className={`fila-dato${d.anulada ? ' anulado' : ''}`}>
-                  <div style={{ minWidth: 0 }}><div className="titulo">{d.nombre} · {fechaCorta(d.realizada_en)}</div><div className="sub">{d.anulada ? `Corregida: ${d.anulada_motivo}` : [d.lote && `Lote ${d.lote}`, d.laboratorio].filter(Boolean).join(' · ') || 'Sin lote'}</div></div>
-                  {d.anulada ? <Chip tono="neutro">Corregida</Chip> : puede('corregir_dosis') && corrigiendo?.id !== d.id && <button className="btn-texto chico" onClick={() => setCorrigiendo(d)} aria-label={`Corregir ${d.nombre} del ${fechaCorta(d.realizada_en)}`}>Corregir</button>}
+                  <div style={{ minWidth: 0 }}><div className="titulo">{d.nombre} · {dia(d.realizada_en)}</div><div className="sub">{d.anulada ? `Corregida: ${d.anulada_motivo}` : [d.lote && `Lote ${d.lote}`, d.laboratorio].filter(Boolean).join(' · ') || 'Sin lote'}</div></div>
+                  {d.anulada ? <Chip tono="neutro">Corregida</Chip> : puede('corregir_dosis') && corrigiendo?.id !== d.id && <button className="btn-texto chico" onClick={() => setCorrigiendo(d)} aria-label={`Corregir ${d.nombre} del ${dia(d.realizada_en)}`}>Corregir</button>}
                 </div>
                 {corrigiendo?.id === d.id && <Corregir d={d} alTerminar={(t) => { setCorrigiendo(null); if (t) alCambiar(t) }} />}
               </div>
@@ -136,7 +136,7 @@ function Aplicar({ m, v, alTerminar }: { m: TExp; v: VacunaEstado; alTerminar: (
       </div>
       <span className="suave chico">Se guarda la fecha en que se aplicó de verdad; la próxima sale sola de esa fecha.</span>
       <Error texto={acc.error} />
-      <div className="fila envolver"><button className="btn btn-chico" disabled={acc.ocupado} onClick={() => acc.correr(async () => { await Huella.registrarDosis(m.id, v.vacuna_id, fecha, lote.trim() || null); alTerminar(`${v.nombre} anotada el ${fechaCorta(fecha)}.`) })}>Guardar dosis</button><button className="btn btn-chico btn-sec" onClick={() => alTerminar()}>Cancelar</button></div>
+      <div className="fila envolver"><button className="btn btn-chico" disabled={acc.ocupado} onClick={() => acc.correr(async () => { await Huella.registrarDosis(m.id, v.vacuna_id, fecha, lote.trim() || null); alTerminar(`${v.nombre} anotada el ${dia(fecha)}.`) })}>Guardar dosis</button><button className="btn btn-chico btn-sec" onClick={() => alTerminar()}>Cancelar</button></div>
     </div>
   )
 }
@@ -146,7 +146,7 @@ function Corregir({ d, alTerminar }: { d: Dosis; alTerminar: (t?: string) => voi
   const acc = useAccion()
   return (
     <div className="columna sub-caja">
-      <strong>Corregir {d.nombre} del {fechaCorta(d.realizada_en)}</strong>
+      <strong>Corregir {d.nombre} del {dia(d.realizada_en)}</strong>
       <span className="suave chico">La dosis no se borra: queda tachada con el motivo, en la bitácora. Si la fecha estaba mal, después aplicá la buena.</span>
       <div className="campo"><label htmlFor={`motivo-${d.id}`}>Motivo</label><input id={`motivo-${d.id}`} className="entrada" value={motivo} onChange={(e) => setMotivo(e.target.value)} placeholder="Se anotó con la fecha equivocada" /></div>
       <Error texto={acc.error} />
@@ -231,7 +231,7 @@ function Datos({ m, alGuardar }: { m: TExp; alGuardar: (t: string) => void }) {
         </>
       ) : (
         <dl className="datos">
-          <div><dt>Nacimiento</dt><dd>{m.nacimiento ? `${m.nacimiento_aprox ? 'aprox. ' : ''}${fechaCorta(m.nacimiento)} ${m.nacimiento.slice(0, 4)}` : '—'}</dd></div>
+          <div><dt>Nacimiento</dt><dd>{m.nacimiento ? `${m.nacimiento_aprox ? 'aprox. ' : ''}${dia(m.nacimiento)}` : '—'}</dd></div>
           <div><dt>Esterilizada</dt><dd>{m.esterilizada == null ? '—' : m.esterilizada ? 'Sí' : 'No'}</dd></div>
           <div><dt>Microchip</dt><dd>{m.microchip || '—'}</dd></div>
           <div><dt>Color</dt><dd>{m.color || '—'}</dd></div>
@@ -257,8 +257,8 @@ function Peso({ m, alGuardar }: { m: TExp; alGuardar: (t: string) => void }) {
       <div className="fila-entre"><h2>Peso</h2>{ultimo != null && <span className="num" style={{ fontSize: 20 }}>{ultimo} kg</span>}</div>
       {ps.length > 1 ? (
         <svg viewBox="0 0 300 60" width="100%" height="60" role="img" aria-label={`Curva de peso: de ${ps[0]} a ${ultimo} kg`} preserveAspectRatio="none"><polyline points={puntos} fill="none" stroke="var(--acento)" strokeWidth="2.5" vectorEffect="non-scaling-stroke" /></svg>
-      ) : <span className="suave chico">{ps.length ? `Una medida, el ${fechaCorta(m.pesos[0].medido_en)}.` : 'Sin pesos anotados.'}</span>}
-      {m.pesos.length > 1 && <span className="suave chico">{m.pesos.length} medidas desde el {fechaCorta(m.pesos[0].medido_en)}</span>}
+      ) : <span className="suave chico">{ps.length ? `Una medida, el ${dia(m.pesos[0].medido_en)}.` : 'Sin pesos anotados.'}</span>}
+      {m.pesos.length > 1 && <span className="suave chico">{m.pesos.length} medidas desde el {dia(m.pesos[0].medido_en)}</span>}
       {puede('registrar_consulta') && !m.fallecida_en && (abierto ? (
         <>
           <Contador rotulo="Peso de hoy" valor={kg} paso={0.1} min={0.1} max={149} unidad="kg" alCambiar={setKg} sub={ultimo ? `La vez pasada: ${ultimo} kg` : undefined} />
@@ -290,7 +290,7 @@ function PlacaMascota({ mascota, nombre }: { mascota: string; nombre: string }) 
           <span className="chico">Código <b className="num" style={{ fontWeight: 600 }}>…{p.codigo.slice(-6)}</b> · <a href={`/p/${p.codigo}`} target="_blank" rel="noreferrer">Ver lo que ve quien la encuentra</a></span>
           {p.modo_perdido ? (
             <>
-              <span className="chico">Perdida desde el {fechaCorta(p.perdido_desde)}{p.mensaje_perdido ? ` · «${p.mensaje_perdido}»` : ''}. Quien escanee la placa ve el teléfono de la familia.</span>
+              <span className="chico">Perdida desde el {dia(p.perdido_desde)}{p.mensaje_perdido ? ` · «${p.mensaje_perdido}»` : ''}. Quien escanee la placa ve el teléfono de la familia.</span>
               <div><button className="btn btn-chico" disabled={acc.ocupado} onClick={() => acc.correr(async () => { await Huella.modoPerdido(mascota, false, null); placa.recargar() })}>Ya apareció: quitar modo perdido</button></div>
             </>
           ) : perdiendo ? (

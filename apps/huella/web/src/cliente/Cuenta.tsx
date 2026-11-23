@@ -3,9 +3,9 @@
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { Chip } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { dinero, fechaCorta } from '@nucleo/formato'
+import { dinero } from '@nucleo/formato'
 import { Nucleo } from '@nucleo/datos/nucleo'
-import { Error, useFamiliaDecide } from '../comun'
+import { Error, useFamiliaDecide, dia } from '../comun'
 
 export function Cuenta() {
   const { negocio, salir } = useSesion()
@@ -33,7 +33,7 @@ export function Cuenta() {
             <div className="lista-filas">
               {filas.map((c) => (
                 <div key={c.id} className="fila-dato envolver">
-                  <div style={{ minWidth: 0, flex: '1 1 180px' }}><div className="titulo">{c.concepto}</div><div className="sub">{fechaCorta(c.creado_en)}{c.factura_url ? <> · <a href={c.factura_url} target="_blank" rel="noreferrer">Factura</a></> : null}</div></div>
+                  <div style={{ minWidth: 0, flex: '1 1 180px' }}><div className="titulo">{c.concepto}</div><div className="sub">{dia(c.creado_en)}{c.factura_url ? <> · <a href={c.factura_url} target="_blank" rel="noreferrer">Factura</a></> : null}</div></div>
                   <div className="columna" style={{ gap: 4, alignItems: 'flex-end' }}>
                     <b>{dinero(c.estado === 'por_cobrar' ? c.saldo : c.monto)}</b>
                     {c.estado === 'por_cobrar' && Number(c.saldo) > 0

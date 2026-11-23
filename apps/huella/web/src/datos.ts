@@ -119,7 +119,8 @@ export const Huella = {
   },
   guardarHorario: (negocio: string, carril: Carril, dias: { dia: number; abre: string; cierra: string }[]) =>
     rpc<void>('dt_huella_guardar_horario', { p_negocio: negocio, p_carril: carril, p_dias: dias }),
-  horasLibres: async (servicio: string, fecha: string) => (await rpc<{ inicio: string }[]>('dt_huella_horas_libres', { p_servicio: servicio, p_fecha: fecha, p_profesional: null })).map((h) => h.inicio),
+  // PostgREST devuelve [{inicio}]; se acepta también la hora suelta (una sola columna) por si el traductor la aplana.
+  horasLibres: async (servicio: string, fecha: string) => (await rpc<({ inicio: string } | string)[]>('dt_huella_horas_libres', { p_servicio: servicio, p_fecha: fecha, p_profesional: null })).map((h) => (typeof h === 'string' ? h : h.inicio)),
   agendar: (mascota: string, servicio: string, inicio: string, direccion: string | null, notas: string | null) =>
     rpc<string>('dt_huella_agendar', { p_mascota: mascota, p_servicio: servicio, p_inicio: inicio, p_direccion: direccion, p_notas: notas, p_profesional: null }),
   confirmarCita: (cita: string) => rpc<void>('dt_huella_confirmar_cita', { p_cita: cita }),

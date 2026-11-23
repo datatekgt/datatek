@@ -5,9 +5,9 @@ import { Link } from 'react-router-dom'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { Chip, Fecha, textoFecha, useAvisoDeshacer } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { dinero, fechaCorta, hora, hoyGT } from '@nucleo/formato'
+import { dinero, hora, hoyGT } from '@nucleo/formato'
 import { Huella, type Carril, type CitaAgenda, type MascotaFila, type Servicio } from '../datos'
-import { AgendarCita, Avatar, CARRIL, ESTADO_CITA, Error, sumarDias } from '../comun'
+import { AgendarCita, Avatar, CARRIL, ESTADO_CITA, Error, sumarDias, dia as fechaDe } from '../comun'
 
 const CARRILES: Carril[] = ['clinica', 'domicilio', 'bano']
 const abierta = (c: CitaAgenda) => c.estado === 'agendada' || c.estado === 'confirmada'
@@ -24,7 +24,7 @@ export function Agenda() {
   return (
     <>
       <div className="titulo-pagina">
-        <div><h1>Agenda</h1><span className="suave" style={{ textTransform: 'capitalize' }}>{dia === hoyGT() ? 'Hoy, ' : ''}{textoFecha(dia)}</span></div>
+        <div><h1>Agenda</h1><span className="suave">{dia === hoyGT() ? `Hoy, ${textoFecha(dia)}` : textoFecha(dia).replace(/^./, (x) => x.toUpperCase())}</span></div>
         <div className="fila envolver" style={{ alignItems: 'flex-end' }}>
           <button className="btn btn-sec" aria-label="Día anterior" onClick={() => setDia(sumarDias(dia, -1))}>‹</button>
           <div style={{ width: 260 }}><Fecha rotulo="Día" valor={dia} alCambiar={setDia} /></div>
@@ -70,7 +70,7 @@ function NuevaCita({ alAgendar }: { alAgendar: (t: string) => void }) {
       ) : (
         <>
           <div className="fila-entre envolver"><span>Para <b>{elegida.nombre}</b> <span className="suave">· {elegida.dueno}</span></span><button className="btn-texto" onClick={() => setElegida(null)}>Cambiar mascota</button></div>
-          <AgendarCita mascota={elegida.id} alAgendar={(t) => alAgendar(`${elegida.nombre}: ${t} Le llega «Confirmá aquí» por WhatsApp.`)} />
+          <AgendarCita mascota={elegida.id} alAgendar={(t) => alAgendar(`${elegida.nombre}: ${t} · le llega «Confirmá aquí» por WhatsApp`)} />
         </>
       )}
     </section>
@@ -120,7 +120,7 @@ function MoverCita({ cita, servicio, alTerminar }: { cita: CitaAgenda; servicio?
   const acc = useAccion()
   const mover = () => inicio && acc.correr(async () => {
     await Huella.moverCita(cita.id, inicio, avisar)
-    alTerminar(`${cita.mascota}: movida al ${fechaCorta(inicio)} a las ${hora(inicio)}${avisar ? '. Le avisamos a la familia.' : ', sin avisar.'}`)
+    alTerminar(`${cita.mascota}: movida al ${fechaDe(inicio)} a las ${hora(inicio)} · ${avisar ? 'le avisamos a la familia' : 'sin avisar'}`)
   })
   return (
     <div className="columna sub-caja">
@@ -132,7 +132,7 @@ function MoverCita({ cita, servicio, alTerminar }: { cita: CitaAgenda; servicio?
       </div>
       {inicio && (
         <div className="aviso-caja" style={{ gap: 6 }}>
-          <span className="chico">Pasa de <b>{fechaCorta(cita.inicio)} {hora(cita.inicio)}</b> a <b>{fechaCorta(inicio)} {hora(inicio)}</b>.</span>
+          <span className="chico">Pasa de <b>{fechaDe(cita.inicio)} {hora(cita.inicio)}</b> a <b>{fechaDe(inicio)} {hora(inicio)}</b>.</span>
           <label className="fila chico casilla"><input type="checkbox" checked={avisar} onChange={(e) => setAvisar(e.target.checked)} /> Avisar a la familia por WhatsApp (vuelve a confirmar)</label>
         </div>
       )}

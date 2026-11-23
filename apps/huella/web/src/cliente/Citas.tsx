@@ -28,7 +28,7 @@ export function Citas() {
         <section className="tarjeta">
           <h2>Agendar una cita</h2>
           {(mascotas.datos?.length ?? 0) > 1 && <BotonesSel rotulo="Para quién" valor={elegida} alCambiar={setMascota} opciones={(mascotas.datos || []).map((m) => ({ valor: m.id, texto: m.nombre }))} />}
-          {elegida && <AgendarCita key={elegida} mascota={elegida} alAgendar={(t) => { setAgendando(false); aviso.mostrar(`${t} Queda confirmada.`); citas.recargar() }} alCancelar={() => setAgendando(false)} />}
+          {elegida && <AgendarCita key={elegida} mascota={elegida} alAgendar={(t) => { setAgendando(false); aviso.mostrar(`${t} · queda confirmada`); citas.recargar() }} alCancelar={() => setAgendando(false)} />}
         </section>
       )}
       <Error texto={citas.error || mascotas.error} />
@@ -49,7 +49,7 @@ function TarjetaCita({ cita: c, decide, alCambiar }: { cita: MiCita; decide: boo
     <section className="tarjeta">
       <div className="fila-entre"><span className="num" style={{ fontSize: 17 }}>{hora(c.inicio)}</span><Chip tono={ESTADO_CITA[c.estado].tono}>{ESTADO_CITA[c.estado].t}</Chip></div>
       <div><b>{c.mascota}</b> · {c.servicio}</div>
-      <span className="suave chico" style={{ textTransform: 'capitalize' }}>{fechaLarga(c.inicio)} · {CARRIL[c.carril]}</span>
+      <span className="suave chico">{fechaLarga(c.inicio).replace(/^./, (x) => x.toUpperCase())} · {CARRIL[c.carril]}</span>
       {c.direccion && <span className="chico">{c.direccion}</span>}
       {decide && !cancelando && (
         <div className="fila envolver">

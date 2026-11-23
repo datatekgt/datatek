@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { BotonesSel, Chip, Error, Fecha, type Tono } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { dinero, fechaCorta, hora, hoyGT } from '@nucleo/formato'
+import { dinero, hora, hoyGT, ZONA } from '@nucleo/formato'
 import { Huella, type Carril, type EstadoCita, type EstadoVacuna, type Especie, type Servicio } from './datos'
 
 export { Error } from '@nucleo/controles'
@@ -13,6 +13,15 @@ export const CARRIL: Record<Carril, string> = { clinica: 'Clínica', domicilio: 
 export const ESTADO_CITA: Record<EstadoCita, { t: string; tono: Tono }> = {
   agendada: { t: 'Por confirmar', tono: 'aviso' }, confirmada: { t: 'Confirmada', tono: 'bien' }, atendida: { t: 'Atendida', tono: 'bien' },
   no_vino: { t: 'No vino', tono: 'mal' }, cancelada: { t: 'Cancelada', tono: 'neutro' },
+}
+
+// Fecha corta para la pantalla. Un día suelto ('YYYY-MM-DD', como realizada_en) se lee a mediodía para que no se corra al
+// día anterior por la zona horaria; si no es de este año, lleva el año.
+export function dia(v?: string | null): string {
+  if (!v) return ''
+  const d = new Date(v.length === 10 ? v + 'T12:00:00Z' : v)
+  const anio = new Intl.DateTimeFormat('en', { timeZone: ZONA, year: 'numeric' }).format(d)
+  return d.toLocaleDateString('es-GT', { timeZone: ZONA, day: 'numeric', month: 'short', ...(anio === hoyGT().slice(0, 4) ? {} : { year: 'numeric' }) })
 }
 
 export const diasHasta = (iso: string) => Math.round((Date.parse(iso.slice(0, 10) + 'T12:00:00') - Date.parse(hoyGT() + 'T12:00:00')) / 86400000)
@@ -26,7 +35,7 @@ export function estadoVacuna(estado: EstadoVacuna | null, proxima: string | null
   const d = proxima ? diasHasta(proxima) : 0
   if (estado === 'vencida') return { t: `Vencida hace ${plural(-d, 'día', 'días')}`, tono: 'mal' }
   if (estado === 'pronto') return { t: d === 0 ? 'Le toca hoy' : `Le toca en ${plural(d, 'día', 'días')}`, tono: 'aviso' }
-  return { t: `Al día · ${fechaCorta(proxima)}`, tono: 'bien' }
+  return { t: `Al día · ${dia(proxima)}`, tono: 'bien' }
 }
 export const ChipVacuna = ({ estado, proxima }: { estado: EstadoVacuna | null; proxima: string | null }) => { const e = estadoVacuna(estado, proxima); return <Chip tono={e.tono}>{e.t}</Chip> }
 
@@ -60,7 +69,7 @@ export function AgendarCita({ mascota, alAgendar, alCancelar, direccionInicial =
   const horas = useCarga(() => (servicio ? Huella.horasLibres(servicio, fecha) : Promise.resolve([] as string[])), [servicio, fecha])
   const agendar = () => s && inicio && acc.correr(async () => {
     await Huella.agendar(mascota, s.id, inicio, s.carril === 'domicilio' ? direccion : null, notas || null)
-    alAgendar(`${s.nombre} agendado el ${fechaCorta(inicio)} a las ${hora(inicio)}.`)
+    alAgendar(`${s.nombre} agendado el ${dia(inicio)} a las ${hora(inicio)}`)
   })
   return (
     <div className="columna">
@@ -89,7 +98,7 @@ export function AgendarCita({ mascota, alAgendar, alCancelar, direccionInicial =
       <Error texto={acc.error} />
       <div className="fila envolver">
         <button className="btn" disabled={acc.ocupado || !s || !inicio || (s.carril === 'domicilio' && direccion.trim().length < 5)} onClick={agendar}>
-          {inicio ? `Agendar ${fechaCorta(inicio)} a las ${hora(inicio)}` : 'Agendar'}
+          {inicio ? `Agendar ${dia(inicio)} a las ${hora(inicio)}` : 'Agendar'}
         </button>
         {alCancelar && <button className="btn btn-sec" onClick={alCancelar}>Cancelar</button>}
       </div>

@@ -5,13 +5,13 @@ import { Link } from 'react-router-dom'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { BotonesSel, Chip, Contador, useAvisoDeshacer } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { dinero, fechaCorta } from '@nucleo/formato'
+import { dinero } from '@nucleo/formato'
 import { Cobros } from '@nucleo/panel/Cobros'
 import { Suscripcion } from '@nucleo/panel/Suscripcion'
 import { Recurrente } from '@nucleo/panel/Recurrente'
 import { Equipo } from '@nucleo/panel/Equipo'
 import { Huella, type Carril, type Servicio } from '../datos'
-import { CARRIL, Error } from '../comun'
+import { CARRIL, Error, dia } from '../comun'
 
 const ROLES_HUELLA: Record<string, string> = { dueno: 'Dueño', tecnico: 'Veterinario o groomer', jefe: 'Administración', caja: 'Recepción' }
 
@@ -169,7 +169,7 @@ function Placas({ negocio, puedeCrear }: { negocio: string; puedeCrear: boolean 
         <div className="lista-filas">
           {asignadas.slice(0, 10).map((p) => (
             <div key={p.id} className="fila-dato">
-              <div style={{ minWidth: 0 }}><div className="titulo"><Link to={`/panel/mascotas/${p.mascota_id}`}>{p.mascota}</Link> <span className="suave" style={{ fontWeight: 400 }}>· {p.dueno}</span></div><div className="sub">…{p.codigo.slice(-6)} · desde el {fechaCorta(p.asignada_en)}</div></div>
+              <div style={{ minWidth: 0 }}><div className="titulo"><Link to={`/panel/mascotas/${p.mascota_id}`}>{p.mascota}</Link> <span className="suave" style={{ fontWeight: 400 }}>· {p.dueno}</span></div><div className="sub">…{p.codigo.slice(-6)} · desde el {dia(p.asignada_en)}</div></div>
               <Chip tono={p.modo_perdido ? 'mal' : 'bien'}>{p.modo_perdido ? 'Perdida' : 'Activa'}</Chip>
             </div>
           ))}

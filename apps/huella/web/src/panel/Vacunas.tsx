@@ -5,9 +5,8 @@ import { Link } from 'react-router-dom'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { BotonesSel, Contador, Filtros, useAvisoDeshacer } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
-import { fechaCorta } from '@nucleo/formato'
 import { Huella, type Especie, type VacunaPlan, type Vencimiento } from '../datos'
-import { ChipVacuna, Error } from '../comun'
+import { ChipVacuna, Error, dia } from '../comun'
 
 type F = 'todas' | 'vencidas' | 'mes' | 'sin_cita'
 const EN: Record<F, (v: Vencimiento) => boolean> = { todas: () => true, vencidas: (v) => v.estado === 'vencida', mes: (v) => v.dias >= 0 && v.dias <= 30, sin_cita: (v) => !v.cita_agendada }
@@ -62,7 +61,7 @@ function Vencimientos() {
               <div className="fila" style={{ minWidth: 0, flex: '1 1 220px', gap: 12 }}>
                 {puedeAvisar && <input type="checkbox" className="casilla-grande" aria-label={`Elegir a ${v.mascota}`} disabled={!v.telefono} checked={sel.has(v.mascota_id)} onChange={() => alternar(v.mascota_id)} />}
                 <div style={{ minWidth: 0 }}><div className="titulo"><Link to={`/panel/mascotas/${v.mascota_id}`}>{v.mascota}</Link> · {v.vacuna}</div>
-                  <div className="sub">{v.dueno}{v.telefono ? '' : ' · sin teléfono'}{v.cita_agendada ? ' · ya tiene cita' : ''} · {fechaCorta(v.proxima)}</div></div>
+                  <div className="sub">{v.dueno}{v.telefono ? '' : ' · sin teléfono'}{v.cita_agendada ? ' · ya tiene cita' : ''} · {dia(v.proxima)}</div></div>
               </div>
               <ChipVacuna estado={v.estado} proxima={v.proxima} />
             </div>

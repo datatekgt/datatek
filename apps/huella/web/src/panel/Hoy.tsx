@@ -6,7 +6,7 @@ import { Chip, useAvisoDeshacer } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
 import { dinero, hora, hoyGT } from '@nucleo/formato'
 import { Nucleo, type Necesidad } from '@nucleo/datos/nucleo'
-import { Huella, type CitaAgenda } from '../datos'
+import { Huella, type CitaAgenda, type Vencimiento } from '../datos'
 import { CARRIL, ChipVacuna, ESTADO_CITA, Error } from '../comun'
 
 function Cifra({ rotulo, valor, sub, a }: { rotulo: string; valor: string; sub?: string; a?: string }) {
@@ -28,7 +28,9 @@ export function Hoy() {
   const lista = citas.datos || []
   const pendientes = lista.filter((c) => c.estado === 'agendada' || c.estado === 'confirmada')
   // Un renglón por mascota: la vacuna más urgente (la lista ya viene ordenada por fecha).
-  const porMascota = [...new Map((venc.datos || []).map((v) => [v.mascota_id, v])).values()].sort((a, b) => a.dias - b.dias)
+  const primera = new Map<string, Vencimiento>()
+  for (const v of venc.datos || []) if (!primera.has(v.mascota_id)) primera.set(v.mascota_id, v)
+  const porMascota = [...primera.values()].sort((a, b) => a.dias - b.dias)
   const vencidas = porMascota.filter((v) => v.estado === 'vencida').length
   const porCobrar = (cobros.datos || []).filter((c) => c.estado === 'por_cobrar').reduce((s, c) => s + Number(c.saldo), 0)
 
@@ -66,7 +68,7 @@ export function Hoy() {
         <section className="tarjeta" style={{ marginBottom: 16 }}>
           <h2>Lo que hay que hacer</h2>
           {necesidades.datos!.map((n) => (
-            <div key={n.id} className="aviso-caja fila-entre envolver" style={{ gap: 12 }}>
+            <div key={n.id} className="aviso-caja fila-entre envolver" style={{ gap: 12, flexDirection: 'row' }}>
               <div className="columna" style={{ gap: 2 }}><b>{n.titulo}</b>{n.detalle && <span className="chico">{n.detalle}</span>}</div>
               <div className="fila envolver">
                 {n.accion === 'avisar_vacunas' && puede('enviar_recordatorios') && <button className="btn btn-chico" disabled={acc.ocupado} onClick={() => hacer(n)}>Avisar a las familias</button>}
