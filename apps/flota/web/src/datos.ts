@@ -28,6 +28,9 @@ export type Evento = { id: string; tipo: string; titulo: string; programada_para
 export type Documento = { id: string; unidad_id: string; tipo: string; numero: string | null; vence: string }
 
 export const Flota = {
+  importar: <T>(flota: string, filas: unknown[], archivo: string | null, cuenta: unknown) =>
+    rpc<T>('dt_flota_importar', { p_flota: flota, p_filas: filas, p_archivo: archivo, p_cuenta: cuenta }),
+  deshacerImportacion: (imp: string) => rpc<{ borradas: number; con_ordenes: number }>('dt_flota_deshacer_importacion', { p_importacion: imp }),
   flotas: (negocio: string) => rpc<Flota[]>('dt_flota_flotas', { p_negocio: negocio }),
   crearCliente: (negocio: string, nombre: string, telefono: string, nit: string | null) =>
     rpc<string>('dt_crear_cliente', { p_negocio: negocio, p_nombre: nombre, p_telefono: telefono, p_nit: nit, p_tipo: 'empresa' }),

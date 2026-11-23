@@ -29,7 +29,7 @@ for (const f of archivos) {
     for (const linea of texto.split(/\r?\n/)) {
       if (/\\gset\s*$/.test(linea)) {
         const rs = await db.exec(poner(acumulado + linea.replace(/\\gset\s*$/, '')), alAviso)
-        for (const [k, v] of Object.entries(rs[rs.length - 1]?.rows?.[0] ?? {})) vars[k] = v instanceof Date ? v.toISOString() : v
+        for (const [k, v] of Object.entries(rs[rs.length - 1]?.rows?.[0] ?? {})) vars[k] = v instanceof Date ? v.toISOString() : v !== null && typeof v === 'object' ? JSON.stringify(v) : v
         acumulado = ''
       } else acumulado += linea + '\n'
     }

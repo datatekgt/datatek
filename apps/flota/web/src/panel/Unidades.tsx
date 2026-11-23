@@ -6,6 +6,7 @@ import { useAccion, useCarga } from '@nucleo/datos/useCarga'
 import { fechaCorta, haceCuanto, km as fmtKm } from '@nucleo/formato'
 import { Flota, type UnidadFila } from '../datos'
 import { DOC, Error, proximoTexto, saludTono, textoUnidad, tonoUnidad } from '../comun'
+import { Importar } from './Importar'
 
 type F = 'todas' | 'atencion' | 'taller' | 'sin_km'
 const EN: Record<F, (u: UnidadFila) => boolean> = {
@@ -21,6 +22,7 @@ export function Unidades() {
   const unidades = useCarga(() => (actual ? Flota.unidades(actual) : Promise.resolve([])), [actual])
   const [f, setF] = useState<F>('todas')
   const [alta, setAlta] = useState(false)
+  const [importando, setImportando] = useState(false)
   const lista = useMemo(() => (unidades.datos || []).filter(EN[f]), [unidades.datos, f])
   const n = (x: F) => (unidades.datos || []).filter(EN[x]).length
   const nombre = flotas.datos?.find((x) => x.id === actual)?.nombre
@@ -28,9 +30,13 @@ export function Unidades() {
     <>
       <div className="titulo-pagina">
         <div><h1>Unidades{nombre ? ` de ${nombre}` : ''}</h1><span className="suave chico">Lo que la empresa ve en su Garage sale de aquí</span></div>
-        {puede('ver_clientes') && actual && <button className="btn" onClick={() => setAlta((v) => !v)}>{alta ? 'Cerrar' : '+ Unidad'}</button>}
+        <div className="fila envolver">
+          {puede('importar') && <button className="btn btn-sec" onClick={() => setImportando((v) => !v)}>{importando ? 'Cerrar importación' : 'Importar desde Excel'}</button>}
+          {puede('ver_clientes') && actual && <button className="btn" onClick={() => setAlta((v) => !v)}>{alta ? 'Cerrar' : '+ Unidad'}</button>}
+        </div>
       </div>
       {(flotas.datos?.length ?? 0) > 1 && <div style={{ marginBottom: 12 }}><BotonesSel valor={actual} alCambiar={setFlota} opciones={(flotas.datos || []).map((x) => ({ valor: x.id, texto: x.nombre, sub: `${x.unidades} unidades` }))} /></div>}
+      {importando && <Importar alCambiar={unidades.recargar} alTerminar={() => { setImportando(false); unidades.recargar() }} />}
       {alta && actual && <AltaUnidad flota={actual} alCrear={() => { setAlta(false); unidades.recargar() }} />}
       <section className="tarjeta">
         <Filtros valor={f} alCambiar={setF} opciones={[{ valor: 'todas', texto: 'Todas', n: n('todas') }, { valor: 'atencion', texto: 'Piden atención', n: n('atencion') }, { valor: 'taller', texto: 'En taller', n: n('taller') }, { valor: 'sin_km', texto: 'Sin km reciente', n: n('sin_km') }]} />
