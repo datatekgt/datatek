@@ -133,6 +133,8 @@ ok(JSON.stringify(pars?.slice(0, 4)) === JSON.stringify(['Taller D-TEK Flotas', 
 ok(pars?.[4].startsWith('https://flota.datatek.gt/mi/orden/'), 'el enlace lleva a la orden (con sesión)')
 ok(msg?.cuerpo.to === '50255550099', 'al teléfono del cliente')
 ok((await q(`select estado from public.recordatorios`))[0].estado === 'enviado', 'queda marcado enviado')
+ok(wa.enlaceDe('https://flota.app/', 'vehiculo', 'u1') === 'https://flota.app/mi/unidad/u1', 'el aviso de documento abre el Garage de la unidad')
+ok(wa.enlaceDe('https://flota.app', 'unidad', 'u1') === 'https://flota.app/piloto', 'el pedido de km abre el enlace del piloto')
 
 await db.close()
 console.log(fallas ? `${fallas} comprobaciones fallaron` : 'Funciones en verde')

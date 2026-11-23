@@ -27,7 +27,21 @@ export type CuentaFila = { cobro_id: string; concepto: string; monto: number; pa
 export type Evento = { id: string; tipo: string; titulo: string; programada_para: string; realizada_en: string | null; estado: string; cliente_id: string | null }
 export type Documento = { id: string; unidad_id: string; tipo: string; numero: string | null; vence: string }
 
+export type Disponibilidad = { unidad_id: string; placa: string; descripcion: string; dias: number; dias_taller: number; disponibilidad: number; costo: number | null; ordenes: number }
+export type Vence = { tipo: 'documento' | 'licencia'; que: string; unidad_id: string | null; placa: string | null; flota: string; vence: string }
+export type Panel = {
+  unidades: number; en_taller: number; ordenes_abiertas: number; esperando_empresa: number; listas_para_entregar: number; sin_km_reciente: number
+  cobrado_mes: number | null; facturado_mes: number | null; por_cobrar: number | null; vencidos: number | null; vence: Vence[]
+}
+export type Necesidad = { id: string; tipo: string; titulo: string; detalle: string | null; cantidad: number; objetos: string[]; accion: string | null; creada_en: string }
+
 export const Flota = {
+  panel: (negocio: string) => rpc<Panel>('dt_flota_panel', { p_negocio: negocio }),
+  disponibilidad: (flota: string, mes: string | null) => rpc<Disponibilidad[]>('dt_flota_disponibilidad', { p_flota: flota, p_mes: mes }),
+  necesidades: (negocio: string) => rpc<Necesidad[]>('dt_necesidades', { p_negocio: negocio }),
+  resolverNecesidad: (id: string) => rpc<null>('dt_necesidad_resolver', { p_necesidad: id }),
+  pedirKm: (unidades: string[]) => rpc<{ enviados: number; sin_telefono: number }>('dt_flota_pedir_km', { p_unidades: unidades }),
+  avisarDocumentos: (unidades: string[]) => rpc<{ enviados: number }>('dt_flota_avisar_documentos', { p_unidades: unidades }),
   importar: <T>(flota: string, filas: unknown[], archivo: string | null, cuenta: unknown) =>
     rpc<T>('dt_flota_importar', { p_flota: flota, p_filas: filas, p_archivo: archivo, p_cuenta: cuenta }),
   deshacerImportacion: (imp: string) => rpc<{ borradas: number; con_ordenes: number }>('dt_flota_deshacer_importacion', { p_importacion: imp }),

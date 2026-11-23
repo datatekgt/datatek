@@ -14,6 +14,7 @@ export function enlaceDe(base: string, objeto: string | null, id: string | null)
   if (objeto === "orden" && id) return `${b}/mi/orden/${id}`;
   if (objeto === "cobro") return `${b}/mi/cuenta`;
   if (objeto === "unidad") return `${b}/piloto`;
+  if (objeto === "vehiculo" && id) return `${b}/mi/unidad/${id}`;
   return `${b}/`;
 }
 

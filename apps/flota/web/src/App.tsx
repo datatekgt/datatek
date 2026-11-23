@@ -5,6 +5,7 @@ import { useSesion } from '@nucleo/acceso/Sesion'
 import { lazy, Suspense } from 'react'
 
 // El panel y la herramienta del cliente se cargan por separado: la empresa no descarga el código del taller.
+const Inicio = lazy(() => import('./panel/Inicio').then((m) => ({ default: m.Inicio })))
 const Flotas = lazy(() => import('./panel/Flotas').then((m) => ({ default: m.Flotas })))
 const Ordenes = lazy(() => import('./panel/Ordenes').then((m) => ({ default: m.Ordenes })))
 const OrdenPanel = lazy(() => import('./panel/Orden').then((m) => ({ default: m.OrdenPanel })))
@@ -30,6 +31,7 @@ const Icono = ({ d }: { d: string }) => <svg width="22" height="22" viewBox="0 0
 function MarcoPanel() {
   const { negocio, negocios, elegir, puede } = useSesion()
   const pestanas = [
+    { a: '/panel/inicio', t: 'Inicio', cap: 'ver_panel' as const },
     { a: '/panel/flotas', t: 'Flotas', cap: 'ver_clientes' as const },
     { a: '/panel/ordenes', t: 'Órdenes', cap: 'ver_ordenes' as const },
     { a: '/panel/unidades', t: 'Unidades', cap: 'ver_clientes' as const },
@@ -75,25 +77,27 @@ function MarcoCliente() {
 }
 
 export function App() {
-  const { cargando, sesion, negocio, negocios } = useSesion()
+  const { cargando, sesion, negocio, negocios, puede } = useSesion()
   const lugar = useLocation()
   if (cargando) return <p className="cargando">Cargando…</p>
   if (!sesion) return <Entrar marca="D-TEK Flotas" sub="El taller de tu flota, en tu teléfono." />
   if (!negocios.length) return (
     <main className="entrar"><div className="tarjeta entrar-caja"><h1 style={{ fontSize: 18 }}>Todavía no tenés acceso</h1><p className="suave">Pedile al taller que te invite con este número de teléfono.</p></div></main>
   )
-  const inicio = negocio?.como === 'miembro' ? '/panel/ordenes' : negocio?.como === 'piloto' ? '/piloto' : '/mi'
+  const inicioPanel = puede('ver_panel') ? '/panel/inicio' : '/panel/ordenes'
+  const inicio = negocio?.como === 'miembro' ? inicioPanel : negocio?.como === 'piloto' ? '/piloto' : '/mi'
   if (lugar.pathname === '/') return <Navigate to={inicio} replace />
   return (
     <Routes>
       <Route path="/panel" element={negocio?.como === 'miembro' ? <MarcoPanel /> : <Navigate to="/mi" replace />}>
+        <Route path="inicio" element={<Inicio />} />
         <Route path="flotas" element={<Flotas />} />
         <Route path="ordenes" element={<Ordenes />} />
         <Route path="ordenes/:id" element={<OrdenPanel />} />
         <Route path="unidades" element={<Unidades />} />
         <Route path="calendario" element={<Calendario />} />
         <Route path="mas" element={<Mas />} />
-        <Route index element={<Navigate to="ordenes" replace />} />
+        <Route index element={<Navigate to={inicioPanel} replace />} />
       </Route>
       <Route path="/mi" element={negocio?.como === 'cliente' ? <MarcoCliente /> : <Navigate to="/panel" replace />}>
         <Route index element={<MiFlota />} />

@@ -82,3 +82,10 @@ begin
   perform public.dt_evento_crear(neg, 'servicio', 'P-123ABC frenos (sugerido)', 'unidad', u1, cli, ((hoy + 6)::timestamp + time '07:00') at time zone 'America/Guatemala');
   perform prueba.como(null);
 end $$;
+
+-- Fechas como en la vida real (para la disponibilidad del panel): las unidades llevan meses; la 2301 estuvo 3 días en el
+-- taller, la 2302 lleva 2 y la 2303 entró hoy en la mañana.
+update public.unidades set creada_en = now() - interval '90 days';
+update public.ordenes set creada_en = now() - interval '3 days' where numero = 2301;
+update public.ordenes set creada_en = now() - interval '2 days' where numero = 2302;
+update public.ordenes set creada_en = now() - interval '5 hours' where numero = 2303;
