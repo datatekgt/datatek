@@ -1,0 +1,17 @@
+{
+  "name": "datatek",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "workspaces": ["apps/flota/web"],
+  "scripts": {
+    "sql": "node scripts/probar-sql.mjs",
+    "sql:flota": "node scripts/probar-sql.mjs flota",
+    "ataque:flota": "node apps/flota/tests/seguridad/ataque.mjs --estricto",
+    "build:flota": "npm --workspace apps/flota/web run build",
+    "test": "node scripts/probar-sql.mjs && node scripts/probar-sql.mjs flota && node --test nucleo"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.3.0"
+  }
+}
