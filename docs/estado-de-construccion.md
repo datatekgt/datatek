@@ -5,7 +5,9 @@ Actualizado: 23 nov 2026. Plan: `docs/antes-de-construir/6-plan-de-construccion.
 **Supabase compartido (`xlhaktvymmbnpotkmdct`), corrido el 23 nov 2026 con todas las verificaciones en true:** núcleo 01–08,
 Flota 100–106, Huella 200–206, Fuego 300–308, Colonia 400–406 y Obra 500–506 (lista exacta en `database/corridas-en-supabase.txt`). Lo corrido
 NO se cambia en su lugar: todo cambio va en un archivo nuevo (núcleo 09+, Flota 107+, Huella 207+, Fuego 309+, Colonia 407+,
-Obra 507+). No queda nada pendiente de correr.
+Obra 507+). **Pendiente de correr: Fuego 309** (`apps/fuego/database/309_fuego_etiquetas_prestamos_calendario.sql`: solo
+lecturas para las pantallas de etiquetas QR, préstamos y calendario; sin tablas nuevas). Hasta que corra, esas tres pantallas
+dan error en producción; importar no depende de ella.
 
 ## Etapa 0 · Núcleo
 
@@ -53,6 +55,15 @@ Pruebas al cierre de Flota: núcleo 102 comprobaciones, Flota 194, 37 ataques (0
 
 Pendiente en Obra: calendario de visitas en el panel (los eventos ya existen), asignar supervisor desde la pantalla (la función
 existe, falta listar el equipo con nombre), enlace del residente sin cuenta, plantillas `obra_*` en `whatsapp-enviar`.
+
+## Fuego · lo que faltaba de pantallas (23 nov 2026)
+
+| Pieza | Estado | Dónde |
+|---|---|---|
+| Etiquetas QR para imprimir | Hecho | `309` (`dt_fuego_etiquetas`), `panel/Etiquetas.tsx`: QR en SVG con `qrcode-generator` 2.0.4, hoja carta de 10 (4 × 2 in, tipo Avery 5163) |
+| Importar clientes, locales y extintores | Hecho | `307` (ya existía), `panel/Importar.tsx` con `nucleo/importador`, vista previa y deshacer 24 h |
+| Préstamos (prestar y devolver) | Hecho | `304` + `309` (`dt_fuego_extintores_propios`), `panel/Prestamos.tsx`; se cobra con la visita de hoy si la hay |
+| Calendario del mes | Hecho | `309` (`dt_fuego_calendario`), `panel/Calendario.tsx` |
 
 ## Lo que necesita a Dominic para publicar Flota
 
