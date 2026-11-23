@@ -1,4 +1,4 @@
--- Huella · ataques (docs/antes-de-construir/2-seguridad.md): comunes 1–10 y de Huella 15–18.
+-- Huella · ataques (docs/antes-de-construir/2-seguridad.md): comunes 1–10 y de Huella 15–19.
 -- Cada «ok» es un ataque que NO funcionó. Lo corre apps/huella/tests/seguridad/ataque.mjs --estricto.
 select prueba.crear_usuario('+50255550001') as plat \gset
 select prueba.crear_usuario('+50255550002') as dueno \gset
@@ -113,3 +113,24 @@ select public.dt_huella_corregir_dosis(:'dosis', 'Se anotó con fecha equivocada
 select prueba.afirmar((select realizada_en from public.dosis where id = :'dosis') = (now() at time zone 'America/Guatemala')::date - 30, '18d · la fecha original no cambia: queda anulada con motivo');
 reset role;
 select prueba.afirmar((select count(*) from public.bitacora where objeto = 'dosis' and objeto_id = :'dosis' and accion = 'corregida') = 1, '18e · y la corrección queda en la bitácora');
+-- 19. Fotos del bucket privado (207): leer o sembrar fotos de otra clínica, y el paseador viendo fotos clínicas
+select :'neg' || '/' || :'canela' || '/consulta/herida.jpg' as foto_c \gset
+select prueba.como(:'dueno'); set role authenticated;
+insert into storage.objects (bucket_id, name) values ('huella-fotos', :'foto_c');
+select public.dt_huella_registrar_consulta(:'canela', 'Herida', null, null, null, null, null, null, 'clinica', array[:'foto_c']) as consulta_c \gset
+select public.dt_huella_fotos_visibles(:'consulta_c', true);
+reset role;
+select prueba.como(:'dueno2'); set role authenticated;
+select prueba.afirmar((select count(*) from storage.objects where bucket_id = 'huella-fotos') = 0, '19a · otra clínica no abre las fotos aunque sepa la ruta');
+select prueba.debe_fallar($$ insert into storage.objects (bucket_id, name) values ('huella-fotos', '$$ || :'neg' || '/' || :'canela' || $$/perfil/x.jpg') $$, '19b · ni siembra una foto en la ruta de otra clínica');
+select prueba.debe_fallar($$ select public.dt_huella_poner_foto('$$ || :'canela' || $$', '$$ || :'neg' || '/' || :'canela' || $$/perfil/x.jpg') $$, '19c · ni cambia la foto de perfil');
+reset role;
+select prueba.como(:'paseador'); set role authenticated;
+select prueba.afirmar((select count(*) from storage.objects where bucket_id = 'huella-fotos') = 0, '19d · el paseador no abre fotos de consulta aunque la clínica las mostró a la titular');
+reset role;
+select prueba.como(:'atacante'); set role authenticated;
+select prueba.afirmar((select count(*) from storage.objects where bucket_id = 'huella-fotos') = 0, '19e · una cuenta nueva no abre nada del bucket');
+reset role;
+select prueba.anonimo(); set role anon;
+select prueba.afirmar((select count(*) from storage.objects where bucket_id = 'huella-fotos') = 0, '19f · sin sesión tampoco');
+reset role;
