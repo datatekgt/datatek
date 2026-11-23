@@ -5,9 +5,9 @@ Actualizado: 23 nov 2026. Plan: `docs/antes-de-construir/6-plan-de-construccion.
 **Supabase compartido (`xlhaktvymmbnpotkmdct`), corrido el 23 nov 2026 con todas las verificaciones en true:** núcleo 01–08,
 Flota 100–106, Huella 200–206, Fuego 300–308, Colonia 400–406 y Obra 500–506 (lista exacta en `database/corridas-en-supabase.txt`). Lo corrido
 NO se cambia en su lugar: todo cambio va en un archivo nuevo (núcleo 09+, Flota 107+, Huella 207+, Fuego 309+, Colonia 407+,
-Obra 507+). **Pendiente de correr: Fuego 309** (`apps/fuego/database/309_fuego_etiquetas_prestamos_calendario.sql`: solo
-lecturas para las pantallas de etiquetas QR, préstamos y calendario; sin tablas nuevas). Hasta que corra, esas tres pantallas
-dan error en producción; importar no depende de ella.
+Obra 507+). **Pendiente de correr: núcleo 09 (plataforma), Huella 207 (fotos), Fuego 309 (etiquetas, préstamos,
+calendario), Colonia 407 (reportes sin ver) y Obra 507 (equipo y calendario).** `npm run supabase:pendientes` arma un solo
+archivo con su verificación. Hasta que corran, esas pantallas fallan con «función no existe»; lo demás funciona igual.
 
 ## Etapa 0 · Núcleo
 
@@ -52,9 +52,14 @@ Pruebas al cierre de Flota: núcleo 102 comprobaciones, Flota 194, 37 ataques (0
 | O-05 Cobro por hito | Hecho | `504_obra_cobros.sql` (`dt_obra_recibir_fase` crea el cobro), `panel/Mas.tsx` |
 | O-SEG | Hecho | `apps/obra/tests/sql/590_ataques.sql` (comunes y 27–30), `ataque.mjs --estricto` en 0 |
 | Solo lectura en Obra | Hecho | `506_obra_solo_lectura.sql` |
+| Asignar supervisor desde la obra | Hecho (falta correr 507) | `507_obra_equipo_calendario.sql` (`dt_obra_equipo`), `panel/Plan.tsx` (selector), `panel/Mas.tsx` (Tu equipo) |
+| Calendario de visitas | Hecho (falta correr 507) | `507` (`dt_obra_calendario`: solo obras que le tocan), `panel/Calendario.tsx` (semana/mes, filtro por supervisor y obra; programa con `dt_obra_programar_visita`, mueve con `dt_evento_mover`) |
 
-Pendiente en Obra: calendario de visitas en el panel (los eventos ya existen), asignar supervisor desde la pantalla (la función
-existe, falta listar el equipo con nombre), enlace del residente sin cuenta, plantillas `obra_*` en `whatsapp-enviar`.
+Pendiente en Obra: enlace del residente sin cuenta, plantillas `obra_*` en `whatsapp-enviar`.
+
+Colonia, después del cierre: reportes nuevos sin ver para la administración (`apps/colonia/database/407_colonia_reportes_sin_ver.sql`,
+`panel/Inicio.tsx`, `panel/Reportes.tsx`, punto en la pestaña). Es el aviso mientras no haya plantilla de WhatsApp aprobada para la
+administración; cuando Meta la apruebe, se encola desde `dt_colonia_reportar`.
 
 ## Fuego · lo que faltaba de pantallas (23 nov 2026)
 

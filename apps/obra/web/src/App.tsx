@@ -9,6 +9,7 @@ import { FranjaSuscripcion } from '@nucleo/panel/FranjaSuscripcion'
 const Obras = lazy(() => import('./panel/Obras').then((m) => ({ default: m.Obras })))
 const Plan = lazy(() => import('./panel/Plan').then((m) => ({ default: m.Plan })))
 const Visita = lazy(() => import('./panel/Visita').then((m) => ({ default: m.Visita })))
+const Calendario = lazy(() => import('./panel/Calendario').then((m) => ({ default: m.Calendario })))
 const Reportes = lazy(() => import('./panel/Reportes').then((m) => ({ default: m.Reportes })))
 const Mas = lazy(() => import('./panel/Mas').then((m) => ({ default: m.Mas })))
 const MiObra = lazy(() => import('./cliente/MiObra').then((m) => ({ default: m.MiObra })))
@@ -29,11 +30,13 @@ const Icono = ({ d }: { d: string }) => <svg width="22" height="22" viewBox="0 0
 
 function MarcoPanel() {
   const { negocio, negocios, elegir, puede, plataforma } = useSesion()
+  // Cada pestaña dice qué capacidades pide (todas). Visitas: el calendario y ver obras (solo las que le tocan).
   const pestanas = [
-    { a: '/panel/obras', t: 'Obras', cap: 'ver_obras' as const },
-    { a: '/panel/reportes', t: 'Reportes', cap: 'ver_obras' as const },
-    { a: '/panel/mas', t: 'Más', cap: null },
-  ].filter((p) => !p.cap || puede(p.cap))
+    { a: '/panel/obras', t: 'Obras', caps: ['ver_obras'] as const },
+    { a: '/panel/visitas', t: 'Visitas', caps: ['ver_calendario', 'ver_obras'] as const },
+    { a: '/panel/reportes', t: 'Reportes', caps: ['ver_obras'] as const },
+    { a: '/panel/mas', t: 'Más', caps: [] as const },
+  ].filter((p) => p.caps.every((c) => puede(c)))
   return (
     <>
       <header className="cabecera">
@@ -93,6 +96,7 @@ export function App() {
         <Route path="obras" element={<Obras />} />
         <Route path="obras/:id" element={<Plan />} />
         <Route path="obras/:id/visita" element={<Visita />} />
+        <Route path="visitas" element={<Calendario />} />
         <Route path="reportes" element={<Reportes />} />
         <Route path="mas" element={<Mas />} />
         <Route index element={<Navigate to="/panel/obras" replace />} />

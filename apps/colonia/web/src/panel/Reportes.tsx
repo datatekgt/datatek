@@ -7,7 +7,7 @@ import { BotonesSel, Chip, Fecha } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
 import { hora, hoyGT } from '@nucleo/formato'
 import { Colonia, PASO_TEXTO, PASO_TONO, type Paso, type ReporteFila } from '../datos'
-import { Error, Estrellas, PasosReporte, VerArchivo, instanteGT, useCondominio, fechaCorta } from '../comun'
+import { Error, Estrellas, PasosReporte, VerArchivo, esperando, instanteGT, useCondominio, useSinVer, fechaCorta } from '../comun'
 
 const COLUMNAS: { paso: Paso; t: string }[] = [{ paso: 'recibido', t: 'Recibido' }, { paso: 'asignado', t: 'Asignado' }, { paso: 'visita', t: 'En visita' }, { paso: 'resuelto', t: 'Resuelto · 60 días' }]
 const FRANJAS = [['07:00', '09:00'], ['09:00', '11:00'], ['11:00', '13:00'], ['14:00', '16:00']]
@@ -20,8 +20,10 @@ export function Reportes() {
   const cerrados = useCarga(() => Colonia.reportes(actual!.id, false), [actual!.id])
   const sel = params.get('r')
   const [nuevo, setNuevo] = useState(false)
+  const sinVer = useSinVer()
   const todos = [...(abiertos.datos || []), ...(cerrados.datos || [])]
-  const recargar = () => { abiertos.recargar(); cerrados.recargar() }
+  const recargar = () => { abiertos.recargar(); cerrados.recargar(); sinVer.recargar() }
+  const acc = useAccion()
   // «En vivo»: el tablero vuelve a pedir cada 30 segundos.
   useEffect(() => { const t = window.setInterval(recargar, 30000); return () => window.clearInterval(t) }) // eslint-disable-line react-hooks/exhaustive-deps
   return (
@@ -31,15 +33,31 @@ export function Reportes() {
         {puede('gestionar_reportes') && <button className="btn btn-sec" onClick={() => setNuevo((n) => !n)}>+ Levantar un reporte</button>}
       </div>
       {nuevo && <NuevoReporte alTerminar={() => { setNuevo(false); recargar() }} />}
+      {sinVer.lista.length > 0 && (
+        <section className="aviso-caja sin-ver" aria-labelledby="sin-ver-titulo">
+          <div className="fila-entre envolver">
+            <strong id="sin-ver-titulo">{sinVer.lista.length === 1 ? '1 reporte nuevo sin ver' : `${sinVer.lista.length} reportes nuevos sin ver`}</strong>
+            <button className="btn-texto" disabled={acc.ocupado} onClick={() => acc.correr(() => sinVer.marcar(sinVer.lista.map((r) => r.id)))}>Marcar todos como vistos</button>
+          </div>
+          <span className="chico">Primero el que más lleva esperando. Al abrir uno queda visto (solo para vos); en el tablero van marcados en rojo.</span>
+          <div className="fila envolver">
+            {sinVer.lista.map((r) => <button key={r.id} type="button" className="filtro" onClick={() => setParams({ r: r.id })}>{r.titulo} · {esperando(r.creado_en)}</button>)}
+          </div>
+          <Error texto={acc.error} />
+        </section>
+      )}
       <Error texto={abiertos.error || cerrados.error} />
       <div className="grilla-2">
         <div className="tablero">
           {COLUMNAS.map((c) => {
+            // Los nuevos sin ver arriba de su columna, el más viejo primero; después el orden de siempre.
             const lista = todos.filter((r) => (c.paso === 'resuelto' ? r.paso === 'resuelto' || r.paso === 'descartado' : r.paso === c.paso))
+              .map((r, i) => ({ r, i })).sort((a, b) => (sinVer.ids.has(b.r.id) ? 1 : 0) - (sinVer.ids.has(a.r.id) ? 1 : 0)
+                || (sinVer.ids.has(a.r.id) ? a.r.creado_en.localeCompare(b.r.creado_en) : a.i - b.i)).map((x) => x.r)
             return (
               <div key={c.paso}>
                 <div className="fila-entre"><strong className="chico">{c.t}</strong><span className="suave chico">{lista.length}</span></div>
-                {lista.map((r) => <TarjetaReporte key={r.id} r={r} elegido={sel === r.id} alElegir={() => setParams({ r: r.id })} />)}
+                {lista.map((r) => <TarjetaReporte key={r.id} r={r} nuevo={sinVer.ids.has(r.id)} elegido={sel === r.id} alElegir={() => setParams({ r: r.id })} />)}
               </div>
             )
           })}
@@ -50,9 +68,10 @@ export function Reportes() {
   )
 }
 
-function TarjetaReporte({ r, elegido, alElegir }: { r: ReporteFila; elegido: boolean; alElegir: () => void }) {
+function TarjetaReporte({ r, nuevo, elegido, alElegir }: { r: ReporteFila; nuevo: boolean; elegido: boolean; alElegir: () => void }) {
   return (
-    <button type="button" className="tarjeta-rep" aria-pressed={elegido} onClick={alElegir}>
+    <button type="button" className={`tarjeta-rep${nuevo ? ' nuevo' : ''}`} aria-pressed={elegido} onClick={alElegir}>
+      {nuevo && <Chip tono="mal">Nuevo sin ver</Chip>}
       <b style={{ fontSize: 13 }}>{r.titulo}</b>
       <span className="suave chico">{r.casas.length ? `Casa ${r.casas.join(', ')}` : 'Administración'} · {r.lugar || 'sin lugar'} · {fechaCorta(r.creado_en)}</span>
       {r.paso === 'resuelto' || r.paso === 'descartado'
@@ -74,6 +93,10 @@ function Detalle({ id, alCambiar }: { id: string; alCambiar: () => void }) {
   const [hecho, setHecho] = useState('')
   const acc = useAccion()
   useEffect(() => { setProveedor(null); setDia(null); setHecho(''); setNota('') }, [id])
+  // Abrir el reporte lo marca visto para esta persona (407); el punto de la pestaña y «Hoy» se actualizan.
+  const { ids: sinVerIds, marcar } = useSinVer()
+  const porVer = sinVerIds.has(id)
+  useEffect(() => { if (porVer) marcar([id]).catch(() => {}) }, [id, porVer]) // eslint-disable-line react-hooks/exhaustive-deps
   if (!r) return <section className="tarjeta"><Error texto={error} /></section>
   const cerrado = r.paso === 'resuelto' || r.paso === 'descartado'
   const mover = (paso: Paso, extra: Parameters<typeof Colonia.moverReporte>[2] = {}) => acc.correr(async () => {

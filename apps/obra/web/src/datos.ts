@@ -56,6 +56,8 @@ export type Pago = {
   monto: number; estado: 'pendiente' | 'liberado'; liberado_en: string | null; cobro_id: string | null; cobro_estado: string | null; pagado: number; saldo: number; vence: string | null; factura_url: string | null
 }
 export type Visita = { id: string; realizada_en: string; semana: number; supervisor: string | null; revisados: number; puntos: number; notas: string | null; fotos: number }
+export type MiembroEquipo = { persona_id: string; nombre: string; rol: string; supervisa: boolean; obras: number; soy_yo: boolean }
+export type VisitaCal = { id: string; obra_id: string; obra: string; municipio: string | null; supervisor_id: string | null; supervisor: string | null; programada_para: string; estado: 'programado' | 'hecho'; realizada_en: string | null }
 export type PreguntaObra = { id: string; fase: string | null; cambio: string | null; pregunta: string; autor: string | null; mia: boolean; creada_en: string; respuesta: string | null; respondida_por: string | null; respondida_en: string | null }
 
 export const ObraDB = {
@@ -71,10 +73,15 @@ export const ObraDB = {
   motivoAtraso: (fase: string, texto: string) => rpc<void>('dt_obra_motivo_atraso', { p_fase: fase, p_texto: texto }),
   guardarHito: (obra: string, tipo: 'anticipo' | 'fase', fase: string | null, nombre: string, monto: number) =>
     rpc<string>('dt_obra_guardar_hito', { p_obra: obra, p_hito: null, p_tipo: tipo, p_fase: fase, p_nombre: nombre, p_monto: monto, p_orden: null }),
+  // Equipo con nombre y rol (507): para elegir supervisor. Solo quien arma el plan o da accesos.
+  equipo: (negocio: string) => rpc<MiembroEquipo[]>('dt_obra_equipo', { p_negocio: negocio }),
   asignarSupervisor: (obra: string, persona: string | null) => rpc<void>('dt_obra_asignar_supervisor', { p_obra: obra, p_persona: persona }),
   registrarVisita: (obra: string, fecha: string, checklist: { punto: string; ok: boolean }[], avances: { fase: string; avance: number }[], notas: string) =>
     rpc<string>('dt_obra_registrar_visita', { p_obra: obra, p_fecha: fecha, p_checklist: checklist, p_avances: avances, p_notas: notas }),
   programarVisita: (obra: string, cuando: string) => rpc<string>('dt_obra_programar_visita', { p_obra: obra, p_cuando: cuando }),
+  // Calendario de visitas (507): solo las obras que le tocan. Mover usa la función del núcleo (aviso al dueño solo si se pide).
+  calendario: (negocio: string, desde: string, hasta: string) => rpc<VisitaCal[]>('dt_obra_calendario', { p_negocio: negocio, p_desde: desde, p_hasta: hasta }),
+  moverVisita: (evento: string, cuando: string, avisar: boolean) => rpc<string | null>('dt_evento_mover', { p_evento: evento, p_cuando: cuando, p_avisar: avisar }),
   visitas: (obra: string) => rpc<Visita[]>('dt_obra_visitas', { p_obra: obra }),
   cargarRecibo: (obra: string, fase: string, tipo: string, proveedor: string, concepto: string, monto: number, fecha: string) =>
     rpc<string>('dt_obra_cargar_recibo', { p_obra: obra, p_fase: fase, p_tipo: tipo, p_proveedor: proveedor, p_concepto: concepto, p_monto: monto, p_fecha: fecha, p_foto: null }),

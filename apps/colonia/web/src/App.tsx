@@ -4,7 +4,7 @@ import { Entrar } from '@nucleo/acceso/Entrar'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { lazy, Suspense } from 'react'
 import { FranjaSuscripcion } from '@nucleo/panel/FranjaSuscripcion'
-import { ProveedorCondominio, ProveedorVecino, useCondominio, useMisCasas } from './comun'
+import { ProveedorCondominio, ProveedorSinVer, ProveedorVecino, useCondominio, useMisCasas, useSinVer } from './comun'
 
 // El panel y la herramienta del vecino se cargan por separado: el vecino no descarga el código de la administración.
 const Inicio = lazy(() => import('./panel/Inicio').then((m) => ({ default: m.Inicio })))
@@ -37,8 +37,15 @@ const ICONOS = {
 const Icono = ({ d }: { d: string }) => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d} /></svg>
 
 function MarcoPanel() {
+  const { puede } = useSesion()
+  const { actual } = useCondominio()
+  return <ProveedorSinVer condominio={actual?.id ?? null} activo={puede('ver_condominio')}><Marco /></ProveedorSinVer>
+}
+
+function Marco() {
   const { negocio, negocios, elegir, puede, plataforma } = useSesion()
   const { lista, actual, elegir: elegirCond, cargando } = useCondominio()
+  const sinVer = useSinVer().lista.length
   const pestanas = [
     { a: '/panel/inicio', t: 'Hoy', ve: puede('ver_panel') },
     { a: '/panel/reportes', t: 'Reportes', ve: puede('ver_condominio') },
@@ -54,7 +61,12 @@ function MarcoPanel() {
       <header className="cabecera">
         <span className="marca">D-TEK <b>Colonia</b></span>
         <nav className="pestanas" aria-label="Secciones">
-          {pestanas.map((p) => <NavLink key={p.a} to={p.a} className={({ isActive }) => (isActive ? 'activa' : '')}>{p.t}</NavLink>)}
+          {pestanas.map((p) => (
+            <NavLink key={p.a} to={p.a} className={({ isActive }) => (isActive ? 'activa' : '')}>
+              {p.t}
+              {p.a === '/panel/reportes' && sinVer > 0 && <><span className="punto" aria-hidden="true" title={`${sinVer} sin ver`} /><span className="solo-lector">, {sinVer} {sinVer === 1 ? 'nuevo sin ver' : 'nuevos sin ver'}</span></>}
+            </NavLink>
+          ))}
         </nav>
         <div className="derecha">
           {plataforma && <NavLink to="/plataforma" className="chico solo-ancho">Plataforma</NavLink>}

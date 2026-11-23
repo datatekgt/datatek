@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Tono } from '@nucleo/controles'
 import { fechaCorta } from '@nucleo/formato'
+import { ROLES } from '@nucleo/acceso/capacidades'
 import { ObraDB, type FaseG, type HitoG, type Foto, type EstadoFase } from './datos'
 
 export { Error } from '@nucleo/controles'
@@ -125,3 +126,6 @@ export const textoSemanas = (n: number) => `${n} ${n === 1 ? 'semana' : 'semanas
 
 // Una fecha sin hora ('YYYY-MM-DD', día de Guatemala): se lee a mediodía para que no se corra al día anterior.
 export const diaCorto = (s?: string | null) => (s ? fechaCorta(s.length === 10 ? `${s}T12:00:00-06:00` : s) : '')
+
+// Cómo se llama cada rol en Obra (el núcleo dice «Jefe» y «Técnico»).
+export const NOMBRE_ROL: Record<string, string> = { ...ROLES, jefe: 'Jefe de supervisión', tecnico: 'Supervisor de campo' }
