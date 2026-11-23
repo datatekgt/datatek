@@ -1,0 +1,442 @@
+// Recorre la app de Huella compilada contra la base real en PGlite (Supabase falso). Valida contra lo planificado
+// (docs/nichos/2-huella.md): la clínica atiende, agenda por carril, mueve con aviso, aplica vacunas con fecha real, corrige
+// con motivo, importa y avisa; la veterinaria y recepción ven solo lo suyo; la familia confirma, agenda, activa el modo
+// perdido y paga; el paseador «consulta» solo mira; quien encuentra la mascota avisa desde la placa. Falla si algo no aparece
+// o si hay errores en la consola.
+//   VITE_SUPABASE_URL=http://supa.local VITE_SUPABASE_ANON_KEY=x npm --workspace apps/huella/web run build
+//   node apps/huella/tests/pantallas/recorrido.mjs [carpeta-de-capturas]
+import fs from 'node:fs'
+import path from 'node:path'
+import { createRequire } from 'node:module'
+import { fileURLToPath } from 'node:url'
+import { crearBase } from '../../../../scripts/base.mjs'
+import { manejador } from '../../../../scripts/supabase-falso.mjs'
+
+const require = createRequire(import.meta.url)
+let chromium
+try { ({ chromium } = require('playwright')) } catch { ({ chromium } = require('/opt/node-tools/node_modules/playwright')) }
+
+const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..')
+const DIST = path.join(RAIZ, 'apps/huella/web/dist')
+const CAPTURAS = process.argv[2] || path.join(RAIZ, 'apps/huella/tests/pantallas/capturas')
+fs.mkdirSync(CAPTURAS, { recursive: true })
+if (!fs.existsSync(path.join(DIST, 'index.html'))) { console.error('Falta compilar: npm --workspace apps/huella/web run build'); process.exit(1) }
+
+const db = await crearBase(RAIZ, 'huella', fs.readFileSync(path.join(RAIZ, 'apps/huella/tests/pantallas/semilla.sql'), 'utf8'))
+const uno = async (sql) => (await db.query(sql)).rows[0]
+const { hoy, martes } = await uno(`select to_char((now() at time zone 'America/Guatemala')::date, 'YYYY-MM-DD') hoy,
+  to_char((now() at time zone 'America/Guatemala')::date + ((9 - extract(dow from (now() at time zone 'America/Guatemala')::date)::int) % 7) + 7, 'YYYY-MM-DD') martes`)
+const ids = Object.fromEntries((await db.query('select nombre, id from public.mascotas')).rows.map((r) => [r.nombre, r.id]))
+const { codigo } = await uno(`select codigo from public.placas where mascota_id = '${ids.Canela}'`)
+
+// La app se sirve (interceptada, sin servidor) en localhost: es un origen seguro y ahí el navegador sí da la ubicación,
+// como en producción con https.
+const registro = []
+const TIPOS = { '.js': 'text/javascript', '.css': 'text/css', '.html': 'text/html', '.svg': 'image/svg+xml' }
+let fallas = 0, comprobaciones = 0
+const ok = (cond, msg) => { comprobaciones++; console.log(`  ${cond ? 'ok   ' : 'FALLA'} ${msg}`); if (!cond) fallas++ }
+
+// Mismo Content-Security-Policy de vercel.json (solo connect-src apunta al Supabase falso).
+const CSP = JSON.parse(fs.readFileSync(path.join(RAIZ, 'apps/huella/web/vercel.json'), 'utf8')).headers.flatMap((h) => h.headers)
+  .find((h) => h.key === 'Content-Security-Policy').value.replace(/connect-src [^;]+/, 'connect-src http://supa.local')
+
+const navegador = await chromium.launch()
+async function contexto(ancho, alto, extra = {}) {
+  const ctx = await navegador.newContext({ viewport: { width: ancho, height: alto }, locale: 'es-GT', timezoneId: 'America/Guatemala', ...extra })
+  await ctx.route('http://supa.local/**', manejador(db, registro))
+  await ctx.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ status: 200, body: '' }))
+  await ctx.route('https://fonts.gstatic.com/**', (r) => r.abort())
+  await ctx.route('https://pago.falso/**', (r) => r.fulfill({ status: 200, contentType: 'text/html', body: '<h1>Pago de Recurrente (simulado)</h1>' }))
+  await ctx.route('http://localhost:5182/**', (r) => {
+    const u = new URL(r.request().url())
+    let f = path.join(DIST, decodeURIComponent(u.pathname))
+    if (!f.startsWith(DIST) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) f = path.join(DIST, 'index.html')
+    return r.fulfill({ status: 200, contentType: TIPOS[path.extname(f)] || 'application/octet-stream', headers: { 'content-security-policy': CSP }, body: fs.readFileSync(f) })
+  })
+  const pagina = await ctx.newPage()
+  pagina.setDefaultTimeout(8000)
+  const errores = []
+  pagina.on('console', (m) => { if (m.type() === 'error') errores.push(m.text()) })
+  pagina.on('pageerror', (e) => errores.push(String(e)))
+  return { ctx, pagina, errores }
+}
+async function entrar(pagina, tel) {
+  await pagina.goto('http://localhost:5182/')
+  await pagina.getByLabel('Tu teléfono').fill(tel)
+  await pagina.getByRole('button', { name: 'Mandarme el código' }).click()
+  await pagina.getByLabel(/Código que te llegó/).fill('123456')
+  await pagina.getByRole('button', { name: 'Entrar' }).click()
+}
+const foto = (p, n) => p.screenshot({ path: path.join(CAPTURAS, n + '.png'), fullPage: true })
+const sinDesborde = (p) => p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)
+const sinErrores = (errores) => ok(errores.length === 0, `sin errores en la consola${errores.length ? ': ' + errores.slice(0, 3).join(' | ') : ''}`)
+// Abre el calendario desplegable (Fecha del núcleo) y toca el día; el nombre del día lo calcula el mismo navegador.
+async function elegirDia(scope, pagina, rotulo, iso, desde = hoy) {
+  await scope.getByRole('button', { name: rotulo, exact: true }).click()
+  if (iso.slice(0, 7) > desde.slice(0, 7)) await scope.getByRole('button', { name: 'Mes siguiente' }).click()
+  const nombre = await pagina.evaluate((d) => new Date(d + 'T12:00:00').toLocaleDateString('es-GT', { weekday: 'long', day: 'numeric', month: 'long' }), iso)
+  await scope.getByRole('dialog').getByRole('button', { name: nombre, exact: true }).click()
+}
+
+// ---------------- Dueña de la clínica ----------------
+console.log('Dueña de la clínica (1440 px)')
+{
+  const { ctx, pagina, errores } = await contexto(1440, 900)
+  await entrar(pagina, '55550002')
+  await pagina.waitForURL('**/panel/hoy')
+  await pagina.getByRole('heading', { name: 'Hoy', exact: true }).waitFor()
+  await pagina.getByRole('heading', { name: 'Citas de hoy' }).waitFor()
+  await pagina.getByText('Consulta general', { exact: false }).first().waitFor()
+  ok(await pagina.getByText('3 mascotas con vacunas vencidas').isVisible(), 'Hoy trae la necesidad de las vacunas vencidas')
+  ok(await pagina.getByText('2 por atender').isVisible(), 'cuenta las 2 citas de hoy por atender')
+  ok(await pagina.getByRole('link', { name: 'Rocky' }).first().isVisible(), 'la antirrábica vencida de Rocky sale en vencimientos')
+  ok((await pagina.getByRole('link', { name: 'Más', exact: true }).count()) === 1 && (await pagina.getByRole('link', { name: 'Vacunas', exact: true }).count()) === 1, 'la dueña ve todas las pestañas')
+  await foto(pagina, '00-dueno-hoy')
+  await pagina.getByRole('button', { name: 'Atendida' }).first().click()
+  await pagina.getByText(/Canela: atendida/).waitFor()
+  ok(true, 'marca la consulta de Canela como atendida')
+  await pagina.getByRole('button', { name: 'Avisar a la familia de Rocky' }).click()
+  await pagina.getByText(/Le avisamos a Pedro por WhatsApp|Ya se había avisado/).waitFor()
+  ok(true, '«Avisar» manda el recordatorio de la vacuna a la familia de Rocky')
+  await pagina.getByRole('button', { name: 'Avisar a las familias' }).click()
+  await pagina.getByText('3 mascotas con vacunas vencidas').waitFor({ state: 'detached' })
+  ok(true, 'el botón de la necesidad avisa y la quita')
+
+  // Agenda por carril
+  await pagina.getByRole('link', { name: 'Agenda', exact: true }).click()
+  await pagina.getByRole('heading', { name: 'Agenda', exact: true }).waitFor()
+  await pagina.getByRole('region', { name: 'Carril Baño' }).getByText('Rocky').waitFor()
+  ok(await pagina.getByRole('region', { name: 'Carril Clínica' }).getByText('Canela').isVisible(), 'la consulta de Canela va en el carril de la clínica')
+  ok(await pagina.getByRole('region', { name: 'Carril Baño' }).getByText('Rocky').isVisible(), 'el baño de Rocky va en el carril de baño')
+  await foto(pagina, '01-dueno-agenda-hoy')
+  await pagina.getByRole('button', { name: '+ Cita' }).click()
+  const nueva = pagina.locator('section', { has: pagina.getByRole('heading', { name: 'Nueva cita' }) })
+  await nueva.getByLabel(/^Mascota/).fill('Mich')
+  await nueva.getByRole('button', { name: /Michi/ }).click()
+  await nueva.getByRole('button', { name: /^Vacunación/ }).click()
+  await elegirDia(nueva, pagina, 'Día', martes)
+  await nueva.getByRole('group', { name: 'Hora' }).getByRole('button').first().waitFor()
+  ok(!(await nueva.getByRole('group', { name: 'Hora' }).getByRole('button', { name: /^9:00/ }).count()), 'las 9:00 del martes ya no se ofrecen (la vacuna de Canela)')
+  await nueva.getByRole('group', { name: 'Hora' }).getByRole('button', { name: /^11:00/ }).click()
+  await foto(pagina, '02-dueno-nueva-cita')
+  await nueva.getByRole('button', { name: /^Agendar .* a las/ }).click()
+  await pagina.getByText(/Michi: Vacunación agendado/).waitFor()
+  ok(true, 'agenda la vacuna de Michi a una hora libre del martes')
+  await elegirDia(pagina.locator('.titulo-pagina'), pagina, 'Día', martes)
+  const dom = pagina.getByRole('region', { name: 'Carril A domicilio' })
+  await dom.getByText('Luna').waitFor()
+  ok(await dom.getByText(/Zona 15, Vista Hermosa/).isVisible(), 'la cita a domicilio de Luna muestra la dirección')
+  ok(await pagina.getByRole('region', { name: 'Carril Clínica' }).getByText('Michi').isVisible(), 'la cita nueva de Michi aparece en el martes')
+  // Cobrar antes de salir a domicilio
+  await dom.getByRole('button', { name: 'Cobrar antes' }).click()
+  ok((await dom.getByLabel('Monto').inputValue()) === '450', 'el monto sale del precio del servicio (Q 450)')
+  await dom.getByRole('button', { name: 'Cobrar Q 450' }).click()
+  await dom.getByText('Por cobrar Q 450').waitFor()
+  ok(true, 'cobra antes la consulta a domicilio')
+  // Mover con confirmación y aviso
+  await dom.getByRole('button', { name: 'Mover' }).click()
+  await dom.getByRole('group', { name: 'Nueva hora' }).getByRole('button', { name: /^2:00 p/ }).click()
+  ok(await dom.getByText(/Pasa de/).isVisible(), 'mover pide confirmación mostrando de qué hora a qué hora')
+  ok(await dom.getByLabel(/Avisar a la familia por WhatsApp/).isChecked(), 'la casilla «avisar» viene marcada')
+  await dom.getByRole('button', { name: /Sí, mover a las 2:00 p/ }).click()
+  await pagina.getByText(/Luna: movida .* le avisamos a la familia/).waitFor()
+  ok(await dom.getByText(/^2:00 p\. m\. – 3:00 p\. m\./).isVisible(), 'la cita queda a las 2 de la tarde')
+  await foto(pagina, '03-dueno-agenda-martes')
+
+  // Mascotas: búsqueda, alta e importar
+  await pagina.getByRole('link', { name: 'Mascotas', exact: true }).click()
+  await pagina.getByRole('heading', { name: 'Mascotas', exact: true }).waitFor()
+  await pagina.getByRole('link', { name: /Canela/ }).waitFor()
+  await pagina.getByLabel('Buscar').fill('985141000123456')
+  await pagina.getByRole('link', { name: /Rocky/ }).waitFor({ state: 'detached' })
+  ok(await pagina.getByRole('link', { name: /Canela/ }).isVisible(), 'busca por microchip')
+  await pagina.getByLabel('Buscar').fill('5555 0098')
+  await pagina.getByRole('link', { name: /Rocky/ }).waitFor()
+  ok((await pagina.getByRole('link', { name: /Canela/ }).count()) === 0, 'y por teléfono del dueño')
+  await pagina.getByLabel('Buscar').fill('')
+  await pagina.getByRole('button', { name: '+ Mascota' }).click()
+  await pagina.getByRole('button', { name: 'Dueño nuevo' }).click()
+  await pagina.getByLabel('Nombre del dueño').fill('Carlos Díaz')
+  await pagina.getByLabel('Teléfono del dueño').fill('5555 0095')
+  await pagina.getByLabel('Nombre de la mascota').fill('Toby')
+  await pagina.getByRole('button', { name: 'Macho' }).click()
+  await pagina.getByRole('button', { name: 'Registrar mascota' }).click()
+  await pagina.getByRole('heading', { name: /^Toby/ }).waitFor()
+  ok(pagina.url().includes('/panel/mascotas/'), 'registra a Toby con su dueño nuevo y abre su expediente')
+  await pagina.getByRole('link', { name: '‹ Mascotas' }).click()
+  await pagina.getByRole('button', { name: 'Importar desde Excel' }).click()
+  await pagina.getByLabel(/Pegá aquí/).fill('Dueño\tTeléfono\tMascota\tEspecie\tRaza\tAntirrábica\tPeso\tColor de collar\nMaría Gómez\t5555 0094\tFirulais\tPerro\tPug\t10/01/2025\t8.5\tRojo\nMaría Gómez\t5555 0094\tNube\tGato\t\t\t\t')
+  await pagina.getByRole('status').filter({ hasText: 'Leímos' }).waitFor()
+  ok(await pagina.getByText(/Leímos 12 celdas/).isVisible(), 'cuenta las 12 celdas con dato')
+  ok((await pagina.getByLabel('Destino de Dueño').inputValue()) === 'dueno' && (await pagina.getByLabel('Destino de Mascota').inputValue()) === 'mascota', 'reconoce dueño y mascota')
+  ok((await pagina.getByLabel('Destino de Antirrábica').inputValue()) === 'antirrabica', 'reconoce la columna de la antirrábica')
+  ok((await pagina.getByLabel('Destino de Color de collar').inputValue()) === '', 'lo que no tiene lugar se guarda tal cual')
+  await foto(pagina, '04-dueno-importar')
+  await pagina.getByRole('button', { name: 'Importar 2 filas' }).click()
+  await pagina.getByRole('heading', { name: 'Importación lista' }).waitFor()
+  ok(await pagina.getByText(/2.*mascotas nuevas/).isVisible() || await pagina.getByText('mascotas nuevas', { exact: false }).isVisible(), 'muestra el resultado')
+  ok(await pagina.getByText(/vacunas? vencidas?/).first().isVisible(), 'la antirrábica de 2025 de Firulais aparece como vencida')
+  await pagina.getByRole('link', { name: /Firulais/ }).waitFor()
+  await pagina.getByRole('button', { name: 'Deshacer la importación' }).click()
+  await pagina.getByRole('heading', { name: 'Importación lista' }).waitFor({ state: 'detached' })
+  await pagina.getByRole('link', { name: /Firulais/ }).waitFor({ state: 'detached' })
+  ok(true, 'deshacer quita lo importado')
+
+  // Expediente de Canela
+  await pagina.getByRole('link', { name: /Canela/ }).click()
+  await pagina.getByRole('heading', { name: /^Canela/ }).waitFor()
+  ok(await pagina.getByText('Alergias: Pollo').isVisible(), 'las alergias salen arriba del expediente')
+  ok(await pagina.getByText(/Vencida hace 15 días/).isVisible(), 'la antirrábica dice cuánto lleva vencida')
+  await pagina.getByRole('button', { name: 'Aplicar Antirrábica' }).click()
+  ok(await pagina.getByRole('button', { name: /^Se aplicó el/ }).textContent().then((t) => t.includes('Hoy')), 'la fecha de aplicación es hoy por defecto')
+  await pagina.getByLabel(/Lote del frasco/).fill('rb3301')
+  await pagina.getByRole('button', { name: 'Guardar dosis' }).click()
+  await pagina.getByText(/Antirrábica anotada/).waitFor()
+  await pagina.getByText(/Antirrábica · .* · Lote RB3301|Lote RB3301/).first().waitFor()
+  ok((await pagina.getByText(/Vencida hace 15 días/).count()) === 0, 'al aplicarla deja de estar vencida (la próxima sale de la fecha real)')
+  await pagina.getByRole('button', { name: /^Corregir Antirrábica/ }).first().click()
+  await pagina.getByLabel('Motivo').fill('Se anotó con el lote equivocado')
+  await pagina.getByRole('button', { name: 'Corregir la dosis' }).click()
+  await pagina.getByText('Dosis corregida.').waitFor()
+  await pagina.getByText(/Corregida: Se anotó con el lote equivocado/).first().waitFor()
+  ok(true, 'la dosis corregida queda tachada con su motivo')
+  await pagina.getByRole('button', { name: '+ Consulta' }).click()
+  await pagina.getByRole('button', { name: 'Control', exact: true }).click()
+  await pagina.getByLabel('Mensaje para la familia').fill('El oído sanó bien')
+  await pagina.getByRole('button', { name: '+ Medicamento' }).click()
+  await pagina.getByLabel('Medicamento').fill('Vitaminas')
+  await pagina.getByRole('button', { name: 'Guardar consulta' }).click()
+  await pagina.getByText(/Consulta de Canela guardada/).waitFor()
+  await pagina.getByText('Consulta: Control').waitFor()
+  ok(true, 'la consulta entra a la línea de tiempo')
+  ok(await pagina.getByText(/Nota interna: Dueña muy atenta/).isVisible(), 'la clínica ve sus notas internas')
+  ok(await pagina.getByRole('heading', { name: 'Invitar a la familia' }).isVisible(), 'la dueña puede invitar a la familia')
+  ok(await pagina.getByText('Activa', { exact: true }).first().isVisible(), 'la placa de Canela está activa')
+  await foto(pagina, '05-dueno-expediente')
+  // Placa para Michi
+  await pagina.goto(`http://localhost:5182/panel/mascotas/${ids.Michi}`)
+  await pagina.getByRole('heading', { name: /^Michi/ }).waitFor()
+  await pagina.getByRole('button', { name: 'Asignar placa del stock' }).click()
+  await pagina.getByRole('group', { name: /Placa para Michi/ }).getByRole('button').first().click()
+  await pagina.getByRole('button', { name: 'Asignar placa' }).click()
+  await pagina.getByText('Ver lo que ve quien la encuentra').waitFor()
+  ok(true, 'asigna a Michi una placa del stock')
+  // Carné
+  await pagina.goto(`http://localhost:5182/carne/${ids.Canela}`)
+  await pagina.getByRole('heading', { name: 'Canela' }).waitFor()
+  ok(await pagina.getByRole('cell', { name: 'Polivalente' }).isVisible(), 'el carné trae la polivalente con su fecha real')
+  ok((await pagina.getByText('RB3301').count()) === 0, 'la dosis corregida no sale en el carné')
+  await pagina.emulateMedia({ media: 'print' })
+  ok(!(await pagina.getByRole('button', { name: 'Imprimir o guardar PDF' }).isVisible()), 'al imprimir se esconden los botones')
+  await foto(pagina, '06-carne-impresion')
+  await pagina.emulateMedia({ media: 'screen' })
+  await pagina.goto('http://localhost:5182/panel/vacunas')
+
+  // Vacunas: vencimientos y plan
+  await pagina.getByRole('heading', { name: 'Vencen en los próximos 60 días' }).waitFor()
+  await pagina.getByRole('link', { name: 'Rocky' }).first().waitFor()
+  await pagina.getByRole('button', { name: /^Elegir las/ }).click()
+  await pagina.getByRole('button', { name: /^Avisar a \d+/ }).click()
+  await pagina.getByText(/Avisamos a \d+ famil/).waitFor()
+  ok(true, 'elige todas y avisa (un mensaje por mascota)')
+  // Bordetella no tiene dosis: ajustar una vacuna con dosis hoy deja esas dosis fuera (ver pendientes de la base).
+  await pagina.getByRole('button', { name: /^Cambiar Bordetella/ }).click()
+  await pagina.getByRole('button', { name: '3 años' }).click()
+  await pagina.getByRole('button', { name: 'Guardar', exact: true }).click()
+  await pagina.getByText(/cada 3 años .*ajustada por la clínica/).waitFor()
+  ok(true, 'la clínica ajusta el plan: bordetella cada 3 años')
+  await foto(pagina, '07-dueno-vacunas')
+
+  // Más
+  await pagina.getByRole('link', { name: 'Más', exact: true }).click()
+  await pagina.getByRole('heading', { name: 'Cobros' }).waitFor()
+  await pagina.getByText(/Consulta general · Canela/).waitFor()
+  ok(true, 'atender la cita creó su cobro con el precio del servicio')
+  ok(await pagina.getByText('Consulta a domicilio · 60 min · Q 450', { exact: false }).isVisible() || await pagina.getByText(/A domicilio · 60 min · Q 450/).isVisible(), 'los servicios muestran carril, duración y precio')
+  await pagina.getByRole('button', { name: 'Crear 10 placas' }).click()
+  await pagina.getByText('Creamos 10 placas. Ya están en stock.').waitFor()
+  ok(await pagina.getByText('13', { exact: true }).isVisible(), 'quedan 13 placas en stock (3 que había + 10)')
+  ok(await pagina.getByRole('button', { name: /Veterinario o groomer/ }).isVisible(), 'el equipo usa los nombres de Huella')
+  await pagina.getByRole('button', { name: 'A domicilio', exact: true }).last().click()
+  await pagina.getByRole('button', { name: /Guardar horario de a domicilio/ }).click()
+  await pagina.getByText('✓ Guardado').waitFor()
+  ok(true, 'guarda el horario del carril a domicilio')
+  await foto(pagina, '08-dueno-mas')
+  sinErrores(errores)
+  await ctx.close()
+}
+
+// ---------------- Veterinario (técnico) ----------------
+console.log('Veterinario (1024 px)')
+{
+  const { ctx, pagina, errores } = await contexto(1024, 800)
+  await entrar(pagina, '55550003')
+  await pagina.waitForURL('**/panel/hoy')
+  await pagina.getByRole('heading', { name: 'Citas de hoy' }).waitFor()
+  ok((await pagina.getByText('Por cobrar').count()) === 0, 'el veterinario no ve dinero en Hoy')
+  ok((await pagina.getByRole('button', { name: /^Avisar a la familia/ }).count()) === 0, 'no ve «Avisar» (no envía recordatorios)')
+  await pagina.goto(`http://localhost:5182/panel/mascotas/${ids.Canela}`)
+  await pagina.getByRole('heading', { name: /^Canela/ }).waitFor()
+  ok(await pagina.getByRole('button', { name: 'Aplicar Polivalente' }).isVisible(), 'aplica vacunas')
+  ok((await pagina.getByRole('button', { name: /^Corregir/ }).count()) === 0, 'pero no corrige dosis (no tiene corregir_dosis)')
+  ok(await pagina.getByRole('button', { name: '+ Consulta' }).isVisible(), 'registra consultas')
+  ok((await pagina.getByRole('heading', { name: 'Invitar a la familia' }).count()) === 0, 'no invita a la familia')
+  await foto(pagina, '09-veterinario-expediente')
+  await pagina.getByRole('link', { name: 'Más', exact: true }).click()
+  await pagina.getByRole('heading', { name: 'Tu sesión' }).waitFor()
+  ok(await pagina.getByText(/Veterinario o groomer/).isVisible(), 'su rol se llama «Veterinario o groomer»')
+  ok((await pagina.getByRole('heading', { name: 'Cobros' }).count()) === 0 && (await pagina.getByRole('heading', { name: 'Servicios' }).count()) === 0, 'no ve cobros ni servicios')
+  ok((await pagina.getByRole('button', { name: /^Crear \d+ placas/ }).count()) === 0, 've las placas pero no crea')
+  sinErrores(errores)
+  await ctx.close()
+}
+
+// ---------------- Recepción (caja) ----------------
+console.log('Recepción (768 px)')
+{
+  const { ctx, pagina, errores } = await contexto(768, 900)
+  await entrar(pagina, '55550004')
+  await pagina.waitForURL('**/panel/hoy')
+  await pagina.getByText('Por cobrar').first().waitFor()
+  ok(true, 'recepción ve lo que hay por cobrar')
+  await pagina.getByRole('link', { name: 'Agenda', exact: true }).click()
+  await pagina.getByRole('region', { name: 'Carril Baño' }).getByText('Rocky').waitFor()
+  ok((await pagina.getByRole('button', { name: 'Mover' }).count()) === 0, 'recepción no mueve citas (no tiene mover_calendario)')
+  await pagina.getByRole('link', { name: 'Más', exact: true }).click()
+  await pagina.getByRole('heading', { name: 'Cobros' }).waitFor()
+  ok((await pagina.getByRole('heading', { name: 'Invitar a tu equipo' }).count()) === 0, 'no invita al equipo')
+  ok(await pagina.getByRole('button', { name: 'Anotar pago' }).first().isVisible(), 'anota pagos en caja')
+  ok(await sinDesborde(pagina), 'no se sale de lado en 768 px')
+  await foto(pagina, '10-recepcion-mas')
+  sinErrores(errores)
+  await ctx.close()
+}
+
+// ---------------- Familia (titular) ----------------
+console.log('Familia de Canela (390 px)')
+{
+  const { ctx, pagina, errores } = await contexto(390, 844)
+  await entrar(pagina, '55550099')
+  await pagina.waitForURL('**/mi')
+  await pagina.getByText('Lo que toca primero').waitFor()
+  ok(await pagina.getByText('Canela: Antirrábica').isVisible(), 'lo que toca primero es la antirrábica de Canela (la dosis de hoy se corrigió)')
+  ok(await pagina.getByRole('link', { name: /Michi/ }).isVisible(), 've a sus dos mascotas')
+  ok((await pagina.getByText('Rocky').count()) === 0, 'no ve mascotas de otra familia')
+  ok(await sinDesborde(pagina), 'no se sale de lado en 390 px')
+  await foto(pagina, '11-familia-mis-mascotas')
+  await pagina.getByRole('link', { name: /Canela/ }).click()
+  await pagina.getByRole('heading', { name: 'Medicamentos de hoy' }).waitFor()
+  ok(await pagina.getByText('Otomax gotas', { exact: true }).isVisible(), 've lo que toma hoy')
+  ok(await pagina.getByText('Ponerle las gotas dos veces al día').isVisible(), 've el mensaje de la clínica')
+  ok((await pagina.getByText(/Dueña muy atenta/).count()) === 0, 'no ve las notas internas')
+  await pagina.getByRole('button', { name: 'Se perdió: activar modo perdido' }).click()
+  await pagina.getByLabel('Mensaje para quien la encuentre').fill('Es tímida, no la persigas')
+  await pagina.getByRole('button', { name: 'Activar modo perdido' }).click()
+  await pagina.getByRole('button', { name: /Ya apareció/ }).waitFor()
+  ok(true, 'activa el modo perdido con su mensaje')
+  await foto(pagina, '12-familia-mascota')
+  await pagina.getByRole('link', { name: 'Citas' }).click()
+  await pagina.getByRole('heading', { name: 'Citas' }).waitFor()
+  await pagina.getByRole('button', { name: 'Confirmar' }).first().click()
+  await pagina.getByText(/Cita de .* confirmada/).waitFor()
+  ok(true, 'confirma la cita que le agendó la clínica')
+  await pagina.getByRole('button', { name: '+ Agendar' }).click()
+  await pagina.getByRole('button', { name: 'Canela', exact: true }).click()
+  await pagina.getByRole('button', { name: /^Baño y corte/ }).click()
+  const agendar = pagina.locator('section', { has: pagina.getByRole('heading', { name: 'Agendar una cita' }) })
+  await elegirDia(agendar, pagina, 'Día', martes)
+  await agendar.getByRole('group', { name: 'Hora' }).getByRole('button').first().click()
+  await agendar.getByRole('button', { name: /^Agendar .* a las/ }).click()
+  await pagina.getByText(/queda confirmada/).waitFor()
+  ok(true, 'agenda el baño de Canela desde su teléfono')
+  ok(await sinDesborde(pagina), 'las citas no se salen de lado')
+  await foto(pagina, '13-familia-citas')
+  await pagina.getByRole('link', { name: 'Cuenta' }).click()
+  await pagina.getByText(/Consulta general · Canela/).waitFor()
+  ok(await pagina.getByRole('button', { name: 'Pagar Q 250' }).isVisible(), 'la cuenta trae el cobro de la consulta con «Pagar»')
+  await foto(pagina, '14-familia-cuenta')
+  await pagina.getByRole('button', { name: 'Pagar Q 250' }).click()
+  await pagina.waitForURL('https://pago.falso/**').catch(() => {})
+  ok(pagina.url().startsWith('https://pago.falso/'), 'Pagar abre el enlace de Recurrente')
+  ok(errores.filter((e) => !e.includes('pago.falso')).length === 0, `sin errores en la consola${errores.length ? ': ' + errores.slice(0, 3).join(' | ') : ''}`)
+  await ctx.close()
+}
+
+// ---------------- Paseador («consulta») ----------------
+console.log('Paseador, solo consulta (375 px)')
+{
+  const { ctx, pagina, errores } = await contexto(375, 760)
+  await entrar(pagina, '55550097')
+  await pagina.waitForURL('**/mi')
+  await pagina.getByRole('link', { name: /Canela/ }).waitFor()
+  ok((await pagina.getByRole('link', { name: 'Agendar la vacuna' }).count()) === 0, 'no agenda (solo mira)')
+  await pagina.getByRole('link', { name: 'Citas' }).click()
+  await pagina.getByText('Vacunación').first().waitFor()
+  ok((await pagina.getByRole('button', { name: /Confirmar|Cancelar|Agendar/ }).count()) === 0, 'no confirma, cancela ni agenda citas')
+  ok((await pagina.getByText(/Vista Hermosa/).count()) === 0, 'no ve direcciones')
+  ok(await sinDesborde(pagina), 'no se sale de lado en 375 px')
+  await foto(pagina, '15-paseador-citas')
+  await pagina.getByRole('link', { name: 'Cuenta' }).click()
+  await pagina.getByText(/los cobros los ve la persona titular/).waitFor()
+  ok((await pagina.getByRole('button', { name: /^Pagar/ }).count()) === 0, 'no ve cobros')
+  sinErrores(errores)
+  await ctx.close()
+}
+
+// ---------------- Quien encuentra a Canela (público) ----------------
+console.log('Placa en modo perdido, sin cuenta (375 px)')
+{
+  const { ctx, pagina, errores } = await contexto(375, 760, { permissions: ['geolocation'], geolocation: { latitude: 14.60123, longitude: -90.51876 } })
+  await pagina.goto(`http://localhost:5182/p/${codigo}`)
+  await pagina.getByRole('heading', { name: 'Canela' }).waitFor()
+  ok(await pagina.getByRole('alert').filter({ hasText: 'Me perdí' }).isVisible(), 'dice que está perdida')
+  ok(await pagina.getByText('«Es tímida, no la persigas»').isVisible(), 'muestra el mensaje de la familia')
+  ok((await pagina.getByRole('link', { name: 'Llamar a mi familia' }).getAttribute('href')) === 'tel:+50255550099', 'en modo perdido deja llamar a la familia')
+  const texto = await pagina.locator('body').innerText()
+  ok(!texto.includes('López') && !texto.includes('Vista Hermosa') && !texto.includes('Zona'), 'nunca muestra apellido ni dirección')
+  ok(await sinDesborde(pagina), 'no se sale de lado en 375 px')
+  await foto(pagina, '16-placa-perdida')
+  await pagina.getByRole('button', { name: 'Avisar a la familia' }).click()
+  await pagina.getByText('¡Gracias! Le avisamos a su familia por WhatsApp.').waitFor()
+  ok(await pagina.getByText(/lugar aproximado/).isVisible(), 'avisa con la ubicación (redondeada) cuando dan permiso')
+  await foto(pagina, '17-placa-avisada')
+  const esc = await uno(`select lat::text, lng::text from public.placa_escaneos order by en desc limit 1`)
+  ok(esc.lat === '14.601' && esc.lng === '-90.519', 'la ubicación se guarda redondeada a unos 100 m')
+  sinErrores(errores)
+  await ctx.close()
+}
+{
+  const { ctx, pagina, errores } = await contexto(375, 760)
+  await pagina.goto(`http://localhost:5182/p/${codigo}`)
+  await pagina.getByRole('button', { name: 'Avisar a la familia' }).click()
+  await pagina.getByText('¡Gracias! Le avisamos a su familia por WhatsApp.').waitFor()
+  ok(await pagina.getByText(/Sin ubicación/).isVisible(), 'si no dan permiso, avisa igual sin ubicación')
+  await pagina.goto('http://localhost:5182/p/' + '0'.repeat(36))
+  await pagina.getByRole('heading', { name: 'Placa sin datos' }).waitFor()
+  ok(true, 'un código que no existe no muestra nada')
+  sinErrores(errores)
+  await ctx.close()
+}
+
+// ---------------- La familia ve dónde la escanearon ----------------
+console.log('Familia: dónde la escanearon (390 px)')
+{
+  const { ctx, pagina, errores } = await contexto(390, 844)
+  await entrar(pagina, '55550099')
+  await pagina.waitForURL('**/mi')
+  await pagina.goto(`http://localhost:5182/mi/mascota/${ids.Canela}`)
+  await pagina.getByText('Dónde la escanearon').waitFor()
+  ok(await pagina.getByRole('link', { name: 'Ver en el mapa' }).isVisible(), 've el punto en el mapa')
+  ok(await pagina.getByText('sin ubicación', { exact: true }).first().isVisible(), 'y el aviso que llegó sin ubicación')
+  await foto(pagina, '18-familia-escaneos')
+  sinErrores(errores)
+  await ctx.close()
+}
+
+await navegador.close()
+const fallos = registro.filter((r) => r.tipo === 'error')
+ok(fallos.length === 0, `la base no rechazó ninguna llamada${fallos.length ? ': ' + fallos.map((f) => f.ruta + ' ' + f.mensaje).slice(0, 3).join(' | ') : ''}`)
+await db.close()
+console.log(`${comprobaciones} comprobaciones, ${registro.filter((r) => r.tipo === 'rpc').length} llamadas a la base`)
+console.log(fallas ? `${fallas} comprobaciones fallaron` : 'Todo el recorrido en verde')
+process.exit(fallas ? 1 : 0)
