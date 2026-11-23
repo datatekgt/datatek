@@ -4,3 +4,4 @@ dist/
 .env*
 apps/flota/tests/pantallas/capturas/
 para-supabase/
+.claude/worktrees/
