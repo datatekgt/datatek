@@ -33,4 +33,6 @@ if (malas.length) { console.error('Verificación falsa en:', malas); process.exi
 fs.mkdirSync(salida, { recursive: true })
 fs.writeFileSync(path.join(salida, `${app}-1-migraciones.sql`), todo)
 fs.writeFileSync(path.join(salida, `${app}-2-verificacion.sql`), verificacion)
-console.log(`${archivos.length} migraciones corridas dos veces sin error y ${filas.length} verificaciones en true.\n${path.join(salida, `${app}-1-migraciones.sql`)}\n${path.join(salida, `${app}-2-verificacion.sql`)}`)
+// Todo en uno: las migraciones y al final la verificación (el SQL Editor muestra el resultado de la última consulta).
+fs.writeFileSync(path.join(salida, `${app}-todo.sql`), todo + '\n\n-- ===== Verificación: esta tabla es la que se pega en el chat =====\n' + verificacion)
+console.log(`${archivos.length} migraciones corridas dos veces sin error y ${filas.length} verificaciones en true.\n${path.join(salida, `${app}-todo.sql`)}\n${path.join(salida, `${app}-1-migraciones.sql`)}\n${path.join(salida, `${app}-2-verificacion.sql`)}`)
