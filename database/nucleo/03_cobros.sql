@@ -162,11 +162,39 @@ language sql stable security definer set search_path = public as $$
   order by c.creado_en desc
 $$;
 
--- Recurrente, paso 1 (lo llama la función recurrente-cobro con la sesión de quien pide): valida y reserva el enlace por el saldo.
+-- Llaves de Recurrente de cada negocio (D7: cada negocio cobra con SU cuenta). Solo las lee el servidor (service_role).
+-- Pendiente para producción: moverlas a Supabase Vault (cifradas); esta tabla ya no tiene ningún permiso para la app.
+create table if not exists public.recurrente_llaves (
+  negocio_id uuid primary key references public.negocios(id) on delete cascade,
+  secret_key text not null,
+  webhook_secret text not null,
+  actualizado_en timestamptz not null default now()
+);
+
+-- El dueño conecta su cuenta: guarda las llaves y nunca las vuelve a ver.
+create or replace function public.dt_recurrente_conectar(p_negocio uuid, p_secret_key text, p_webhook_secret text)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  perform public.dt_exigir(p_negocio, 'configurar_negocio');
+  if coalesce(p_secret_key, '') !~ '^sk_(live|test)_[A-Za-z0-9]{10,}$' then raise exception 'llave_invalida'; end if;
+  if coalesce(p_webhook_secret, '') !~ '^whsec_[A-Za-z0-9+/=]{10,}$' then raise exception 'secreto_invalido'; end if;
+  insert into public.recurrente_llaves (negocio_id, secret_key, webhook_secret) values (p_negocio, p_secret_key, p_webhook_secret)
+  on conflict (negocio_id) do update set secret_key = excluded.secret_key, webhook_secret = excluded.webhook_secret, actualizado_en = now();
+  insert into public.pagos_cuenta (negocio_id, recurrente_conectado) values (p_negocio, true)
+  on conflict (negocio_id) do update set recurrente_conectado = true, actualizado_en = now();
+  perform public.dt_bitacora_anotar(p_negocio, 'negocio', p_negocio, 'recurrente_conectado', '{}');
+end $$;
+
+drop function if exists public.dt_recurrente_pedir_enlace(uuid);
+drop function if exists public.dt_recurrente_aviso(text, uuid, numeric, text, text);
+
+-- Recurrente, paso 1 (lo llama recurrente-cobro con la sesión de quien paga o cobra): valida y reserva el enlace por el
+-- saldo. Si ya hay un enlace listo por ese mismo saldo de menos de 72 horas, devuelve ese (no se duplican).
 create or replace function public.dt_recurrente_pedir_enlace(p_cobro uuid)
-returns table (enlace_id uuid, monto numeric, concepto text, negocio text)
+returns table (enlace_id uuid, negocio_id uuid, monto numeric, concepto text, negocio text, checkout_url text, existente boolean)
 language plpgsql security definer set search_path = public as $$
-declare v public.cobros; v_saldo numeric; v_id uuid;
+#variable_conflict use_column
+declare v public.cobros; v_saldo numeric; v_id uuid; v_e public.recurrente_enlaces;
 begin
   if auth.uid() is null then raise exception 'sin_sesion' using errcode = '42501'; end if;
   select * into v from public.cobros where id = p_cobro;
@@ -174,35 +202,65 @@ begin
   if not (public.dt_tengo_capacidad(v.negocio_id, 'cobrar') or v.cliente_id in (select public.dt_mis_clientes())) then
     raise exception 'sin_permiso' using errcode = '42501';
   end if;
-  if not coalesce((select recurrente_conectado from public.pagos_cuenta where negocio_id = v.negocio_id), false) then raise exception 'recurrente_no_conectado'; end if;
-  if v.estado not in ('por_cobrar') then raise exception 'nada_por_cobrar'; end if;
+  if not coalesce((select recurrente_conectado from public.pagos_cuenta pc where pc.negocio_id = v.negocio_id), false) then raise exception 'recurrente_no_conectado'; end if;
+  if v.estado <> 'por_cobrar' then raise exception 'nada_por_cobrar'; end if;
   v_saldo := v.monto - public.dt_cobro_pagado(p_cobro);
+  if v_saldo < 5 then raise exception 'saldo_muy_chico'; end if;
+  select * into v_e from public.recurrente_enlaces e where e.cobro_id = p_cobro and e.estado = 'listo' and e.monto = v_saldo and e.creado_en > now() - interval '72 hours' order by e.creado_en desc limit 1;
+  if v_e.id is not null then
+    return query select v_e.id, v.negocio_id, v_saldo, v.concepto, (select n.nombre from public.negocios n where n.id = v.negocio_id), v_e.checkout_url, true;
+    return;
+  end if;
   insert into public.recurrente_enlaces (cobro_id, monto, pedido_por) values (p_cobro, v_saldo, auth.uid()) returning id into v_id;
-  return query select v_id, v_saldo, v.concepto, (select nombre from public.negocios where id = v.negocio_id);
+  return query select v_id, v.negocio_id, v_saldo, v.concepto, (select n.nombre from public.negocios n where n.id = v.negocio_id), null::text, false;
 end $$;
 
--- Recurrente, paso 2 (service_role): guarda el enlace que devolvió Recurrente.
-create or replace function public.dt_recurrente_guardar_enlace(p_enlace uuid, p_checkout_url text, p_recurrente_id text)
-returns void language sql security definer set search_path = public as $$
-  update public.recurrente_enlaces set checkout_url = p_checkout_url, recurrente_id = p_recurrente_id, estado = 'listo' where id = p_enlace and estado = 'pedido'
+-- service_role: la llave del negocio para crear el checkout, y el secreto para verificar sus avisos.
+create or replace function public.dt_recurrente_llaves_de(p_negocio uuid)
+returns table (secret_key text, webhook_secret text) language sql stable security definer set search_path = public as $$
+  select secret_key, webhook_secret from public.recurrente_llaves where negocio_id = p_negocio
 $$;
 
--- Recurrente, paso 3 (service_role, desde recurrente-aviso con la firma ya verificada): anota el pago una sola vez.
-create or replace function public.dt_recurrente_aviso(p_svix_id text, p_enlace uuid, p_monto numeric, p_referencia text, p_factura_url text)
+-- Recurrente, paso 2 (service_role): guarda el enlace que devolvió Recurrente, o el error.
+create or replace function public.dt_recurrente_guardar_enlace(p_enlace uuid, p_checkout_url text, p_recurrente_id text)
+returns void language sql security definer set search_path = public as $$
+  update public.recurrente_enlaces set checkout_url = p_checkout_url, recurrente_id = p_recurrente_id,
+    estado = case when p_checkout_url is null then 'fallo' else 'listo' end
+  where id = p_enlace and estado = 'pedido'
+$$;
+
+-- Recurrente, paso 3 (service_role, desde recurrente-aviso con la firma ya verificada con el secreto de ESE negocio):
+-- anota el pago una sola vez. El checkout tiene que ser de un cobro de ese negocio.
+create or replace function public.dt_recurrente_aviso(p_svix_id text, p_negocio uuid, p_evento jsonb)
 returns text language plpgsql security definer set search_path = public as $$
-declare v_e public.recurrente_enlaces; v_res text;
+declare
+  v_tipo text := coalesce(p_evento ->> 'event_type', '');
+  v_checkout text := nullif(p_evento #>> '{checkout,id}', '');
+  v_centavos bigint; v_e public.recurrente_enlaces; v_res text; v_metodo text;
 begin
-  if exists (select 1 from public.recurrente_avisos where svix_id = p_svix_id) then return 'repetido'; end if;
-  select * into v_e from public.recurrente_enlaces where id = p_enlace for update;
-  if v_e.id is null then v_res := 'enlace_desconocido';
-  elsif round(p_monto, 2) <> v_e.monto then v_res := 'monto_distinto';
-  elsif v_e.estado = 'pagado' then v_res := 'enlace_ya_pagado';
+  if nullif(trim(coalesce(p_svix_id, '')), '') is null then raise exception 'falta_svix_id'; end if;
+  insert into public.recurrente_avisos (svix_id, resultado) values (p_svix_id, 'recibido') on conflict (svix_id) do nothing;
+  if not found then return 'repetido'; end if;
+  if v_tipo not in ('intent.succeeded', 'payment_intent.succeeded') then v_res := 'ignorado';
+  elsif v_checkout is null then v_res := 'sin_checkout';
   else
-    perform public.dt_cobro_registrar_pago(v_e.cobro_id, p_monto, 'recurrente', p_referencia, p_factura_url, null);
-    update public.recurrente_enlaces set estado = 'pagado' where id = p_enlace;
-    v_res := 'anotado';
+    select e.* into v_e from public.recurrente_enlaces e join public.cobros c on c.id = e.cobro_id
+      where e.recurrente_id = v_checkout and c.negocio_id = p_negocio for update of e;
+    if v_e.id is null then v_res := 'checkout_ajeno';
+    elsif v_e.estado = 'pagado' then v_res := 'ya_pagado';
+    else
+      v_centavos := coalesce(nullif(p_evento ->> 'amount_in_cents', '')::bigint, nullif(p_evento #>> '{checkout,total_in_cents}', '')::bigint);
+      if v_centavos is null or v_centavos <> round(v_e.monto * 100) then v_res := 'monto_distinto';
+      else
+        v_metodo := case p_evento ->> 'type' when 'bank_transfer' then 'transferencia' else 'tarjeta' end;
+        perform public.dt_cobro_registrar_pago(v_e.cobro_id, v_e.monto, 'recurrente', left(coalesce(nullif(p_evento ->> 'id', ''), v_checkout) || ' · ' || v_metodo, 120),
+          nullif(p_evento ->> 'tax_invoice_url', ''), null);
+        update public.recurrente_enlaces set estado = 'pagado' where id = v_e.id;
+        v_res := 'anotado';
+      end if;
+    end if;
   end if;
-  insert into public.recurrente_avisos (svix_id, enlace_id, resultado) values (p_svix_id, v_e.id, v_res);
+  update public.recurrente_avisos set resultado = v_res, enlace_id = v_e.id where svix_id = p_svix_id;
   return v_res;
 end $$;
 
@@ -212,6 +270,8 @@ alter table public.cobro_pagos enable row level security;
 alter table public.pagos_cuenta enable row level security;
 alter table public.recurrente_enlaces enable row level security;
 alter table public.recurrente_avisos enable row level security;
+alter table public.recurrente_llaves enable row level security;
+revoke all on public.recurrente_llaves from anon, authenticated;
 revoke all on public.cobros, public.cobro_pagos, public.pagos_cuenta, public.recurrente_enlaces, public.recurrente_avisos from anon;
 revoke insert, update, delete, truncate on public.cobros, public.cobro_pagos, public.pagos_cuenta, public.recurrente_enlaces, public.recurrente_avisos from authenticated;
 drop policy if exists cobros_ver on public.cobros;
@@ -228,8 +288,9 @@ create policy enlaces_ver on public.recurrente_enlaces for select to authenticat
 revoke execute on function public.dt_cobro_pagado(uuid), public.dt_cobro_crear(uuid, uuid, text, uuid, text, numeric, date),
   public.dt_cobro_registrar_pago(uuid, numeric, text, text, text, text), public.dt_cobro_anotar_pago(uuid, numeric, text, text, text),
   public.dt_cobro_anular(uuid, text), public.dt_cobros(uuid, text), public.dt_mis_cobros(uuid), public.dt_recurrente_pedir_enlace(uuid),
-  public.dt_recurrente_guardar_enlace(uuid, text, text), public.dt_recurrente_aviso(text, uuid, numeric, text, text)
+  public.dt_recurrente_guardar_enlace(uuid, text, text), public.dt_recurrente_aviso(text, uuid, jsonb), public.dt_recurrente_conectar(uuid, text, text),
+  public.dt_recurrente_llaves_de(uuid)
   from public, anon, authenticated;
 grant execute on function public.dt_cobro_anotar_pago(uuid, numeric, text, text, text), public.dt_cobro_anular(uuid, text),
-  public.dt_cobros(uuid, text), public.dt_mis_cobros(uuid), public.dt_recurrente_pedir_enlace(uuid) to authenticated;
-grant execute on function public.dt_recurrente_guardar_enlace(uuid, text, text), public.dt_recurrente_aviso(text, uuid, numeric, text, text) to service_role;
+  public.dt_cobros(uuid, text), public.dt_mis_cobros(uuid), public.dt_recurrente_pedir_enlace(uuid), public.dt_recurrente_conectar(uuid, text, text) to authenticated;
+grant execute on function public.dt_recurrente_guardar_enlace(uuid, text, text), public.dt_recurrente_aviso(text, uuid, jsonb), public.dt_recurrente_llaves_de(uuid) to service_role;

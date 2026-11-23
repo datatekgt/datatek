@@ -74,6 +74,7 @@ export const Flota = {
     if (error) throw new ErrorDeBase(enEspanol(error.message))
     return (data || []) as Documento[]
   },
+  conectarRecurrente: (negocio: string, llave: string, secreto: string) => rpc<void>('dt_recurrente_conectar', { p_negocio: negocio, p_secret_key: llave, p_webhook_secret: secreto }),
   // Pide a la función recurrente-cobro el enlace de pago por el saldo (la llave de Recurrente vive en el servidor).
   pagar: async (cobro: string) => {
     const { data, error } = await supabase.functions.invoke('recurrente-cobro', { body: { cobro_id: cobro } })

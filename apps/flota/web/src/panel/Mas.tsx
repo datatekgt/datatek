@@ -13,6 +13,7 @@ export function Mas() {
   return (
     <div className="columna" style={{ gap: 20 }}>
       {puede('ver_dinero') && <Cobros />}
+      {puede('configurar_negocio') && <Recurrente negocio={negocio!.negocio_id} />}
       {puede('configurar_negocio') && <Equipo negocio={negocio!.negocio_id} />}
       <section className="tarjeta">
         <div className="fila-entre"><div><h2>Tu sesión</h2><span className="suave chico">{negocio?.nombre} · {ROLES[negocio?.rol || ''] || negocio?.rol}</span></div><button className="btn btn-sec" onClick={salir}>Salir</button></div>
@@ -82,6 +83,31 @@ function AnotarPago({ cobro, alTerminar }: { cobro: Cobro; alTerminar: () => voi
       <Error texto={acc.error} />
       <div className="fila"><button className="btn" disabled={acc.ocupado} onClick={() => acc.correr(async () => { await Flota.anotarPago(cobro.id, monto, metodo, factura || null); alTerminar() })}>Guardar pago</button><button className="btn-texto" onClick={alTerminar}>Cancelar</button></div>
     </div>
+  )
+}
+
+function Recurrente({ negocio }: { negocio: string }) {
+  const [llave, setLlave] = useState('')
+  const [secreto, setSecreto] = useState('')
+  const [listo, setListo] = useState(false)
+  const acc = useAccion()
+  const webhook = `${(import.meta.env.VITE_SUPABASE_URL as string) || ''}/functions/v1/recurrente-aviso?negocio=${negocio}`
+  return (
+    <section className="tarjeta">
+      <h2>Cuenta de Recurrente</h2>
+      <p className="suave chico" style={{ margin: 0 }}>Tus clientes pagan con tarjeta y el dinero entra directo a tu cuenta. Recurrente emite la factura electrónica con tu NIT. D-TEK Flotas no toca el dinero.</p>
+      <ol className="chico" style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <li>En Recurrente → Desarrolladores, copiá tu llave secreta.</li>
+        <li>En Webhooks, agregá esta dirección con el evento <b>intent.succeeded</b> y copiá su secreto:<br /><code style={{ wordBreak: 'break-all' }}>{webhook}</code></li>
+        <li>Pegá las dos aquí. Se guardan y nadie las vuelve a ver.</li>
+      </ol>
+      <div className="grilla-campos">
+        <div className="campo"><label htmlFor="sk">Llave secreta</label><input id="sk" className="entrada" type="password" autoComplete="off" value={llave} onChange={(e) => setLlave(e.target.value.trim())} placeholder="sk_live_…" /></div>
+        <div className="campo"><label htmlFor="wh">Secreto del webhook</label><input id="wh" className="entrada" type="password" autoComplete="off" value={secreto} onChange={(e) => setSecreto(e.target.value.trim())} placeholder="whsec_…" /></div>
+      </div>
+      <Error texto={acc.error} />
+      {listo ? <span className="chico" style={{ color: 'var(--bien-texto)', fontWeight: 600 }}>✓ Cuenta conectada.</span> : <div><button className="btn" disabled={acc.ocupado} onClick={() => acc.correr(async () => { await Flota.conectarRecurrente(negocio, llave, secreto); setLlave(''); setSecreto(''); setListo(true) })}>Conectar</button></div>}
+    </section>
   )
 }
 

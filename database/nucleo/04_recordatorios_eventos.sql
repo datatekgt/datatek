@@ -62,7 +62,8 @@ begin
     v_motivo := 'repetido_en_4_horas';
   end if;
   insert into public.recordatorios (negocio_id, plantilla, telefono, variables, objeto, objeto_id, programado_para, estado, motivo, creado_por)
-  values (p_negocio, p_plantilla, coalesce(v_tel, coalesce(p_telefono, '')), coalesce(p_variables, '{}'::jsonb), p_objeto, p_objeto_id,
+  values (p_negocio, p_plantilla, coalesce(v_tel, coalesce(p_telefono, '')),
+          jsonb_build_object('negocio', (select nombre from public.negocios where id = p_negocio)) || coalesce(p_variables, '{}'::jsonb), p_objeto, p_objeto_id,
           coalesce(p_programado, now()), case when v_motivo is null then 'pendiente' else 'omitido' end, v_motivo, auth.uid())
   returning id into v_id;
   return v_id;

@@ -27,6 +27,8 @@ const MENSAJES: [RegExp, string][] = [
   [/placa_invalida/, 'La placa no es válida.'],
   [/duplicate key|unique/, 'Ya existe un registro con ese dato.'],
   [/tiene_pagos/, 'Este cobro ya tiene pagos: se devuelve, no se anula.'],
+  [/llave_invalida/, 'La llave secreta de Recurrente empieza con sk_live_ o sk_test_.'],
+  [/secreto_invalido/, 'El secreto del webhook empieza con whsec_.'],
   [/recurrente_no_conectado/, 'El negocio todavía no conectó su cuenta de Recurrente.'],
 ]
 

@@ -65,7 +65,7 @@ select prueba.debe_fallar($$ select public.dt_bitacora_anotar('$$ || :'neg' || $
 reset role;
 -- 7. Aviso de pago repetido o sin pasar por la función firmada
 select prueba.como(:'atacante'); set role authenticated;
-select prueba.debe_fallar($$ select public.dt_recurrente_aviso('svix', gen_random_uuid(), 1, 'x', null) $$, '7 · nadie con sesión finge un aviso de Recurrente');
+select prueba.debe_fallar($$ select public.dt_recurrente_aviso('svix', gen_random_uuid(), '{}') $$, '7 · nadie con sesión finge un aviso de Recurrente');
 reset role;
 -- 8. Llenar los topes de otro: repetir el aviso de cotización no gasta mensajes
 select prueba.como(:'dueno');

@@ -48,15 +48,38 @@ reset role;
 select prueba.como(:'ajeno'); set role authenticated;
 select prueba.debe_fallar($$ select * from public.dt_recurrente_pedir_enlace('$$ || :'cobro' || $$') $$, 'un ajeno no pide enlace de un cobro que no es suyo');
 -- (3) nadie con sesión anota avisos de Recurrente
-select prueba.debe_fallar($$ select public.dt_recurrente_aviso('svix_falso', '$$ || :'enlace' || $$', 3450, 'x', null) $$, 'una cuenta con sesión no puede fingir un aviso de pago');
+select prueba.debe_fallar($$ select public.dt_recurrente_aviso('svix_falso', '$$ || :'neg' || $$', '{}') $$, 'una cuenta con sesión no puede fingir un aviso de pago');
 reset role;
 
--- (2) el aviso: monto distinto no anota; el correcto anota una vez; repetido no hace nada
+-- (2) el aviso: va atado al checkout y al negocio; monto distinto no anota; el correcto anota una vez; repetido no hace nada
 set role service_role;
-select prueba.afirmar(public.dt_recurrente_aviso('svix_1', :'enlace', 100, 'r-1', null) = 'monto_distinto', 'un aviso con otro monto no anota');
-select prueba.afirmar(public.dt_recurrente_aviso('svix_2', :'enlace', 3450, 'r-2', 'https://fel.ejemplo/1') = 'anotado', 'el aviso correcto anota el pago');
-select prueba.afirmar(public.dt_recurrente_aviso('svix_2', :'enlace', 3450, 'r-2', null) = 'repetido', 'el mismo aviso dos veces no cobra dos veces');
-select prueba.afirmar(public.dt_recurrente_aviso('svix_3', :'enlace', 3450, 'r-3', null) = 'enlace_ya_pagado', 'un enlace pagado no se paga otra vez');
+select public.dt_recurrente_guardar_enlace(:'enlace', 'https://app.recurrente.com/checkout/ch_1', 'ch_1');
+reset role;
+select prueba.como(:'gerente'); set role authenticated;
+select prueba.afirmar((select existente and enlace_id = :'enlace'::uuid and checkout_url like '%ch_1' from public.dt_recurrente_pedir_enlace(:'cobro')), 'tocar Pagar otra vez devuelve el mismo enlace, no crea otro');
+reset role;
+set role service_role;
+select prueba.afirmar(public.dt_recurrente_aviso('svix_0', :'otro', '{"event_type":"intent.succeeded","checkout":{"id":"ch_1"},"amount_in_cents":345000}') = 'checkout_ajeno', 'un aviso firmado por otro negocio no paga este cobro');
+select prueba.afirmar(public.dt_recurrente_aviso('svix_1', :'neg', '{"event_type":"intent.succeeded","checkout":{"id":"ch_1"},"amount_in_cents":100}') = 'monto_distinto', 'un aviso con otro monto no anota');
+select prueba.afirmar(public.dt_recurrente_aviso('svix_x', :'neg', '{"event_type":"intent.failed","checkout":{"id":"ch_1"}}') = 'ignorado', 'un intento fallido no anota');
+select prueba.afirmar(public.dt_recurrente_aviso('svix_2', :'neg', '{"event_type":"intent.succeeded","id":"pa_9","type":"payment","checkout":{"id":"ch_1"},"amount_in_cents":345000,"tax_invoice_url":"https://fel.ejemplo/1"}') = 'anotado', 'el aviso correcto anota el pago');
+select prueba.afirmar(public.dt_recurrente_aviso('svix_2', :'neg', '{"event_type":"intent.succeeded","checkout":{"id":"ch_1"},"amount_in_cents":345000}') = 'repetido', 'el mismo aviso dos veces no cobra dos veces');
+select prueba.afirmar(public.dt_recurrente_aviso('svix_3', :'neg', '{"event_type":"intent.succeeded","checkout":{"id":"ch_1"},"amount_in_cents":345000}') = 'ya_pagado', 'un enlace pagado no se paga otra vez');
 reset role;
 select prueba.afirmar((select estado from public.cobros where id = :'cobro') = 'cobrado', 'el cobro queda cobrado');
+select prueba.afirmar((select factura_url from public.cobro_pagos where metodo = 'recurrente') = 'https://fel.ejemplo/1', 'guarda el enlace de la factura de Recurrente');
 select prueba.afirmar((select count(*) from public.bitacora where objeto = 'cobro' and objeto_id = :'cobro') = 3, 'creado y dos pagos quedan en la bitácora');
+
+-- Conectar la cuenta: solo el dueño, con llaves bien formadas, y nadie las vuelve a leer
+select prueba.como(:'tec'); set role authenticated;
+select prueba.debe_fallar($$ select public.dt_recurrente_conectar('$$ || :'neg' || $$', 'sk_test_abcdefghijkl', 'whsec_abcdefghijkl') $$, 'el técnico no conecta la cuenta de cobro');
+reset role;
+select prueba.como(:'dueno'); set role authenticated;
+select prueba.debe_fallar($$ select public.dt_recurrente_conectar('$$ || :'neg' || $$', 'cualquier cosa', 'whsec_abcdefghijkl') $$, 'una llave mal formada no se guarda');
+select public.dt_recurrente_conectar(:'neg', 'sk_test_abcdefghijkl', 'whsec_abcdefghijkl');
+select prueba.debe_fallar($$ select * from public.recurrente_llaves $$, 'ni el dueño vuelve a leer las llaves');
+select prueba.debe_fallar($$ select * from public.dt_recurrente_llaves_de('$$ || :'neg' || $$') $$, 'solo el servidor pide las llaves');
+reset role;
+set role service_role;
+select prueba.afirmar((select secret_key from public.dt_recurrente_llaves_de(:'neg')) = 'sk_test_abcdefghijkl', 'el servidor sí obtiene la llave del negocio');
+reset role;
