@@ -176,3 +176,21 @@ select prueba.como(:'dueno_obra'); set role authenticated;
 select prueba.debe_fallar($$ select public.dt_obra_reporte('$$ || :'rep' || $$') $$, '30e · el dueño no ve el reporte sin publicar');
 select prueba.afirmar(jsonb_array_length(public.dt_obra_fase(:'f_losa') -> 'fotos') = 0, '30f · ni sus fotos');
 reset role;
+-- 31. Ver por el calendario o por la lista del equipo lo que no le toca (507)
+select prueba.como(:'jefe'); set role authenticated;
+select public.dt_obra_programar_visita(:'obra2', now() + interval '2 days') as ev_ajeno \gset
+reset role;
+select prueba.como(:'campo'); set role authenticated;
+select prueba.afirmar(not exists (select 1 from public.dt_obra_calendario(:'neg', current_date, current_date + 14) where obra_id = :'obra2'), '31a · el supervisor de campo no ve las visitas de una obra que no tiene asignada');
+select prueba.debe_fallar($$ select public.dt_evento_mover('$$ || :'ev_ajeno' || $$', now() + interval '9 days', true) $$, '31b · ni la mueve (y no le manda un aviso al dueño)');
+select prueba.debe_fallar($$ select * from public.dt_obra_equipo('$$ || :'neg' || $$') $$, '31c · ni lista al equipo');
+reset role;
+select prueba.como(:'dueno2'); set role authenticated;
+select prueba.debe_fallar($$ select * from public.dt_obra_calendario('$$ || :'neg' || $$', current_date, current_date + 14) $$, '31d · otra supervisora no lee nuestro calendario');
+select prueba.debe_fallar($$ select * from public.dt_obra_equipo('$$ || :'neg' || $$') $$, '31e · ni nuestro equipo');
+select prueba.debe_fallar($$ select public.dt_obra_asignar_supervisor('$$ || :'obra' || $$', '$$ || :'dueno2' || $$') $$, '31f · ni se asigna como supervisor de nuestra obra');
+reset role;
+select prueba.como(:'dueno'); set role authenticated;
+select prueba.debe_fallar($$ select public.dt_obra_asignar_supervisor('$$ || :'obra' || $$', '$$ || :'dueno2' || $$') $$, '31g · nadie de otro negocio queda como supervisor, ni puesto por el dueño');
+reset role;
+select prueba.afirmar((select count(*) from public.recordatorios where plantilla = 'cita_cambiada' and objeto_id = :'ev_ajeno') = 0, '31h · ningún aviso salió');

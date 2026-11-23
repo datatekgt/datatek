@@ -8,7 +8,7 @@ import { BotonesSel, Chip } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
 import { dinero, fechaCorta } from '@nucleo/formato'
 import { ObraDB, type FaseG, type Obra } from '../datos'
-import { Error, Gantt, Leyenda, estadoFase, textoSemanas } from '../comun'
+import { Error, Gantt, Leyenda, NOMBRE_ROL, estadoFase, textoSemanas } from '../comun'
 import { FaseCuerpo } from '../cliente/Fase'
 
 const ESTADO_CAMBIO: Record<string, { t: string; tono: 'bien' | 'aviso' | 'mal' | 'neutro' }> = {
@@ -46,6 +46,7 @@ export function Plan() {
           <Cambios o={o} recargar={obra.recargar} />
         </div>
         <div className="columna" style={{ gap: 16, minWidth: 0 }}>
+          <Supervisor o={o} recargar={obra.recargar} />
           {fase && <FaseElegida o={o} f={fase} recargar={obra.recargar} />}
           {fase && (
             <div className="preview">
@@ -57,6 +58,39 @@ export function Plan() {
         </div>
       </div>
     </>
+  )
+}
+
+// Quién supervisa la obra. Quien arma el plan lo elige de su equipo (dt_obra_equipo); solo aparecen los roles que registran
+// visitas, y la base lo vuelve a revisar al asignar. Los demás solo lo leen.
+function Supervisor({ o, recargar }: { o: Obra; recargar: () => void }) {
+  const { negocio, puede } = useSesion()
+  const elige = puede('editar_plan')
+  const equipo = useCarga(() => (elige ? ObraDB.equipo(negocio!.negocio_id) : Promise.resolve([])), [elige, negocio!.negocio_id])
+  const [hecho, setHecho] = useState('')
+  const acc = useAccion()
+  const opciones = (equipo.datos || []).filter((m) => m.supervisa)
+  return (
+    <section className="tarjeta">
+      <div><h2>Supervisor de la obra</h2><span className="suave chico">Registra las visitas y sube las fotos; el supervisor de campo solo ve las obras que tiene asignadas.</span></div>
+      {elige ? (
+        <label className="campo"><span className="rotulo">Quién supervisa</span>
+          <select className="entrada" value={o.supervisor_id || ''} disabled={acc.ocupado || !equipo.datos} onChange={(e) => {
+            const id = e.target.value || null
+            acc.correr(async () => {
+              await ObraDB.asignarSupervisor(o.id, id)
+              const m = opciones.find((x) => x.persona_id === id)
+              setHecho(m ? `${m.nombre} ya ve la obra y sus visitas.` : 'La obra quedó sin supervisor.'); recargar(); equipo.recargar()
+            })
+          }}>
+            <option value="">Sin supervisor</option>
+            {opciones.map((m) => <option key={m.persona_id} value={m.persona_id}>{m.nombre} · {NOMBRE_ROL[m.rol] || m.rol}{m.obras ? ` · ${m.obras} ${m.obras === 1 ? 'obra' : 'obras'}` : ''}</option>)}
+          </select>
+        </label>
+      ) : <span><b>{o.supervisor || 'Sin supervisor'}</b></span>}
+      {hecho && <span className="chico" role="status" style={{ color: 'var(--bien-texto)', fontWeight: 600 }}>✓ {hecho}</span>}
+      <Error texto={acc.error || equipo.error} />
+    </section>
   )
 }
 

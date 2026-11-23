@@ -1,6 +1,7 @@
 // Recorre la app de Obra compilada contra la base real en PGlite (Supabase falso), con el CSP de vercel.json. Valida contra lo
 // planificado: lista de obras y plan con el Gantt; el jefe publica el reporte verificado y recibe la losa (se crea el cobro);
-// el supervisor de campo ve solo su obra y registra la visita en el teléfono; el dueño de la obra (390 px) ve su avance, abre
+// el dueño asigna supervisor desde la obra y usa el calendario de visitas (semana y mes, filtro por supervisor, programar y
+// mover sin avisar); el supervisor de campo ve solo su obra y sus visitas y registra la visita en el teléfono; el dueño de la obra (390 px) ve su avance, abre
 // una fase sin costos (precio cerrado), aprueba el cambio y paga el Pago 3; la familia ve el avance sin montos.
 //   VITE_SUPABASE_URL=http://supa.local VITE_SUPABASE_ANON_KEY=x (cd apps/obra/web && npx vite build)
 //   node apps/obra/tests/pantallas/recorrido.mjs [carpeta-de-capturas]
@@ -57,6 +58,10 @@ async function entrar(pagina, tel) {
   await pagina.getByRole('button', { name: 'Entrar' }).click()
 }
 const foto = (p, n) => p.screenshot({ path: path.join(CAPTURAS, n + '.png'), fullPage: true })
+// Hoy en Guatemala y si hoy + n días cae en la misma semana (lunes a domingo) que hoy.
+const HOY = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Guatemala' }).format(new Date())
+const mismaSemana = (n) => ((new Date(HOY + 'T12:00:00Z').getUTCDay() + 6) % 7) + n <= 6
+const consulta = async (sql, p = []) => (await db.query(sql, p)).rows
 const sinScrollLateral = (p) => p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)
 
 // ---------------- Dueño de D-TEK Obra (1440) ----------------
@@ -87,8 +92,60 @@ console.log('Dueño de D-TEK Obra (1440 px)')
   await pagina.getByText('Le mandamos la decisión al dueño por WhatsApp.').waitFor()
   ok(await pagina.getByText('Cisterna de 2 m³').isVisible(), 'propone un cambio y queda esperando al dueño')
   await foto(pagina, '01-panel-plan')
+  // Supervisor desde la pantalla: la lista del equipo con nombre y rol (dt_obra_equipo).
+  const quien = pagina.getByLabel('Quién supervisa')
+  ok((await quien.locator('option:checked').textContent())?.startsWith('Julio Ajcá · Supervisor de campo'), 'la obra muestra a su supervisor elegido de la lista del equipo')
+  ok((await quien.locator('option').allTextContents()).every((t) => !t.startsWith('Caja')), 'la lista solo trae a quien puede supervisar')
+  await pagina.getByRole('link', { name: '‹ Obras' }).click()
+  await pagina.getByRole('link', { name: 'Casa Gómez' }).click()
+  await pagina.getByRole('heading', { name: 'Supervisor de la obra' }).waitFor()
+  await pagina.getByLabel('Quién supervisa').selectOption({ label: 'Ing. Marta Cux · Jefe de supervisión' })
+  await pagina.getByText('Ing. Marta Cux ya ve la obra y sus visitas.').waitFor()
+  ok((await consulta(`select p.nombre from public.obra_obras o join public.personas p on p.id = o.supervisor_id where o.nombre = 'Casa Gómez'`))[0]?.nombre === 'Ing. Marta Cux', 'asigna a la jefa como supervisora de la Casa Gómez')
+  await foto(pagina, '01b-panel-supervisor')
+  // Calendario de visitas: semana con la visita programada de la Casa López y su supervisor.
+  await pagina.getByRole('link', { name: 'Visitas', exact: true }).click()
+  await pagina.getByRole('heading', { name: 'Visitas', exact: true }).waitFor()
+  if (!mismaSemana(3)) await pagina.getByRole('button', { name: 'Semana siguiente' }).click()
+  const diaLopez = pagina.locator('button.cal-dia', { hasText: 'Casa familia López' })
+  await diaLopez.waitFor()
+  ok(await diaLopez.getByText('Julio Ajcá').isVisible(), 'la semana muestra la visita de la Casa López con su supervisor')
+  ok((await pagina.locator('button.cal-dia').count()) === 7, 'la vista de semana trae los siete días')
+  // Programar desde el calendario (dt_obra_programar_visita): la Casa Gómez, mañana.
+  await pagina.getByLabel('Obra a visitar').selectOption({ label: 'Casa Gómez · Ing. Marta Cux' })
+  await pagina.getByRole('button', { name: 'Día', exact: true }).click()
+  await pagina.getByRole('button', { name: 'Mañana' }).click()
+  await pagina.getByRole('button', { name: 'Programar', exact: true }).click()
+  await pagina.getByText(/Visita programada el .* y aviso enviado/).waitFor()
+  await pagina.locator('button.cal-dia', { hasText: 'Casa Gómez' }).waitFor()
+  ok((await consulta(`select count(*)::int n from public.eventos e join public.obra_obras o on o.id = e.objeto_id where o.nombre = 'Casa Gómez' and e.tipo = 'visita'`))[0].n === 1, 'programa la visita de la Casa Gómez y aparece en la semana')
+  ok((await consulta(`select count(*)::int n from public.recordatorios where plantilla = 'obra_visita'`))[0].n >= 2, 'y al dueño de la obra le llega el aviso obra_visita')
+  // Filtro por supervisor: con la jefa, la visita de Julio desaparece.
+  await pagina.getByLabel('Supervisor', { exact: true }).selectOption({ label: 'Ing. Marta Cux' })
+  ok((await pagina.locator('button.cal-dia', { hasText: 'Casa familia López' }).count()) === 0, 'filtrar por supervisor deja solo sus visitas')
+  await pagina.getByLabel('Supervisor', { exact: true }).selectOption({ label: 'Todos' })
+  await foto(pagina, '01c-panel-visitas-semana')
+  // Mover sin avisar (dt_evento_mover): la visita de la Casa López, una semana después.
+  if (!mismaSemana(3) && mismaSemana(1)) await pagina.getByRole('button', { name: 'Semana siguiente' }).click()
+  if (mismaSemana(3) && !mismaSemana(1)) await pagina.getByRole('button', { name: 'Semana anterior' }).click()
+  await pagina.locator('button.cal-dia', { hasText: 'Casa familia López' }).click()
+  const antes = (await consulta(`select e.programada_para from public.eventos e join public.obra_obras o on o.id = e.objeto_id where o.nombre = 'Casa familia López' and e.estado = 'programado'`))[0].programada_para
+  await pagina.getByRole('button', { name: 'Mover', exact: true }).click()
+  await pagina.getByRole('button', { name: 'Nuevo día' }).click()
+  await pagina.getByRole('button', { name: 'En una semana' }).click()
+  ok(await pagina.getByText(/Si avisás, el dueño recibe por WhatsApp/).isVisible(), 'antes de mover dice qué mensaje recibiría el dueño (D14)')
+  await pagina.getByRole('button', { name: 'Mover sin avisar' }).click()
+  await pagina.getByText('Visita movida sin avisar.').waitFor()
+  const despues = (await consulta(`select e.programada_para from public.eventos e join public.obra_obras o on o.id = e.objeto_id where o.nombre = 'Casa familia López' and e.estado = 'programado'`))[0].programada_para
+  ok(String(despues) !== String(antes), 'mueve la visita de la Casa López')
+  ok((await consulta(`select count(*)::int n from public.recordatorios where plantilla = 'cita_cambiada'`))[0].n === 0, 'sin avisar: no sale ningún mensaje')
+  await pagina.getByRole('button', { name: 'Mes', exact: true }).click()
+  await pagina.locator('.cal-mes').waitFor()
+  ok((await pagina.locator('button.cal-celda').count()) >= 28, 'la vista de mes trae todos los días')
+  await foto(pagina, '01d-panel-visitas-mes')
   await pagina.getByRole('link', { name: 'Más' }).click()
   await pagina.getByRole('heading', { name: 'Cobros' }).waitFor()
+  ok(await pagina.getByRole('heading', { name: 'Tu equipo', exact: true }).isVisible() && await pagina.getByText('Ing. Marta Cux').first().isVisible(), 'Más lista al equipo con nombre y rol')
   await foto(pagina, '02-panel-cobros')
   ok(errores.length === 0, `sin errores en la consola${errores.length ? ': ' + errores.slice(0, 3).join(' | ') : ''}`)
   await ctx.close()
@@ -129,7 +186,24 @@ console.log('Supervisor de campo (375 px)')
   ok((await pagina.getByRole('button', { name: '+ Obra' }).count()) === 0, 'no crea obras (sin editar_plan)')
   ok(await sinScrollLateral(pagina), 'la lista no se sale de lado en 375 px')
   await foto(pagina, '05-campo-obras')
+  // Sus visitas en el calendario: solo las de su obra; programa pero no mueve (sin mover_calendario).
+  await pagina.getByRole('link', { name: 'Visitas', exact: true }).click()
+  await pagina.getByRole('heading', { name: 'Visitas', exact: true }).waitFor()
+  await pagina.getByRole('heading', { name: 'Programar una visita' }).waitFor()
+  ok((await pagina.locator('button.cal-dia', { hasText: 'Casa Gómez' }).count()) === 0, 'en el calendario no ve las visitas de la obra que no tiene')
+  ok((await pagina.getByLabel('Obra a visitar').locator('option').allTextContents()).every((t) => !t.includes('Casa Gómez')), 'ni la puede programar')
+  ok((await pagina.getByRole('button', { name: 'Mover', exact: true }).count()) === 0, 'no tiene botón de mover')
+  ok(await sinScrollLateral(pagina), 'la semana no se sale de lado en 375 px')
+  await foto(pagina, '05b-campo-visitas-semana')
+  await pagina.getByRole('button', { name: 'Mes', exact: true }).click()
+  await pagina.locator('.cal-mes').waitFor()
+  ok(await sinScrollLateral(pagina), 'el mes no se sale de lado en 375 px')
+  await foto(pagina, '05c-campo-visitas-mes')
+  await pagina.getByRole('link', { name: 'Obras', exact: true }).click()
   await pagina.getByRole('link', { name: /Casa familia López/ }).click()
+  await pagina.getByRole('heading', { name: 'Supervisor de la obra' }).waitFor()
+  ok((await pagina.getByLabel('Quién supervisa').count()) === 0 && await pagina.getByText('Julio Ajcá', { exact: true }).isVisible(), 'el supervisor de campo ve quién supervisa, sin poder cambiarlo')
+  ok(await sinScrollLateral(pagina), 'el plan no se sale de lado en 375 px')
   await pagina.getByRole('link', { name: 'Registrar visita' }).click()
   await pagina.getByRole('heading', { name: /Visita · semana 14/ }).waitFor()
   ok((await pagina.getByRole('slider', { name: 'Losa' }).count()) === 0, 'la losa recibida ya no se anota')
