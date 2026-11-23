@@ -69,7 +69,7 @@ declare c public.citas;
 begin
   select * into c from public.citas where id = p_cita;
   if c.id is null or not (public.dt_tengo_capacidad(c.negocio_id, 'ver_agenda')
-      or (select m.cliente_id in (select public.dt_mis_clientes()) from public.mascotas m where m.id = c.mascota_id)) then
+      or (select m.cliente_id in (select public.dt_mis_clientes_titulares()) from public.mascotas m where m.id = c.mascota_id)) then
     raise exception 'sin_permiso' using errcode = '42501';
   end if;
   return query select k.id, k.monto, k.monto - public.dt_cobro_pagado(k.id), k.estado from public.cobros k where k.origen = 'cita' and k.origen_id = p_cita;

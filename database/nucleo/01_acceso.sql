@@ -174,6 +174,14 @@ returns setof uuid language sql stable security definer set search_path = public
   union select cliente_id from public.cliente_personas where persona_id = auth.uid()
 $$;
 
+-- Los clientes donde la persona decide (el cliente mismo, o invitada como titular o aprobador). Quien entró como «consulta»
+-- (un familiar, un paseador, alguien de la empresa que solo mira) ve, pero no ve dinero ni direcciones ni decide (ataque 16).
+create or replace function public.dt_mis_clientes_titulares()
+returns setof uuid language sql stable security definer set search_path = public as $$
+  select id from public.clientes where persona_id = auth.uid()
+  union select cliente_id from public.cliente_personas where persona_id = auth.uid() and rol in ('titular', 'aprobador')
+$$;
+
 -- ---------------------------------------------------------------------
 -- RLS: lectura mínima. Nadie escribe directo.
 -- ---------------------------------------------------------------------
@@ -319,12 +327,12 @@ end $$;
 -- Puertas: nada para anon ni public; authenticated solo lo que la app usa.
 -- ---------------------------------------------------------------------
 revoke execute on function public.dt_normalizar_telefono(text), public.dt_persona_desde_auth(), public.dt_capacidades_rol(text, text),
-  public.dt_tengo_capacidad(uuid, text), public.dt_exigir(uuid, text), public.dt_soy_miembro(uuid), public.dt_mis_clientes(),
+  public.dt_tengo_capacidad(uuid, text), public.dt_exigir(uuid, text), public.dt_soy_miembro(uuid), public.dt_mis_clientes(), public.dt_mis_clientes_titulares(),
   public.dt_crear_negocio(text, text, text), public.dt_mis_negocios(), public.dt_invitar(uuid, text, uuid, text, text),
   public.dt_aceptar_invitacion(text), public.dt_reclamar_clientes(), public.dt_crear_cliente(uuid, text, text, text, text)
   from public, anon;
 grant execute on function public.dt_normalizar_telefono(text), public.dt_capacidades_rol(text, text), public.dt_tengo_capacidad(uuid, text),
-  public.dt_exigir(uuid, text), public.dt_soy_miembro(uuid), public.dt_mis_clientes(), public.dt_crear_negocio(text, text, text),
+  public.dt_exigir(uuid, text), public.dt_soy_miembro(uuid), public.dt_mis_clientes(), public.dt_mis_clientes_titulares(), public.dt_crear_negocio(text, text, text),
   public.dt_mis_negocios(), public.dt_invitar(uuid, text, uuid, text, text), public.dt_aceptar_invitacion(text),
   public.dt_reclamar_clientes(), public.dt_crear_cliente(uuid, text, text, text, text)
   to authenticated;

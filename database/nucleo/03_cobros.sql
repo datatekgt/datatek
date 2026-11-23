@@ -187,7 +187,7 @@ language sql stable security definer set search_path = public as $$
   select c.id, c.concepto, c.monto, public.dt_cobro_pagado(c.id), c.monto - public.dt_cobro_pagado(c.id), c.vence, c.estado, c.creado_en,
          (select p.factura_url from public.cobro_pagos p where p.cobro_id = c.id and p.factura_url is not null order by p.en desc limit 1), c.agrupado_en
   from public.cobros c
-  where c.negocio_id = p_negocio and c.cliente_id in (select public.dt_mis_clientes()) and c.estado <> 'anulado'
+  where c.negocio_id = p_negocio and c.cliente_id in (select public.dt_mis_clientes_titulares()) and c.estado <> 'anulado'
   order by c.creado_en desc
 $$;
 
@@ -228,7 +228,7 @@ begin
   if auth.uid() is null then raise exception 'sin_sesion' using errcode = '42501'; end if;
   select * into v from public.cobros where id = p_cobro;
   if v.id is null then raise exception 'no_existe'; end if;
-  if not (public.dt_tengo_capacidad(v.negocio_id, 'cobrar') or v.cliente_id in (select public.dt_mis_clientes())) then
+  if not (public.dt_tengo_capacidad(v.negocio_id, 'cobrar') or v.cliente_id in (select public.dt_mis_clientes_titulares())) then
     raise exception 'sin_permiso' using errcode = '42501';
   end if;
   if not coalesce((select recurrente_conectado from public.pagos_cuenta pc where pc.negocio_id = v.negocio_id), false) then raise exception 'recurrente_no_conectado'; end if;

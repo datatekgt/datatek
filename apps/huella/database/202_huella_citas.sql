@@ -141,7 +141,7 @@ begin
   select * into m from public.mascotas where id = p_mascota;
   if m.id is null then raise exception 'no_existe'; end if;
   v_personal := public.dt_tengo_capacidad(m.negocio_id, 'ver_agenda');
-  v_familia := m.cliente_id in (select public.dt_mis_clientes());
+  v_familia := m.cliente_id in (select public.dt_mis_clientes_titulares());
   if not (v_personal or v_familia) then raise exception 'sin_permiso' using errcode = '42501'; end if;
   if m.fallecida_en is not null then raise exception 'mascota_fallecida'; end if;
   select * into s from public.huella_servicios where id = p_servicio and negocio_id = m.negocio_id and activo;
@@ -174,7 +174,7 @@ returns void language plpgsql security definer set search_path = public as $$
 declare c public.citas;
 begin
   select * into c from public.citas where id = p_cita for update;
-  if c.id is null or not (select m.cliente_id in (select public.dt_mis_clientes()) from public.mascotas m where m.id = c.mascota_id) then raise exception 'sin_permiso' using errcode = '42501'; end if;
+  if c.id is null or not (select m.cliente_id in (select public.dt_mis_clientes_titulares()) from public.mascotas m where m.id = c.mascota_id) then raise exception 'sin_permiso' using errcode = '42501'; end if;
   if c.estado <> 'agendada' then raise exception 'cita_no_por_confirmar'; end if;
   update public.citas set estado = 'confirmada' where id = p_cita;
   perform public.dt_bitacora_anotar(c.negocio_id, 'cita', p_cita, 'confirmada', '{}');
@@ -209,7 +209,7 @@ begin
   if c.id is null then raise exception 'no_existe'; end if;
   if p_estado not in ('atendida', 'no_vino', 'cancelada') then raise exception 'estado_invalido'; end if;
   if c.estado not in ('agendada', 'confirmada') then raise exception 'cita_cerrada'; end if;
-  v_familia := (select m.cliente_id in (select public.dt_mis_clientes()) from public.mascotas m where m.id = c.mascota_id);
+  v_familia := (select m.cliente_id in (select public.dt_mis_clientes_titulares()) from public.mascotas m where m.id = c.mascota_id);
   if public.dt_tengo_capacidad(c.negocio_id, 'ver_agenda') then null;
   elsif v_familia and p_estado = 'cancelada' then
     if c.inicio < now() + interval '2 hours' then raise exception 'muy_tarde_para_cancelar'; end if;
@@ -242,7 +242,8 @@ end $$;
 create or replace function public.dt_huella_mis_citas(p_negocio uuid)
 returns table (id uuid, inicio timestamptz, duracion_min integer, carril text, estado text, servicio text, mascota_id uuid, mascota text, direccion text)
 language sql stable security definer set search_path = public as $$
-  select c.id, c.inicio, c.duracion_min, c.carril, c.estado, s.nombre, m.id, m.nombre, c.direccion
+  select c.id, c.inicio, c.duracion_min, c.carril, c.estado, s.nombre, m.id, m.nombre,
+         case when m.cliente_id in (select public.dt_mis_clientes_titulares()) then c.direccion end   -- ataque 16: «consulta» no ve la dirección
   from public.citas c join public.mascotas m on m.id = c.mascota_id join public.huella_servicios s on s.id = c.servicio_id
   where c.negocio_id = p_negocio and m.cliente_id in (select public.dt_mis_clientes()) and c.estado in ('agendada', 'confirmada') and c.inicio > now() - interval '2 hours'
   order by c.inicio
@@ -259,7 +260,7 @@ drop policy if exists huella_horario_ver on public.huella_horario;
 create policy huella_horario_ver on public.huella_horario for select to authenticated using (public.dt_huella_puedo_agendar(negocio_id));
 drop policy if exists citas_ver on public.citas;
 create policy citas_ver on public.citas for select to authenticated
-  using (public.dt_tengo_capacidad(negocio_id, 'ver_agenda') or mascota_id in (select m.id from public.mascotas m where m.cliente_id in (select public.dt_mis_clientes())));
+  using (public.dt_tengo_capacidad(negocio_id, 'ver_agenda') or mascota_id in (select m.id from public.mascotas m where m.cliente_id in (select public.dt_mis_clientes_titulares())));
 
 drop trigger if exists citas_solo_lectura on public.citas;
 create trigger citas_solo_lectura before insert on public.citas for each row execute function public.dt_bloquear_si_solo_lectura();

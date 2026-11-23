@@ -11,12 +11,13 @@
     "sql:flota": "node scripts/probar-sql.mjs flota",
     "ataque:flota": "node apps/flota/tests/seguridad/ataque.mjs --estricto",
     "build:flota": "npm --workspace apps/flota/web run build",
-    "test": "node scripts/probar-sql.mjs && node scripts/probar-sql.mjs flota && node scripts/probar-sql.mjs huella && node apps/flota/tests/seguridad/ataque.mjs --estricto && node scripts/probar-verificaciones.mjs flota && node scripts/probar-verificaciones.mjs huella && node scripts/capacidades-iguales.mjs && node scripts/probar-funciones.mjs && node --test nucleo/importador/motor.test.mjs",
+    "test": "node scripts/probar-sql.mjs && node scripts/probar-sql.mjs flota && node scripts/probar-sql.mjs huella && node apps/flota/tests/seguridad/ataque.mjs --estricto && node apps/huella/tests/seguridad/ataque.mjs --estricto && node scripts/probar-verificaciones.mjs flota && node scripts/probar-verificaciones.mjs huella && node scripts/capacidades-iguales.mjs && node scripts/probar-funciones.mjs && node --test nucleo/importador/motor.test.mjs",
     "pantallas:flota": "VITE_SUPABASE_URL=http://supa.local VITE_SUPABASE_ANON_KEY=x npm --workspace apps/flota/web run build && node apps/flota/tests/pantallas/recorrido.mjs",
     "capacidades": "node scripts/capacidades-iguales.mjs",
     "funciones": "node scripts/probar-funciones.mjs",
     "salida:flota": "npm run build:flota && node scripts/revisar-salida.mjs apps/flota/web/dist",
-    "sql:huella": "node scripts/probar-sql.mjs huella"
+    "sql:huella": "node scripts/probar-sql.mjs huella",
+    "ataque:huella": "node apps/huella/tests/seguridad/ataque.mjs --estricto"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.3.0"

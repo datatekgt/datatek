@@ -317,7 +317,7 @@ declare v_neg uuid; v_cli uuid;
 begin
   select negocio_id, cliente_id into v_neg, v_cli from public.flotas where id = p_flota;
   if v_neg is null then raise exception 'no_existe'; end if;
-  if not (public.dt_tengo_capacidad(v_neg, 'ver_dinero') or v_cli in (select public.dt_mis_clientes())) then raise exception 'sin_permiso' using errcode = '42501'; end if;
+  if not (public.dt_tengo_capacidad(v_neg, 'ver_dinero') or v_cli in (select public.dt_mis_clientes_titulares())) then raise exception 'sin_permiso' using errcode = '42501'; end if;
   return query select c.id, c.concepto, c.monto, public.dt_cobro_pagado(c.id), c.monto - public.dt_cobro_pagado(c.id), c.vence, c.estado, c.creado_en, c.origen, c.agrupado_en
     from public.cobros c where c.negocio_id = v_neg and c.cliente_id = v_cli and c.estado <> 'anulado' order by c.creado_en desc;
 end $$;

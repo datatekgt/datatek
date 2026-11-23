@@ -82,7 +82,7 @@ declare v_neg uuid; v_cli uuid;
 begin
   select negocio_id, cliente_id into v_neg, v_cli from public.flotas where id = p_flota;
   if v_neg is null then raise exception 'no_existe'; end if;
-  if not (public.dt_tengo_capacidad(v_neg, 'ver_dinero') or v_cli in (select public.dt_mis_clientes())) then raise exception 'sin_permiso' using errcode = '42501'; end if;
+  if not (public.dt_tengo_capacidad(v_neg, 'ver_dinero') or v_cli in (select public.dt_mis_clientes_titulares())) then raise exception 'sin_permiso' using errcode = '42501'; end if;
   return query select k.id, k.hasta, k.cobro_id, k.ordenes, c.monto, public.dt_cobro_pagado(c.id), c.monto - public.dt_cobro_pagado(c.id), c.vence, c.estado
     from public.flota_cortes k join public.cobros c on c.id = k.cobro_id where k.flota_id = p_flota order by k.hasta desc, k.creado_en desc;
 end $$;
@@ -92,7 +92,7 @@ revoke all on public.flota_cortes from anon;
 revoke insert, update, delete, truncate on public.flota_cortes from authenticated;
 drop policy if exists flota_cortes_ver on public.flota_cortes;
 create policy flota_cortes_ver on public.flota_cortes for select to authenticated
-  using (public.dt_tengo_capacidad(negocio_id, 'ver_dinero') or flota_id in (select f.id from public.flotas f where f.cliente_id in (select public.dt_mis_clientes())));
+  using (public.dt_tengo_capacidad(negocio_id, 'ver_dinero') or flota_id in (select f.id from public.flotas f where f.cliente_id in (select public.dt_mis_clientes_titulares())));
 
 revoke execute on function public.dt_flota_corte_previo(uuid, date), public.dt_flota_cerrar_corte(uuid, date), public.dt_flota_cortes(uuid) from public, anon;
 grant execute on function public.dt_flota_corte_previo(uuid, date), public.dt_flota_cerrar_corte(uuid, date), public.dt_flota_cortes(uuid) to authenticated;
