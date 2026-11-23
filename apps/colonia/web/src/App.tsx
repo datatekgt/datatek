@@ -24,6 +24,8 @@ const Avisos = lazy(() => import('./cliente/Avisos').then((m) => ({ default: m.A
 const Reservar = lazy(() => import('./cliente/Reservar').then((m) => ({ default: m.Reservar })))
 const Junta = lazy(() => import('./cliente/Junta').then((m) => ({ default: m.Junta })))
 const Cargando = () => <p className="cargando">Cargando…</p>
+// Plataforma (D-TEK da de alta negocios): solo la descarga quien es plataforma.
+const Plataforma = lazy(() => import('@nucleo/panel/Plataforma').then((m) => ({ default: m.Plataforma })))
 
 const ICONOS = {
   casa: 'M3 11l9-8 9 8M5 10v10h14V10',
@@ -35,7 +37,7 @@ const ICONOS = {
 const Icono = ({ d }: { d: string }) => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d} /></svg>
 
 function MarcoPanel() {
-  const { negocio, negocios, elegir, puede } = useSesion()
+  const { negocio, negocios, elegir, puede, plataforma } = useSesion()
   const { lista, actual, elegir: elegirCond, cargando } = useCondominio()
   const pestanas = [
     { a: '/panel/inicio', t: 'Hoy', ve: puede('ver_panel') },
@@ -55,6 +57,7 @@ function MarcoPanel() {
           {pestanas.map((p) => <NavLink key={p.a} to={p.a} className={({ isActive }) => (isActive ? 'activa' : '')}>{p.t}</NavLink>)}
         </nav>
         <div className="derecha">
+          {plataforma && <NavLink to="/plataforma" className="chico solo-ancho">Plataforma</NavLink>}
           {lista.length > 1 ? (
             <select className="entrada" aria-label="Condominio" value={actual?.id} onChange={(e) => elegirCond(e.target.value)} style={{ minHeight: 36, width: 'auto', maxWidth: 200 }}>
               {lista.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
@@ -98,10 +101,13 @@ function MarcoVecino() {
 }
 
 export function App() {
-  const { cargando, sesion, negocio, negocios, puede } = useSesion()
+  const { cargando, sesion, negocio, negocios, plataforma, puede } = useSesion()
   const lugar = useLocation()
   if (cargando) return <p className="cargando">Cargando…</p>
   if (!sesion) return <Entrar marca="D-TEK Colonia" sub="Tu condominio al día, en tu teléfono." />
+  // Quien es plataforma y no tiene negocios entra directo a «Plataforma»; con negocios, la abre desde la cabecera.
+  if (plataforma && !negocios.length && lugar.pathname !== '/plataforma') return <Navigate to="/plataforma" replace />
+  if (plataforma && lugar.pathname === '/plataforma') return <Suspense fallback={<Cargando />}><Plataforma producto="colonia" marca={<>D-TEK <b>Colonia</b></>} /></Suspense>
   if (!negocios.length) return (
     <main className="entrar"><div className="tarjeta entrar-caja"><h1 style={{ fontSize: 18 }}>Todavía no tenés acceso</h1><p className="suave">Pedile a la administración de tu condominio que te invite con este número de teléfono.</p></div></main>
   )

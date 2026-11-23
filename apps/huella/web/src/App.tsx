@@ -21,6 +21,8 @@ const MascotaFamilia = lazy(() => import('./cliente/Mascota').then((m) => ({ def
 const Citas = lazy(() => import('./cliente/Citas').then((m) => ({ default: m.Citas })))
 const Cuenta = lazy(() => import('./cliente/Cuenta').then((m) => ({ default: m.Cuenta })))
 const Cargando = () => <p className="cargando">Cargando…</p>
+// Plataforma (D-TEK da de alta negocios): solo la descarga quien es plataforma.
+const Plataforma = lazy(() => import('@nucleo/panel/Plataforma').then((m) => ({ default: m.Plataforma })))
 
 const ICONOS = {
   huella: 'M12 14c-3 0-5 2.5-5 4.5S9 21 12 21s5-.5 5-2.5S15 14 12 14zM6 11a2 2 0 100-4 2 2 0 000 4zM18 11a2 2 0 100-4 2 2 0 000 4zM9.5 7a2 2 0 100-4 2 2 0 000 4zM14.5 7a2 2 0 100-4 2 2 0 000 4z',
@@ -38,7 +40,7 @@ export const PESTANAS: { a: string; t: string; cap: Capacidad | null }[] = [
 ]
 
 function MarcoPanel() {
-  const { negocio, negocios, elegir, puede } = useSesion()
+  const { negocio, negocios, elegir, puede, plataforma } = useSesion()
   const pestanas = PESTANAS.filter((p) => !p.cap || puede(p.cap))
   const miembro = negocios.filter((n) => n.como === 'miembro')
   return (
@@ -49,6 +51,7 @@ function MarcoPanel() {
           {pestanas.map((p) => <NavLink key={p.a} to={p.a} className={({ isActive }) => (isActive ? 'activa' : '')}>{p.t}</NavLink>)}
         </nav>
         <div className="derecha">
+          {plataforma && <NavLink to="/plataforma" className="chico solo-ancho">Plataforma</NavLink>}
           {miembro.length > 1 ? (
             <select className="entrada solo-ancho" aria-label="Clínica" value={negocio?.negocio_id} onChange={(e) => elegir(e.target.value)} style={{ minHeight: 36, width: 'auto' }}>
               {miembro.map((n) => <option key={n.negocio_id} value={n.negocio_id}>{n.nombre}</option>)}
@@ -81,7 +84,7 @@ function MarcoFamilia() {
 }
 
 export function App() {
-  const { cargando, sesion, negocio, negocios, puede } = useSesion()
+  const { cargando, sesion, negocio, negocios, plataforma, puede } = useSesion()
   const lugar = useLocation()
   // La placa es pública: se resuelve antes de mirar la sesión (quien la escanea no tiene cuenta).
   if (lugar.pathname.startsWith('/p/')) return (
@@ -89,6 +92,9 @@ export function App() {
   )
   if (cargando) return <Cargando />
   if (!sesion) return <Entrar marca="D-TEK Huella" sub="El expediente y las vacunas de tu mascota, en tu teléfono." />
+  // Quien es plataforma y no tiene negocios entra directo a «Plataforma»; con negocios, la abre desde la cabecera.
+  if (plataforma && !negocios.length && lugar.pathname !== '/plataforma') return <Navigate to="/plataforma" replace />
+  if (plataforma && lugar.pathname === '/plataforma') return <Suspense fallback={<Cargando />}><Plataforma producto="huella" marca={<>D-TEK <b>Huella</b></>} /></Suspense>
   if (!negocios.length) return (
     <main className="entrar"><div className="tarjeta entrar-caja"><h1 style={{ fontSize: 18 }}>Todavía no tenés acceso</h1><p className="suave">Pedile a tu veterinaria que te invite con este número de teléfono.</p></div></main>
   )

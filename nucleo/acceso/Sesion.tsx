@@ -11,6 +11,8 @@ type Ctx = {
   sesion: Session | null
   negocios: NegocioMio[]
   negocio: NegocioMio | null
+  // Si la persona es de la plataforma (D-TEK): solo decide si se muestra «Plataforma»; la base vuelve a exigirlo.
+  plataforma: boolean
   elegir: (id: string) => void
   puede: (c: Capacidad) => boolean
   recargar: () => Promise<void>
@@ -25,8 +27,13 @@ export function ProveedorSesion({ producto, children }: { producto: Producto; ch
   const [negocios, setNegocios] = useState<NegocioMio[]>([])
   const [activo, setActivo] = useState<string | null>(() => { try { return localStorage.getItem(CLAVE_NEGOCIO) } catch { return null } })
   const [cargando, setCargando] = useState(true)
+  const [plataforma, setPlataforma] = useState(false)
 
   const cargarNegocios = useCallback(async () => {
+    // Núcleo 09: recibe lo que la invitaron a su teléfono (el dueño que dio de alta la plataforma) y si es plataforma.
+    // Cada una por separado: si la base todavía no tiene el núcleo 09, la persona entra igual que antes.
+    try { await rpc<number>('dt_aceptar_mis_invitaciones') } catch { /* sin núcleo 09 todavía */ }
+    try { setPlataforma(!!(await rpc<boolean>('dt_soy_plataforma'))) } catch { setPlataforma(false) }
     try {
       await rpc<number>('dt_reclamar_clientes')
       const lista = await rpc<NegocioMio[]>('dt_mis_negocios')
@@ -47,18 +54,18 @@ export function ProveedorSesion({ producto, children }: { producto: Producto; ch
     const { data: sub } = supabase.auth.onAuthStateChange((evento, s) => {
       setSesion(s)
       if (evento === 'SIGNED_IN') { setCargando(true); cargarNegocios().finally(() => setCargando(false)) }
-      if (evento === 'SIGNED_OUT') setNegocios([])
+      if (evento === 'SIGNED_OUT') { setNegocios([]); setPlataforma(false) }
     })
     return () => { vivo = false; sub.subscription.unsubscribe() }
   }, [cargarNegocios])
 
   const negocio = useMemo(() => negocios.find((n) => n.negocio_id === activo) || negocios[0] || null, [negocios, activo])
   const valor: Ctx = {
-    cargando, sesion, negocios, negocio,
+    cargando, sesion, negocios, negocio, plataforma,
     elegir: (id) => { setActivo(id); try { localStorage.setItem(CLAVE_NEGOCIO, id) } catch { /* sin almacenamiento */ } },
     puede: (c) => !!negocio && negocio.capacidades.includes(c),
     recargar: cargarNegocios,
-    salir: async () => { await supabase.auth.signOut(); setNegocios([]) },
+    salir: async () => { await supabase.auth.signOut(); setNegocios([]); setPlataforma(false) },
   }
   return <SesionCtx.Provider value={valor}>{children}</SesionCtx.Provider>
 }

@@ -237,6 +237,50 @@ console.log('Piloto (375 px)')
   await ctx.close()
 }
 
+// ---------------- Plataforma: D-TEK da de alta un negocio (núcleo 09) ----------------
+console.log('Plataforma (1024 px y 375 px)')
+{
+  const { ctx, pagina, errores } = await contexto(1024, 800)
+  await entrar(pagina, '55550001')
+  await pagina.waitForURL('**/plataforma')
+  await pagina.getByRole('heading', { name: 'Nuevo negocio' }).waitFor()
+  ok(true, 'la plataforma sin negocios propios entra directo a «Plataforma»')
+  await pagina.getByText('Taller D-TEK Flotas').waitFor()
+  ok(await pagina.getByText(/Carlos Méndez · \+502 5555 0002/).isVisible(), 'la lista trae el taller con su dueño y su teléfono')
+  await pagina.getByRole('button', { name: 'Crear negocio' }).click()
+  await pagina.getByText('Escribí el nombre del negocio.').waitFor()
+  ok(true, 'sin nombre no crea y lo explica')
+  await pagina.getByLabel('Nombre del negocio').fill('Taller Nuevo Ejemplo')
+  await pagina.getByLabel('Teléfono del dueño').fill('5555 0070')
+  await pagina.getByRole('button', { name: 'Crear negocio' }).click()
+  await pagina.getByRole('status').filter({ hasText: 'quedó creado' }).waitFor()
+  ok(await pagina.getByText(/El dueño entra con el \+502 5555 0070/).isVisible(), 'al crear explica que el dueño entra con ese teléfono')
+  ok(await pagina.getByText(/Dueño invitado · \+502 5555 0070 · todavía no entró/).isVisible(), 'el negocio nuevo aparece con el dueño invitado')
+  await foto(pagina, '14-plataforma')
+  ok(errores.length === 0, `sin errores en la consola${errores.length ? ': ' + errores.slice(0, 3).join(' | ') : ''}`)
+  await ctx.close()
+  const tel = await contexto(375, 800)
+  await entrar(tel.pagina, '55550001')
+  await tel.pagina.getByRole('heading', { name: 'Nuevo negocio' }).waitFor()
+  await tel.pagina.getByText('Taller Nuevo Ejemplo').waitFor()
+  ok(await tel.pagina.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), '«Plataforma» no se sale de lado en 375 px')
+  await foto(tel.pagina, '14b-plataforma-telefono')
+  ok(tel.errores.length === 0, 'sin errores en la consola')
+  await tel.ctx.close()
+}
+console.log('El dueño invitado entra por primera vez (1024 px)')
+{
+  await db.exec(`select prueba.crear_usuario('+50255550070', true, 'Rosa Nueva')`)
+  const { ctx, pagina, errores } = await contexto(1024, 800)
+  await entrar(pagina, '55550070')
+  await pagina.waitForURL('**/panel/inicio')
+  await pagina.getByRole('heading', { name: 'Hoy' }).waitFor()
+  ok(await pagina.getByText('Taller Nuevo Ejemplo').isVisible(), 'entra con su teléfono y ya es dueño del negocio nuevo')
+  ok((await pagina.getByRole('link', { name: 'Plataforma' }).count()) === 0, 'el dueño no ve el enlace «Plataforma»')
+  ok(errores.length === 0, `sin errores en la consola${errores.length ? ': ' + errores.slice(0, 3).join(' | ') : ''}`)
+  await ctx.close()
+}
+
 // ---------------- Taller con la suscripción vencida (D6) ----------------
 console.log('Taller en solo lectura (1024 px)')
 {

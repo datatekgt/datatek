@@ -20,6 +20,8 @@ const MisLocales = lazy(() => import('./cliente/MisLocales').then((m) => ({ defa
 const LocalCliente = lazy(() => import('./cliente/Local').then((m) => ({ default: m.LocalCliente })))
 const Cuenta = lazy(() => import('./cliente/Cuenta').then((m) => ({ default: m.Cuenta })))
 const Cargando = () => <p className="cargando">Cargando…</p>
+// Plataforma (D-TEK da de alta negocios): solo la descarga quien es plataforma.
+const Plataforma = lazy(() => import('@nucleo/panel/Plataforma').then((m) => ({ default: m.Plataforma })))
 
 const ICONOS = {
   locales: 'M3 11l9-8 9 8M5 10v10h14V10',
@@ -28,7 +30,7 @@ const ICONOS = {
 const Icono = ({ d }: { d: string }) => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d} /></svg>
 
 function MarcoPanel() {
-  const { negocio, negocios, elegir, puede } = useSesion()
+  const { negocio, negocios, elegir, puede, plataforma } = useSesion()
   const pestanas = [
     { a: '/panel/hoy', t: 'Hoy', cap: 'ver_panel' as const },
     { a: '/panel/clientes', t: 'Clientes', cap: 'ver_clientes' as const },
@@ -44,6 +46,7 @@ function MarcoPanel() {
           {pestanas.map((p) => <NavLink key={p.a} to={p.a} className={({ isActive }) => (isActive ? 'activa' : '')}>{p.t}</NavLink>)}
         </nav>
         <div className="derecha">
+          {plataforma && <NavLink to="/plataforma" className="chico solo-ancho">Plataforma</NavLink>}
           {miembro.length > 1 ? (
             <select className="entrada solo-ancho selector-negocio" aria-label="Negocio" value={negocio?.negocio_id} onChange={(e) => elegir(e.target.value)}>
               {miembro.map((n) => <option key={n.negocio_id} value={n.negocio_id}>{n.nombre}</option>)}
@@ -75,12 +78,15 @@ function MarcoCliente() {
 }
 
 export function App() {
-  const { cargando, sesion, negocio, negocios, puede } = useSesion()
+  const { cargando, sesion, negocio, negocios, plataforma, puede } = useSesion()
   const lugar = useLocation()
   // La página del QR es pública: no pide sesión ni espera a cargar los negocios.
   if (lugar.pathname.startsWith('/q/')) return <Suspense fallback={<Cargando />}><Routes><Route path="/q/:codigo" element={<Qr />} /></Routes></Suspense>
   if (cargando) return <p className="cargando">Cargando…</p>
   if (!sesion) return <Entrar marca="DATATEK Fuego" sub="Cada extintor con su QR, sus fechas y su constancia." />
+  // Quien es plataforma y no tiene negocios entra directo a «Plataforma»; con negocios, la abre desde la cabecera.
+  if (plataforma && !negocios.length && lugar.pathname !== '/plataforma') return <Navigate to="/plataforma" replace />
+  if (plataforma && lugar.pathname === '/plataforma') return <Suspense fallback={<Cargando />}><Plataforma producto="fuego" marca={<>DATATEK <b>Fuego</b></>} /></Suspense>
   if (!negocios.length) return (
     <main className="entrar"><div className="tarjeta entrar-caja"><h1 style={{ fontSize: 18 }}>Todavía no tenés acceso</h1><p className="suave">Pedile a tu recargadora que te invite con este número de teléfono.</p></div></main>
   )

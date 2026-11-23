@@ -26,6 +26,7 @@ const MENSAJES: [RegExp, string][] = [
   [/recepcion_ya_firmada/, 'La recepción ya está firmada.'],
   [/paso_no_permitido/, 'Ese paso no se puede hacer desde el estado actual.'],
   [/placa_invalida/, 'La placa no es válida.'],
+  [/negocios_nombre_check/, 'El nombre del negocio necesita entre 2 y 120 letras.'],
   [/duplicate key|unique/, 'Ya existe un registro con ese dato.'],
   [/tiene_pagos/, 'Este cobro ya tiene pagos: se devuelve, no se anula.'],
   [/llave_invalida/, 'La llave secreta de Recurrente empieza con sk_live_ o sk_test_.'],
