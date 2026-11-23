@@ -1,0 +1,78 @@
+/* DATATEK Fuego: acento ladrillo de las maquetas (#9A3412). */
+:root { --acento: #C2410C; --acento-oscuro: #9A3412; --acento-suave: #FFF7ED; --tinta: #1C1917; --tinta-2: #57534E; --linea: #E7E5E4; --fondo: #FAFAF9; }
+
+/* Panel de la recargadora */
+.cabecera { height: 64px; display: flex; align-items: center; gap: 28px; padding: 0 24px; background: #fff; border-bottom: 1px solid var(--linea); position: sticky; top: 0; z-index: 10; }
+.marca { font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 18px; white-space: nowrap; }
+.marca b { color: var(--acento-oscuro); }
+.pestanas { display: flex; gap: 2px; height: 100%; overflow-x: auto; }
+.pestanas a { display: flex; align-items: center; padding: 0 14px; font-size: 14px; text-decoration: none; color: var(--tinta-2); font-weight: 500; white-space: nowrap; }
+.pestanas a.activa { color: var(--acento-oscuro); font-weight: 700; box-shadow: inset 0 -3px 0 var(--acento); }
+.cabecera .derecha { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.selector-negocio { min-height: 36px; width: auto; }
+.contenido { padding: 24px; max-width: 1440px; margin: 0 auto; }
+.grilla-2 { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; align-items: start; }
+.titulo-pagina { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.titulo-pagina h1 { font-family: 'Space Grotesk', Inter, sans-serif; font-size: 22px; }
+.grilla-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.columna-ancha { gap: 12px; max-width: 720px; }
+.cifras { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.cifra { display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: inherit; }
+.cifra-valor { font-size: 26px; font-weight: 700; line-height: 1.1; }
+.contenido .solo-telefono { display: none; }
+.franja { padding: 10px 24px; font-size: 13px; border-bottom: 1px solid var(--linea); }
+.franja.aviso { background: var(--aviso-fondo); color: var(--aviso-texto); }
+.franja.mal { background: var(--mal-fondo); color: var(--mal-texto); }
+.franja a { color: inherit; font-weight: 600; }
+.aviso-caja.mal { background: var(--mal-fondo); border-color: #F3B4B4; color: var(--mal-texto); }
+
+/* Visita del técnico: cada extintor con sus tres marcas (QR, servicio, foto). */
+.marcas { display: flex; gap: 6px; flex-wrap: wrap; }
+.escaner { display: flex; flex-direction: column; gap: 10px; border: 1.5px dashed var(--acento); border-radius: 16px; padding: 14px 16px; background: var(--acento-suave); }
+.escaner video { width: 100%; max-height: 260px; border-radius: 12px; background: #000; object-fit: cover; }
+
+@media (max-width: 1024px) {
+  .grilla-2 { grid-template-columns: minmax(0, 1fr); }
+  .cabecera { gap: 12px; padding: 0 12px; }
+  .contenido { padding: 16px; }
+}
+@media (max-width: 760px) {
+  .cifras { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cifra-valor { font-size: 22px; }
+  .contenido .solo-telefono { display: block; }
+  .contenido .solo-ancho { display: none; }
+  .franja { padding: 10px 16px; }
+}
+@media (max-width: 640px) {
+  .cabecera .derecha .solo-ancho { display: none; }
+  .marca { font-size: 16px; }
+}
+
+/* Herramienta de la empresa (teléfono primero) */
+.app-cliente { min-height: 100vh; padding-bottom: 72px; }
+.app-cliente .arriba { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; background: #fff; border-bottom: 1px solid var(--linea); position: sticky; top: 0; z-index: 10; }
+.app-cliente .arriba strong { font-family: 'Space Grotesk', Inter, sans-serif; font-size: 17px; display: block; }
+.app-cliente main { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; max-width: 720px; margin: 0 auto; }
+.barra-abajo { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; display: flex; background: #fff; border-top: 1px solid var(--linea); z-index: 10; }
+.barra-abajo a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; color: var(--tinta-2); font-weight: 500; }
+.barra-abajo a.activa { color: var(--acento-oscuro); font-weight: 700; }
+.semaforo { width: 14px; height: 14px; border-radius: 50%; flex: none; }
+.semaforo.verde { background: var(--bien); }
+.semaforo.amarillo { background: var(--aviso); }
+.semaforo.rojo { background: var(--mal); }
+
+.entrar { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.entrar-caja { width: 100%; max-width: 380px; }
+
+/* Página pública del QR */
+.qr { min-height: 100vh; display: flex; justify-content: center; padding: 16px; background: var(--fondo); }
+.qr-caja { width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 12px; }
+.qr-estado { display: flex; align-items: center; gap: 10px; font-size: 26px; font-weight: 700; font-family: 'Space Grotesk', Inter, sans-serif; }
+.qr-estado .punto { width: 18px; height: 18px; border-radius: 50%; }
+
+/* La constancia se imprime sola, sin la navegación. */
+@media print {
+  .cabecera, .barra-abajo, .franja, .no-imprimir, .app-cliente .arriba { display: none !important; }
+  .contenido, .app-cliente main { padding: 0; max-width: none; }
+  .constancia { border: none; box-shadow: none; }
+}
