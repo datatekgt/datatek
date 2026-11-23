@@ -96,7 +96,7 @@ select prueba.como(:'dueno'); set role authenticated;
 select public.dt_flota_mover_orden(:'orden', 'lista');
 -- Prueba 7
 select prueba.afirmar((select monto from public.cobros where origen_id = :'orden') = 6200, 'el cobro es la suma de lo aprobado (4,800 + 650 + 750)');
-select prueba.afirmar((select vence from public.cobros where origen_id = :'orden') = (now() at time zone 'America/Guatemala')::date + 15, 'con crédito de 15 días vence en 15 días');
+select prueba.afirmar((select vence from public.cobros where origen_id = :'orden') is null, 'con crédito el cobro espera al corte del mes (sin fecha todavía)');
 select prueba.afirmar((select count(*) from public.componentes_unidad where orden_id = :'orden' and componente = 'transmission_fluid') = 1, 'el aceite de caja cambiado entra a la salud de la unidad');
 select prueba.afirmar((select count(*) from public.recordatorios where plantilla = 'flota_unidad_lista') = 1, 'se avisa que la unidad está lista');
 select prueba.debe_fallar($$ select public.dt_flota_mover_orden('$$ || :'orden' || $$', 'lista') $$, 'no se puede repetir el paso');

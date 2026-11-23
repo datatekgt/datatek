@@ -79,10 +79,10 @@ begin
         and u.estado <> 'baja' and (u.km_reportado_en is null or u.km_reportado_en < now() - interval '14 days')),
     'cobrado_mes', case when v_dinero then (select coalesce(sum(p.monto), 0) from public.cobro_pagos p join public.cobros c on c.id = p.cobro_id
         where c.negocio_id = p_negocio and p.en >= v_mes) end,
-    'facturado_mes', case when v_dinero then (select coalesce(sum(monto), 0) from public.cobros where negocio_id = p_negocio and estado <> 'anulado' and creado_en >= v_mes) end,
+    'facturado_mes', case when v_dinero then (select coalesce(sum(monto), 0) from public.cobros where negocio_id = p_negocio and estado <> 'anulado' and origen <> 'corte' and creado_en >= v_mes) end,
     'por_cobrar', case when v_dinero then (select coalesce(sum(c.monto - coalesce((select sum(p.monto) from public.cobro_pagos p where p.cobro_id = c.id), 0)), 0)
-        from public.cobros c where c.negocio_id = p_negocio and c.estado = 'por_cobrar') end,
-    'vencidos', case when v_dinero then (select count(*) from public.cobros where negocio_id = p_negocio and estado = 'por_cobrar' and vence < v_hoy) end,
+        from public.cobros c where c.negocio_id = p_negocio and c.estado = 'por_cobrar' and c.agrupado_en is null) end,
+    'vencidos', case when v_dinero then (select count(*) from public.cobros where negocio_id = p_negocio and estado = 'por_cobrar' and agrupado_en is null and vence < v_hoy) end,
     'vence', coalesce((select jsonb_agg(x order by x ->> 'vence') from (
         select jsonb_build_object('tipo', 'documento', 'que', d.tipo, 'unidad_id', u.id, 'placa', u.placa, 'flota', f.nombre, 'vence', d.vence) x
         from public.documentos_unidad d join public.unidades u on u.id = d.unidad_id join public.flotas f on f.id = u.flota_id

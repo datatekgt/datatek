@@ -239,7 +239,8 @@ begin
       from public.flotas f join public.clientes c on c.id = f.cliente_id join public.unidades u on u.id = v.unidad_id where f.id = v.flota_id;
     if v_total > 0 then
       v_cobro := public.dt_cobro_crear(v.negocio_id, v_cli, 'orden', p_orden, 'Orden ' || v.numero || ' · ' || v_placa, v_total,
-        case when v_cred > 0 then (now() at time zone 'America/Guatemala')::date + v_cred else (now() at time zone 'America/Guatemala')::date end);
+        -- Con crédito, el cobro espera al corte del mes (Flota 105), que le pone la fecha; sin crédito, se paga al entregar.
+        case when v_cred > 0 then null else (now() at time zone 'America/Guatemala')::date end);
     end if;
     select km into v_km from public.orden_recepciones where orden_id = p_orden;
     for r in select componente from public.orden_lineas where orden_id = p_orden and respuesta in ('aprobada', 'aprobada_auto') and componente is not null loop
@@ -308,15 +309,16 @@ begin
 end $$;
 
 -- Estado de cuenta de una flota en un mes (empresa o taller con ver_dinero).
+drop function if exists public.dt_flota_estado_cuenta(uuid);
 create or replace function public.dt_flota_estado_cuenta(p_flota uuid)
-returns table (cobro_id uuid, concepto text, monto numeric, pagado numeric, saldo numeric, vence date, estado text, creado_en timestamptz)
+returns table (cobro_id uuid, concepto text, monto numeric, pagado numeric, saldo numeric, vence date, estado text, creado_en timestamptz, origen text, agrupado_en uuid)
 language plpgsql stable security definer set search_path = public as $$
 declare v_neg uuid; v_cli uuid;
 begin
   select negocio_id, cliente_id into v_neg, v_cli from public.flotas where id = p_flota;
   if v_neg is null then raise exception 'no_existe'; end if;
   if not (public.dt_tengo_capacidad(v_neg, 'ver_dinero') or v_cli in (select public.dt_mis_clientes())) then raise exception 'sin_permiso' using errcode = '42501'; end if;
-  return query select c.id, c.concepto, c.monto, public.dt_cobro_pagado(c.id), c.monto - public.dt_cobro_pagado(c.id), c.vence, c.estado, c.creado_en
+  return query select c.id, c.concepto, c.monto, public.dt_cobro_pagado(c.id), c.monto - public.dt_cobro_pagado(c.id), c.vence, c.estado, c.creado_en, c.origen, c.agrupado_en
     from public.cobros c where c.negocio_id = v_neg and c.cliente_id = v_cli and c.estado <> 'anulado' order by c.creado_en desc;
 end $$;
 

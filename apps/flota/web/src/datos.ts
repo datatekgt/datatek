@@ -22,8 +22,10 @@ export type Orden = {
   recepcion: { km: number; combustible_octavos: number; danos: string | null; fotos: string[]; firmo_nombre: string; firmo_en: string } | null
   pasos: { accion: string; en: string }[]; sello: { eslabones: number } | null
 }
-export type Cobro = { id: string; cliente: string; origen: string; concepto: string; monto: number; pagado: number; saldo: number; vence: string | null; vencido: boolean; estado: string; creado_en: string; factura_url: string | null }
-export type CuentaFila = { cobro_id: string; concepto: string; monto: number; pagado: number; saldo: number; vence: string | null; estado: string; creado_en: string }
+export type Cobro = { id: string; cliente: string; origen: string; concepto: string; monto: number; pagado: number; saldo: number; vence: string | null; vencido: boolean; estado: string; creado_en: string; factura_url: string | null; agrupado_en: string | null }
+export type CuentaFila = { cobro_id: string; concepto: string; monto: number; pagado: number; saldo: number; vence: string | null; estado: string; creado_en: string; origen: string; agrupado_en: string | null }
+export type Corte = { id: string; hasta: string; cobro_id: string; ordenes: number; monto: number; pagado: number; saldo: number; vence: string | null; estado: string }
+export type CortePrevio = { cobro_id: string; concepto: string; saldo: number; creado_en: string }
 export type Evento = { id: string; tipo: string; titulo: string; programada_para: string; realizada_en: string | null; estado: string; cliente_id: string | null }
 export type Documento = { id: string; unidad_id: string; tipo: string; numero: string | null; vence: string }
 
@@ -78,6 +80,9 @@ export const Flota = {
   marcarLinea: (linea: string, hecha: boolean) => rpc<void>('dt_flota_marcar_linea', { p_linea: linea, p_hecha: hecha }),
   mover: (orden: string, a: EstadoOrden, motivo?: string) => rpc<void>('dt_flota_mover_orden', { p_orden: orden, p_a: a, p_motivo: motivo ?? null }),
   estadoCuenta: (flota: string) => rpc<CuentaFila[]>('dt_flota_estado_cuenta', { p_flota: flota }),
+  cortePrevio: (flota: string) => rpc<CortePrevio[]>('dt_flota_corte_previo', { p_flota: flota, p_hasta: null }),
+  cerrarCorte: (flota: string) => rpc<{ corte: string; cobro: string; total: number; ordenes: number; vence: string }>('dt_flota_cerrar_corte', { p_flota: flota, p_hasta: null }),
+  cortes: (flota: string) => rpc<Corte[]>('dt_flota_cortes', { p_flota: flota }),
   cobros: (negocio: string) => rpc<Cobro[]>('dt_cobros', { p_negocio: negocio, p_estado: null }),
   anotarPago: (cobro: string, monto: number, metodo: string, facturaExterna: string | null) =>
     rpc<string>('dt_cobro_anotar_pago', { p_cobro: cobro, p_monto: monto, p_metodo: metodo, p_referencia: null, p_factura_externa: facturaExterna }),

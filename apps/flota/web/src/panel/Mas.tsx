@@ -5,7 +5,7 @@ import { BotonesSel, Chip, Filtros } from '@nucleo/controles'
 import { ROLES } from '@nucleo/acceso/capacidades'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
 import { dinero, fechaCorta } from '@nucleo/formato'
-import { Flota, type Cobro } from '../datos'
+import { Flota, type Cobro, type Flota as TFlota } from '../datos'
 import { Error } from '../comun'
 
 export function Mas() {
@@ -23,7 +23,7 @@ export function Mas() {
 }
 
 type F = 'por_cobrar' | 'vencidos' | 'cobrados' | 'todos'
-const EN: Record<F, (c: Cobro) => boolean> = { todos: () => true, por_cobrar: (c) => c.estado === 'por_cobrar', vencidos: (c) => c.vencido, cobrados: (c) => c.estado === 'cobrado' || c.estado === 'de_mas' }
+const EN: Record<F, (c: Cobro) => boolean> = { todos: () => true, por_cobrar: (c) => c.estado === 'por_cobrar' && !c.agrupado_en, vencidos: (c) => c.vencido, cobrados: (c) => c.estado === 'cobrado' || c.estado === 'de_mas' }
 const ESTADO: Record<string, { t: string; tono: 'bien' | 'aviso' | 'mal' | 'neutro' }> = { por_cobrar: { t: 'Por cobrar', tono: 'neutro' }, cobrado: { t: 'Cobrado', tono: 'bien' }, de_mas: { t: 'De más: devolver', tono: 'aviso' }, anulado: { t: 'Anulado', tono: 'neutro' } }
 
 function Cobros() {
@@ -41,6 +41,7 @@ function Cobros() {
         <div><div className="num" style={{ fontSize: 26 }}>{dinero(suma('por_cobrar'))}</div><span className="suave chico">por cobrar</span></div>
         <div><div className="num" style={{ fontSize: 26 }}>{dinero(suma('vencidos'))}</div><span className="suave chico">vencido</span></div>
       </div>
+      {puede('cobrar') && <Cortes negocio={neg} alCerrar={recargar} />}
       <Filtros valor={f} alCambiar={setF} opciones={[{ valor: 'por_cobrar', texto: 'Por cobrar', n: (datos || []).filter(EN.por_cobrar).length }, { valor: 'vencidos', texto: 'Vencidos', n: (datos || []).filter(EN.vencidos).length }, { valor: 'cobrados', texto: 'Cobrados' }, { valor: 'todos', texto: 'Todos' }]} />
       <Error texto={error} />
       {lista.length === 0 ? <p className="vacio">Nada aquí.</p> : (
@@ -53,8 +54,8 @@ function Cobros() {
                   <td><b>{c.cliente}</b><div className="suave chico">{c.concepto}</div></td>
                   <td>{dinero(c.monto)}</td><td><b>{dinero(c.saldo)}</b></td>
                   <td>{c.vence ? fechaCorta(c.vence) : '—'}</td>
-                  <td><Chip tono={c.vencido ? 'mal' : ESTADO[c.estado].tono}>{c.vencido ? 'Vencido' : ESTADO[c.estado].t}</Chip></td>
-                  <td>{c.estado === 'por_cobrar' && puede('cobrar') && <button className="btn btn-sec btn-chico" onClick={() => setAnotando(c)}>Anotar pago</button>}{c.factura_url && <a href={c.factura_url} target="_blank" rel="noreferrer">Factura</a>}</td>
+                  <td>{c.agrupado_en && c.estado === 'por_cobrar' ? <Chip tono="neutro">En el corte</Chip> : <Chip tono={c.vencido ? 'mal' : ESTADO[c.estado].tono}>{c.vencido ? 'Vencido' : ESTADO[c.estado].t}</Chip>}</td>
+                  <td>{c.estado === 'por_cobrar' && !c.agrupado_en && puede('cobrar') && <button className="btn btn-sec btn-chico" onClick={() => setAnotando(c)}>Anotar pago</button>}{c.factura_url && <a href={c.factura_url} target="_blank" rel="noreferrer">Factura</a>}</td>
                 </tr>
               ))}
             </tbody>
@@ -64,6 +65,53 @@ function Cobros() {
       {anotando && <AnotarPago cobro={anotando} alTerminar={() => { setAnotando(null); recargar() }} />}
       <span className="suave chico">Un cobro nunca se borra: se anula con motivo y queda en la bitácora.</span>
     </section>
+  )
+}
+
+// Corte mensual (F-05): las flotas con crédito pagan el mes de una vez. El taller ve qué entra y lo cierra con confirmación.
+function Cortes({ negocio, alCerrar }: { negocio: string; alCerrar: () => void }) {
+  const flotas = useCarga(() => Flota.flotas(negocio), [negocio])
+  const conCredito = (flotas.datos || []).filter((f) => f.credito_dias > 0)
+  if (!conCredito.length) return null
+  return (
+    <div className="columna" style={{ gap: 8 }}>
+      <strong>Cortes del mes</strong>
+      {conCredito.map((f) => <CorteFlota key={f.id} flota={f} alCerrar={alCerrar} />)}
+    </div>
+  )
+}
+
+function CorteFlota({ flota, alCerrar }: { flota: TFlota; alCerrar: () => void }) {
+  const previo = useCarga(() => Flota.cortePrevio(flota.id), [flota.id])
+  const [confirmar, setConfirmar] = useState(false)
+  const [hecho, setHecho] = useState('')
+  const acc = useAccion()
+  const filas = previo.datos || []
+  const total = filas.reduce((s, c) => s + Number(c.saldo), 0)
+  const cerrar = () => acc.correr(async () => {
+    const r = await Flota.cerrarCorte(flota.id)
+    setHecho(`Corte cerrado: ${dinero(r.total)} por ${r.ordenes} ${r.ordenes === 1 ? 'orden' : 'órdenes'}, vence el ${fechaCorta(r.vence)}. Le mandamos el enlace de pago a la empresa.`)
+    setConfirmar(false); previo.recargar(); alCerrar()
+  })
+  return (
+    <div className="aviso-caja" style={{ background: 'var(--linea-suave)', borderColor: 'var(--linea)' }}>
+      <div className="fila-entre envolver" style={{ gap: 12 }}>
+        <div className="columna" style={{ gap: 2 }}>
+          <b>{flota.nombre}</b>
+          <span className="chico">{filas.length ? `${filas.length} ${filas.length === 1 ? 'orden' : 'órdenes'} sin cortar · ${dinero(total)}` : 'Nada pendiente de cortar'} · crédito a {flota.credito_dias} días</span>
+        </div>
+        {filas.length > 0 && !confirmar && <button className="btn btn-chico" onClick={() => setConfirmar(true)}>Cerrar el corte</button>}
+      </div>
+      {confirmar && (
+        <div className="columna" style={{ gap: 8 }}>
+          <ul className="chico" style={{ margin: 0, paddingLeft: 18 }}>{filas.map((c) => <li key={c.cobro_id}>{c.concepto} · {dinero(c.saldo)}</li>)}</ul>
+          <span className="chico">Se junta en un solo cobro de <b>{dinero(total)}</b> y a la empresa le llega el enlace de pago por WhatsApp.</span>
+          <div className="fila envolver"><button className="btn btn-chico" disabled={acc.ocupado} onClick={cerrar}>Sí, cerrar por {dinero(total)}</button><button className="btn btn-chico btn-sec" onClick={() => setConfirmar(false)}>Cancelar</button></div>
+        </div>
+      )}
+      {hecho && <span className="chico" role="status" style={{ color: 'var(--bien-texto)' }}>✓ {hecho}</span>}
+      <Error texto={acc.error || previo.error} />
+    </div>
   )
 }
 

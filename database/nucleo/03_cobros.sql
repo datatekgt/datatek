@@ -32,8 +32,11 @@ create table if not exists public.cobros (
   nit text not null default 'CF',
   creado_en timestamptz not null default now(),
   cobrado_en timestamptz,
-  anulado_motivo text
+  anulado_motivo text,
+  agrupado_en uuid references public.cobros(id)   -- este cobro se paga dentro de otro (corte mensual): no se paga ni se anula solo
 );
+alter table public.cobros add column if not exists agrupado_en uuid references public.cobros(id);
+create index if not exists cobros_agrupado on public.cobros (agrupado_en) where agrupado_en is not null;
 create index if not exists cobros_negocio on public.cobros (negocio_id, estado);
 create index if not exists cobros_cliente on public.cobros (cliente_id);
 create unique index if not exists cobros_origen_unico on public.cobros (origen, origen_id) where origen_id is not null and estado <> 'anulado';
@@ -95,6 +98,21 @@ begin
 end $$;
 
 -- Anotar un pago a mano (efectivo o transferencia directa) o desde el aviso de Recurrente.
+-- Interna: junta cobros abiertos de un cliente en uno solo (el corte mensual). El corte vale la suma de los saldos.
+create or replace function public.dt_cobro_agrupar(p_negocio uuid, p_cliente uuid, p_origen text, p_origen_id uuid, p_concepto text, p_cobros uuid[], p_vence date)
+returns uuid language plpgsql security definer set search_path = public as $$
+declare v_total numeric; v_n integer; v_id uuid;
+begin
+  if coalesce(array_length(p_cobros, 1), 0) = 0 then raise exception 'nada_que_agrupar'; end if;
+  perform 1 from public.cobros where id = any (p_cobros) for update;
+  select count(*), sum(monto - public.dt_cobro_pagado(id)) into v_n, v_total from public.cobros
+    where id = any (p_cobros) and negocio_id = p_negocio and cliente_id = p_cliente and estado = 'por_cobrar' and agrupado_en is null;
+  if v_n <> array_length(p_cobros, 1) then raise exception 'cobro_no_agrupable'; end if;
+  v_id := public.dt_cobro_crear(p_negocio, p_cliente, p_origen, p_origen_id, p_concepto, v_total, p_vence);
+  update public.cobros set agrupado_en = v_id where id = any (p_cobros);
+  return v_id;
+end $$;
+
 create or replace function public.dt_cobro_registrar_pago(p_cobro uuid, p_monto numeric, p_metodo text, p_referencia text, p_factura_url text, p_factura_externa text)
 returns text language plpgsql security definer set search_path = public as $$
 declare v public.cobros; v_pagado numeric; v_estado text;
@@ -102,11 +120,16 @@ begin
   select * into v from public.cobros where id = p_cobro for update;
   if v.id is null then raise exception 'no_existe'; end if;
   if v.estado = 'anulado' then raise exception 'cobro_anulado'; end if;
+  if v.agrupado_en is not null then raise exception 'en_corte: se paga el corte del mes'; end if;
   insert into public.cobro_pagos (cobro_id, monto, metodo, referencia, factura_url, factura_externa, recibido_por)
   values (p_cobro, round(p_monto, 2), p_metodo, p_referencia, p_factura_url, nullif(trim(coalesce(p_factura_externa, '')), ''), auth.uid());
   v_pagado := public.dt_cobro_pagado(p_cobro);
   v_estado := case when v_pagado > v.monto then 'de_mas' when v_pagado = v.monto then 'cobrado' else 'por_cobrar' end;
   update public.cobros set estado = v_estado, cobrado_en = case when v_estado in ('cobrado', 'de_mas') then now() else null end where id = p_cobro;
+  -- Pagado el corte, quedan pagados los cobros que agrupa.
+  if v_estado in ('cobrado', 'de_mas') then
+    update public.cobros set estado = 'cobrado', cobrado_en = now() where agrupado_en = p_cobro and estado = 'por_cobrar';
+  end if;
   perform public.dt_bitacora_anotar(v.negocio_id, 'cobro', p_cobro, 'pago', jsonb_build_object('monto', round(p_monto, 2), 'metodo', p_metodo, 'estado', v_estado));
   return v_estado;
 end $$;
@@ -132,31 +155,37 @@ begin
   perform public.dt_exigir(v.negocio_id, 'anular_cobro');
   if length(trim(coalesce(p_motivo, ''))) < 5 then raise exception 'falta_motivo'; end if;
   if public.dt_cobro_pagado(p_cobro) > 0 then raise exception 'tiene_pagos: se devuelve, no se anula'; end if;
+  if v.agrupado_en is not null then raise exception 'en_corte: se anula el corte, no el cobro'; end if;
   update public.cobros set estado = 'anulado', anulado_motivo = trim(p_motivo) where id = p_cobro;
+  -- Anular un corte suelta sus cobros: vuelven a cobrarse uno por uno (o en el próximo corte).
+  update public.cobros set agrupado_en = null where agrupado_en = p_cobro;
   perform public.dt_bitacora_anotar(v.negocio_id, 'cobro', p_cobro, 'anulado', jsonb_build_object('motivo', trim(p_motivo)));
 end $$;
 
 -- Lista para el negocio.
+drop function if exists public.dt_cobros(uuid, text);
 create or replace function public.dt_cobros(p_negocio uuid, p_estado text default null)
-returns table (id uuid, cliente text, origen text, concepto text, monto numeric, pagado numeric, saldo numeric, vence date, vencido boolean, estado text, creado_en timestamptz, factura_url text)
+returns table (id uuid, cliente text, origen text, concepto text, monto numeric, pagado numeric, saldo numeric, vence date, vencido boolean, estado text, creado_en timestamptz, factura_url text, agrupado_en uuid)
 language plpgsql stable security definer set search_path = public as $$
 begin
   perform public.dt_exigir(p_negocio, 'ver_dinero');
   return query
     select c.id, cl.nombre, c.origen, c.concepto, c.monto, public.dt_cobro_pagado(c.id), c.monto - public.dt_cobro_pagado(c.id), c.vence,
-           (c.estado = 'por_cobrar' and c.vence is not null and c.vence < (now() at time zone 'America/Guatemala')::date),
-           c.estado, c.creado_en, (select p.factura_url from public.cobro_pagos p where p.cobro_id = c.id and p.factura_url is not null order by p.en desc limit 1)
+           (c.estado = 'por_cobrar' and c.agrupado_en is null and c.vence is not null and c.vence < (now() at time zone 'America/Guatemala')::date),
+           c.estado, c.creado_en, (select p.factura_url from public.cobro_pagos p where p.cobro_id = c.id and p.factura_url is not null order by p.en desc limit 1),
+           c.agrupado_en
     from public.cobros c join public.clientes cl on cl.id = c.cliente_id
     where c.negocio_id = p_negocio and (p_estado is null or c.estado = p_estado)
     order by c.creado_en desc;
 end $$;
 
 -- Lo que ve el cliente: solo sus cobros.
+drop function if exists public.dt_mis_cobros(uuid);
 create or replace function public.dt_mis_cobros(p_negocio uuid)
-returns table (id uuid, concepto text, monto numeric, pagado numeric, saldo numeric, vence date, estado text, creado_en timestamptz, factura_url text)
+returns table (id uuid, concepto text, monto numeric, pagado numeric, saldo numeric, vence date, estado text, creado_en timestamptz, factura_url text, agrupado_en uuid)
 language sql stable security definer set search_path = public as $$
   select c.id, c.concepto, c.monto, public.dt_cobro_pagado(c.id), c.monto - public.dt_cobro_pagado(c.id), c.vence, c.estado, c.creado_en,
-         (select p.factura_url from public.cobro_pagos p where p.cobro_id = c.id and p.factura_url is not null order by p.en desc limit 1)
+         (select p.factura_url from public.cobro_pagos p where p.cobro_id = c.id and p.factura_url is not null order by p.en desc limit 1), c.agrupado_en
   from public.cobros c
   where c.negocio_id = p_negocio and c.cliente_id in (select public.dt_mis_clientes()) and c.estado <> 'anulado'
   order by c.creado_en desc
@@ -204,6 +233,7 @@ begin
   end if;
   if not coalesce((select recurrente_conectado from public.pagos_cuenta pc where pc.negocio_id = v.negocio_id), false) then raise exception 'recurrente_no_conectado'; end if;
   if v.estado <> 'por_cobrar' then raise exception 'nada_por_cobrar'; end if;
+  if v.agrupado_en is not null then raise exception 'en_corte: se paga el corte del mes'; end if;
   v_saldo := v.monto - public.dt_cobro_pagado(p_cobro);
   if v_saldo < 5 then raise exception 'saldo_muy_chico'; end if;
   select * into v_e from public.recurrente_enlaces e where e.cobro_id = p_cobro and e.estado = 'listo' and e.monto = v_saldo and e.creado_en > now() - interval '72 hours' order by e.creado_en desc limit 1;
@@ -286,6 +316,7 @@ drop policy if exists enlaces_ver on public.recurrente_enlaces;
 create policy enlaces_ver on public.recurrente_enlaces for select to authenticated using (cobro_id in (select id from public.cobros));
 
 revoke execute on function public.dt_cobro_pagado(uuid), public.dt_cobro_crear(uuid, uuid, text, uuid, text, numeric, date),
+  public.dt_cobro_agrupar(uuid, uuid, text, uuid, text, uuid[], date),
   public.dt_cobro_registrar_pago(uuid, numeric, text, text, text, text), public.dt_cobro_anotar_pago(uuid, numeric, text, text, text),
   public.dt_cobro_anular(uuid, text), public.dt_cobros(uuid, text), public.dt_mis_cobros(uuid), public.dt_recurrente_pedir_enlace(uuid),
   public.dt_recurrente_guardar_enlace(uuid, text, text), public.dt_recurrente_aviso(text, uuid, jsonb), public.dt_recurrente_conectar(uuid, text, text),
