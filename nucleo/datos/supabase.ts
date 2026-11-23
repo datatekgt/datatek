@@ -10,6 +10,7 @@ export const supabase: SupabaseClient = createClient(url || 'http://localhost:54
 
 // Mensajes de la base en español para la persona (la base responde códigos cortos).
 const MENSAJES: [RegExp, string][] = [
+  [/solo_lectura/, 'La suscripción a DATATEK está vencida: podés ver, exportar y cobrar, pero no crear. Pedile al dueño que la ponga al día.'],
   [/sin_sesion/, 'Tu sesión terminó. Entrá de nuevo.'],
   [/sin_permiso/, 'No tenés permiso para hacer esto.'],
   [/telefono_invalido/, 'El teléfono no es válido. Usá 8 dígitos.'],
@@ -30,6 +31,17 @@ const MENSAJES: [RegExp, string][] = [
   [/llave_invalida/, 'La llave secreta de Recurrente empieza con sk_live_ o sk_test_.'],
   [/secreto_invalido/, 'El secreto del webhook empieza con whsec_.'],
   [/recurrente_no_conectado/, 'El negocio todavía no conectó su cuenta de Recurrente.'],
+  [/en_corte/, 'Este cobro está dentro del corte del mes: se paga o se anula el corte.'],
+  [/nada_que_cortar/, 'No hay órdenes nuevas para el corte.'],
+  [/fecha_futura/, 'La fecha no puede ser en el futuro.'],
+  [/cobro_no_agrupable/, 'Alguno de esos cobros ya no está pendiente. Recargá y probá otra vez.'],
+  [/nada_por_cobrar/, 'Ese cobro ya no tiene nada pendiente.'],
+  [/saldo_muy_chico/, 'El saldo es muy chico para pagar con tarjeta (mínimo Q 5).'],
+  [/nada_que_importar/, 'No hay filas para importar.'],
+  [/demasiadas_filas/, 'Son demasiadas filas de una vez (máximo 2,000). Partí el archivo.'],
+  [/paso_el_plazo/, 'Ya pasaron las 24 horas para deshacer esta importación.'],
+  [/ya_deshecha/, 'Esta importación ya se deshizo.'],
+  [/nada_que_pedir|nada_que_avisar/, 'No hay unidades seleccionadas.'],
 ]
 
 export class ErrorDeBase extends Error {}

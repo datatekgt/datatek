@@ -232,8 +232,35 @@ console.log('Piloto (375 px)')
   await ctx.close()
 }
 
+// ---------------- Taller con la suscripción vencida (D6) ----------------
+console.log('Taller en solo lectura (1024 px)')
+{
+  await db.exec(`
+    update public.negocios set suscripcion = 'solo_lectura' where producto = 'flota';
+    insert into public.suscripciones (negocio_id, plan, precio, proximo_cobro) select id, 'completo', 450, current_date + 10 from public.negocios;
+    insert into public.suscripcion_cobros (negocio_id, periodo, monto, vence) select id, date_trunc('month', current_date - 20)::date, 450, current_date - 20 from public.negocios;`)
+  const { ctx, pagina, errores } = await contexto(1024, 800)
+  await entrar(pagina, '55550002')
+  await pagina.getByRole('heading', { name: 'Hoy' }).waitFor()
+  ok(await pagina.getByText(/Solo lectura:/).isVisible(), 'todo el equipo ve la franja de solo lectura')
+  await pagina.getByRole('link', { name: 'Órdenes', exact: true }).click()
+  await pagina.getByRole('button', { name: '+ Orden' }).click()
+  await pagina.getByRole('button', { name: /Flota Distribuidora Ejemplo/ }).click()
+  await pagina.getByRole('button', { name: /P-147STU/ }).click()
+  await pagina.getByLabel(/Motivo/).fill('Revisión general')
+  await pagina.getByRole('button', { name: 'Crear orden' }).click()
+  await pagina.getByText(/podés ver, exportar y cobrar, pero no crear/).waitFor()
+  ok(true, 'crear una orden explica que la suscripción está vencida, en español')
+  await pagina.getByRole('link', { name: 'Ver mi suscripción' }).click()
+  await pagina.getByRole('heading', { name: 'Tu suscripción a DATATEK' }).waitFor()
+  ok(await pagina.getByText('Pendiente: Q 450').isVisible(), 'el dueño ve cuánto debe')
+  await foto(pagina, '13-solo-lectura')
+  const otros = errores.filter((e) => !/solo_lectura|400|403|42501/.test(e)); ok(otros.length === 0, 'sin errores en la consola (fuera del rechazo esperado)' + (otros.length ? ': ' + otros.slice(0, 2).join(' | ') : ''))
+  await ctx.close()
+}
+
 await navegador.close()
-const fallos = registro.filter((r) => r.tipo === 'error')
+const fallos = registro.filter((r) => r.tipo === 'error' && !/solo_lectura/.test(r.mensaje || ''))
 ok(fallos.length === 0, `la base no rechazó ninguna llamada${fallos.length ? ': ' + fallos.map((f) => f.ruta + ' ' + f.mensaje).slice(0, 3).join(' | ') : ''}`)
 await db.close()
 console.log(fallas ? `${fallas} comprobaciones fallaron` : 'Todo el recorrido en verde')

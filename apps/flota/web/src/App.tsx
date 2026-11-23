@@ -3,6 +3,8 @@ import { Navigate, NavLink, Outlet, Route, Routes, useLocation } from 'react-rou
 import { Entrar } from '@nucleo/acceso/Entrar'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { lazy, Suspense } from 'react'
+import { useCarga } from '@nucleo/datos/useCarga'
+import { Flota } from './datos'
 
 // El panel y la herramienta del cliente se cargan por separado: la empresa no descarga el código del taller.
 const Inicio = lazy(() => import('./panel/Inicio').then((m) => ({ default: m.Inicio })))
@@ -53,8 +55,24 @@ function MarcoPanel() {
           ) : <span className="suave solo-ancho">{negocio?.nombre}</span>}
         </div>
       </header>
+      <FranjaSuscripcion negocio={negocio!.negocio_id} />
       <div className="contenido"><Suspense fallback={<Cargando />}><Outlet /></Suspense></div>
     </>
+  )
+}
+
+// Todo el equipo ve si la suscripción está en aviso o en solo lectura (así entiende por qué no puede crear). D6.
+function FranjaSuscripcion({ negocio }: { negocio: string }) {
+  const { puede } = useSesion()
+  const { datos } = useCarga(() => Flota.suscripcionEstado(negocio), [negocio])
+  if (datos !== 'aviso' && datos !== 'solo_lectura') return null
+  const solo = datos === 'solo_lectura'
+  return (
+    <div className={`franja ${solo ? 'mal' : 'aviso'}`} role="status">
+      <b>{solo ? 'Solo lectura:' : 'Pago pendiente:'}</b>{' '}
+      {solo ? 'la suscripción a DATATEK está vencida. Podés ver, exportar, terminar lo que tenés y cobrar, pero no crear nada nuevo.' : 'la suscripción a DATATEK tiene un pago vencido. Ponela al día para no pasar a solo lectura.'}
+      {puede('configurar_negocio') && <> <NavLink to="/panel/mas">Ver mi suscripción</NavLink></>}
+    </div>
   )
 }
 

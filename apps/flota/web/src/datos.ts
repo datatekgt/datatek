@@ -35,9 +35,12 @@ export type Panel = {
   unidades: number; en_taller: number; ordenes_abiertas: number; esperando_empresa: number; listas_para_entregar: number; sin_km_reciente: number
   cobrado_mes: number | null; facturado_mes: number | null; por_cobrar: number | null; vencidos: number | null; vence: Vence[]
 }
+export type MiSuscripcion = { estado: string; plan: string; precio: number | null; proximo_cobro: string | null; debe: number; solo_lectura_el: string | null; dias_para_solo_lectura: number | null; cobros: { id: string; periodo: string; monto: number; vence: string; estado: string; cobrado_en: string | null }[] }
 export type Necesidad = { id: string; tipo: string; titulo: string; detalle: string | null; cantidad: number; objetos: string[]; accion: string | null; creada_en: string }
 
 export const Flota = {
+  suscripcionEstado: (negocio: string) => rpc<string>('dt_suscripcion_estado', { p_negocio: negocio }),
+  miSuscripcion: (negocio: string) => rpc<MiSuscripcion>('dt_mi_suscripcion', { p_negocio: negocio }),
   panel: (negocio: string) => rpc<Panel>('dt_flota_panel', { p_negocio: negocio }),
   disponibilidad: (flota: string, mes: string | null) => rpc<Disponibilidad[]>('dt_flota_disponibilidad', { p_flota: flota, p_mes: mes }),
   necesidades: (negocio: string) => rpc<Necesidad[]>('dt_necesidades', { p_negocio: negocio }),

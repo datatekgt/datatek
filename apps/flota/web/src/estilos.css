@@ -51,3 +51,11 @@ a.cifra:hover { border-color: var(--acento); }
 /* Tablas anchas que en teléfono se vuelven lista: se dibujan las dos y se muestra una. */
 .contenido .solo-telefono { display: none; }
 @media (max-width: 760px) { .contenido .solo-telefono { display: block; } .contenido .solo-ancho { display: none; } }
+
+/* Franja de la suscripción (aviso / solo lectura), debajo de la cabecera. */
+.franja { padding: 10px 24px; font-size: 13px; border-bottom: 1px solid var(--linea); }
+.franja.aviso { background: var(--aviso-fondo); color: var(--aviso-texto); }
+.franja.mal { background: var(--mal-fondo); color: var(--mal-texto); }
+.franja a { color: inherit; font-weight: 600; }
+@media (max-width: 760px) { .franja { padding: 10px 16px; } }
+.aviso-caja.mal { background: var(--mal-fondo); border-color: #F3B4B4; color: var(--mal-texto); }

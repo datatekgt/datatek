@@ -56,6 +56,8 @@ begin
     where negocio_id = p_negocio and estado in ('pendiente', 'enviado', 'leido')
       and creado_en >= date_trunc('month', now() at time zone 'America/Guatemala') at time zone 'America/Guatemala';
   if v_motivo is null and p_plantilla <> 'codigo_acceso' and v_usados >= v_tope then v_motivo := 'tope_del_plan'; end if;
+  -- Con la suscripción en solo lectura no salen mensajes que cuestan (núcleo 06); el código para entrar sí.
+  if v_motivo is null and p_plantilla <> 'codigo_acceso' and (select suscripcion from public.negocios where id = p_negocio) = 'solo_lectura' then v_motivo := 'solo_lectura'; end if;
   if v_motivo is null and p_objeto_id is not null and exists (
       select 1 from public.recordatorios where negocio_id = p_negocio and plantilla = p_plantilla and objeto_id = p_objeto_id
         and estado in ('pendiente', 'enviado', 'leido') and creado_en > now() - interval '4 hours') then
