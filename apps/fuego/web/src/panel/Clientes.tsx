@@ -13,7 +13,7 @@ const estadoLocal = (l: LocalFila) =>
     : l.pronto > 0 ? <Chip tono="aviso">{l.pronto} vencen en 30 días</Chip> : <Chip tono="bien">{l.total ? 'Todos vigentes' : 'Sin extintores'}</Chip>
 
 export function Clientes() {
-  const { negocio } = useSesion()
+  const { negocio, puede } = useSesion()
   const neg = negocio!.negocio_id
   const [buscar, setBuscar] = useState('')
   const { datos, error, cargando, recargar } = useCarga(() => Fuego.locales(neg, buscar.trim() || null), [neg, buscar])
@@ -22,7 +22,11 @@ export function Clientes() {
     <>
       <div className="titulo-pagina">
         <div><h1>Clientes y locales</h1><span className="suave chico">Lo que cada empresa ve en su teléfono sale de aquí</span></div>
-        <button className="btn" onClick={() => setAlta((v) => !v)}>{alta ? 'Cerrar' : '+ Cliente o local'}</button>
+        <div className="fila envolver">
+          {puede('importar') && <Link className="btn btn-sec" to="/panel/importar">Importar desde Excel</Link>}
+          <Link className="btn btn-sec" to="/panel/etiquetas">Etiquetas QR</Link>
+          <button className="btn" onClick={() => setAlta((v) => !v)}>{alta ? 'Cerrar' : '+ Cliente o local'}</button>
+        </div>
       </div>
       {alta && <Alta negocio={neg} alCrear={() => { setAlta(false); recargar() }} />}
       <section className="tarjeta">

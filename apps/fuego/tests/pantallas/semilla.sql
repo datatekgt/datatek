@@ -29,6 +29,8 @@ begin
   perform public.dt_fuego_crear_extintor(neg, mx, 'co2', 10, 'lb', 'Cuarto eléctrico', 'MX-01', null, null, 2023, hoy - 345);
   perform public.dt_fuego_crear_extintor(neg, public.dt_fuego_crear_local(neg, cli2, 'La Ceiba Zona 1', '6a avenida, zona 1', 'Zona 1'), 'pqs_abc', 10, 'lb', 'Caja', 'Z1-01', null, null, 2023, hoy - 350);
   e := public.dt_fuego_crear_extintor(neg, lc, 'clase_k', 6, 'kg', 'Cocina, junto a la puerta trasera', 'LC-01', null, null, 2024, hoy - 60);
+  perform public.dt_fuego_crear_extintor(neg, null, 'pqs_abc', 20, 'lb', null, 'PREST-1', 'P-9001', null, 2022, hoy - 30);
+  perform public.dt_fuego_crear_extintor(neg, null, 'co2', 10, 'lb', null, 'PREST-2', 'P-9002', null, 2022, hoy - 30);
   perform public.dt_fuego_crear_visita(vn, now(), tec, '8:00 y 10:00', false);
   cod := public.dt_invitar(neg, 'cliente', cli, 'titular', '55550099');
   perform prueba.como(enc);

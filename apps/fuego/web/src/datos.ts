@@ -1,4 +1,4 @@
-// Acceso a datos de Fuego: un wrapper por función de la base (apps/fuego/database/300–307). Ninguna pantalla llama a Supabase
+// Acceso a datos de Fuego: un wrapper por función de la base (apps/fuego/database/300–309). Ninguna pantalla llama a Supabase
 // directo; lo común (clientes, cobros, equipo, suscripción) está en nucleo/datos/nucleo.ts.
 import { supabase, ErrorDeBase, enEspanol } from '@nucleo/datos/supabase'
 
@@ -18,6 +18,15 @@ const MENSAJES: [RegExp, string][] = [
   [/ya_pedida/, 'Ya hay una visita pedida para este local.'],
   [/ya_cobrada/, 'Esta visita ya tiene su cobro.'],
   [/negocio_no_es_fuego/, 'Este negocio no es una recargadora.'],
+  [/no_es_de_prestamo/, 'Ese extintor es de un cliente: solo se prestan los de la recargadora.'],
+  [/no_disponible/, 'Ese extintor no está disponible (ya está prestado o en recarga).'],
+  [/ya_devuelto/, 'Ese préstamo ya se devolvió.'],
+  [/visita_de_otro_local/, 'Esa visita es de otro local.'],
+  [/rango_invalido/, 'Elegí un rango de hasta dos meses.'],
+  [/nada_que_importar/, 'No hay filas para importar.'],
+  [/demasiadas_filas/, 'Son demasiadas filas: importá de 5,000 en 5,000.'],
+  [/paso_el_plazo/, 'Ya pasaron las 24 horas para deshacer esta importación.'],
+  [/ya_deshecha/, 'Esta importación ya se deshizo.'],
 ]
 async function rpc<T>(fn: string, args: Record<string, unknown> = {}): Promise<T> {
   const { data, error } = await supabase.rpc(fn, args)
@@ -63,6 +72,11 @@ export type Constancia = {
   detalle: DetalleConstancia[]
 }
 export type Precio = { id: string; tipo: string; agente: Agente | null; por_unidad: number; por_lb: number }
+export type EtiquetaQR = { extintor_id: string; codigo: string; etiqueta: string | null; ubicacion: string | null; agente: Agente; capacidad: number; unidad: string; local_id: string | null; local: string | null; cliente: string | null; recargadora: string }
+export type Propio = { id: string; etiqueta: string | null; agente: Agente; capacidad: number; unidad: string; serie: string | null; fabricado_anio: number | null; estado: string; vigencia: EstadoExt; proximo: string | null; prestamo_id: string | null; prestado_a: string | null; desde: string | null }
+export type Prestamo = { id: string; extintor_id: string; etiqueta: string | null; local_id: string; local: string; cliente: string; reemplaza: string | null; desde: string; hasta: string | null; dias: number }
+export type VisitaMes = { visita_id: string; dia: string; programada_para: string | null; franja: string | null; estado: string; local_id: string; local: string; zona: string | null; cliente: string; tecnico_id: string | null; tecnico: string | null }
+export type ResultadoImportar = { importacion: string; creados: number; actualizados: number; errores: { fila: number; cliente: string | null; motivo: string }[]; necesidades: { tipo: string; titulo: string; detalle: string; cantidad: number; accion: string }[] }
 export type VistaQR = { estado: EstadoExt; vence: string | null; motivo: string | null; ultima_recarga: string | null; agente: Agente; capacidad: number; unidad: string; ubicacion: string | null; recargadora: string; reporte_abierto: boolean }
 
 export const Fuego = {
@@ -94,8 +108,12 @@ export const Fuego = {
   cerrarVisita: (visita: string) => rpc<string>('dt_fuego_cerrar_visita', { p_visita: visita }),
   constancia: (id: string) => rpc<Constancia>('dt_fuego_constancia', { p_constancia: id }),
   constancias: (local: string) => rpc<ConstanciaFila[]>('dt_fuego_constancias', { p_local: local }),
-  // 304 · vida del extintor
+  // 304 · vida del extintor y préstamos
   extintor: (id: string) => rpc<Ficha>('dt_fuego_extintor', { p_extintor: id }),
+  prestamos: (negocio: string, abiertos = true) => rpc<Prestamo[]>('dt_fuego_prestamos', { p_negocio: negocio, p_abiertos: abiertos }),
+  prestar: (prestado: string, local: string, reemplaza: string | null, visita: string | null) =>
+    rpc<string>('dt_fuego_prestar', { p_prestado: prestado, p_local: local, p_reemplaza: reemplaza, p_visita: visita }),
+  devolver: (prestamo: string) => rpc<null>('dt_fuego_devolver', { p_prestamo: prestamo }),
   // 305 · rutas y avisos
   ruta: (negocio: string, fecha: string) => rpc<RutaFila[]>('dt_fuego_ruta', { p_negocio: negocio, p_fecha: fecha }),
   hoy: (negocio: string) => rpc<Hoy>('dt_fuego_hoy', { p_negocio: negocio }),
@@ -106,6 +124,14 @@ export const Fuego = {
   pedidas: (negocio: string) => rpc<{ visita_id: string; pedida_para: string; nota: string | null; local_id: string; local: string; zona: string | null; cliente: string }[]>('dt_fuego_visitas_pedidas', { p_negocio: negocio }),
   programar: (visita: string, cuando: string, tecnico: string, franja: string | null, avisar: boolean) =>
     rpc<null>('dt_fuego_programar_visita', { p_visita: visita, p_cuando: cuando, p_tecnico: tecnico, p_franja: franja, p_avisar: avisar }),
+  // 307 · importar
+  importar: (negocio: string, filas: unknown[], archivo: string | null, cuenta: unknown) =>
+    rpc<ResultadoImportar>('dt_fuego_importar', { p_negocio: negocio, p_filas: filas, p_archivo: archivo, p_cuenta: cuenta }),
+  deshacerImportacion: (imp: string) => rpc<{ servicios: number; extintores: number; locales: number; clientes: number }>('dt_fuego_deshacer_importacion', { p_importacion: imp }),
+  // 309 · etiquetas, extintores de préstamo y calendario
+  etiquetas: (negocio: string, locales: string[] | null, propios: boolean) => rpc<EtiquetaQR[]>('dt_fuego_etiquetas', { p_negocio: negocio, p_locales: locales, p_propios: propios }),
+  propios: (negocio: string) => rpc<Propio[]>('dt_fuego_extintores_propios', { p_negocio: negocio }),
+  calendario: (negocio: string, desde: string, hasta: string) => rpc<VisitaMes[]>('dt_fuego_calendario', { p_negocio: negocio, p_desde: desde, p_hasta: hasta }),
   // 306 · precios
   precios: (negocio: string) => rpc<Precio[]>('dt_fuego_precios', { p_negocio: negocio }),
   guardarPrecio: (negocio: string, tipo: string, agente: string | null, porUnidad: number, porLb: number) =>
