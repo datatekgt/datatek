@@ -1,0 +1,44 @@
+/* Gantt de la obra (maquetas Obra-C1, C2 y Admin-Obra-Plan): plan claro, real en el acento, raya de hoy y pagos como rombos.
+   Los anchos van en %: el mismo Gantt sirve en 375 y en 1440 px. */
+.gantt { display: flex; flex-direction: column; }
+.gantt-eje { position: relative; height: 16px; margin: 0 28px 0 6px; font-size: 10px; color: var(--tinta-3); }
+.gantt-eje span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.gantt-eje span.hoy { font-weight: 700; color: var(--tinta); }
+.gantt-fila { display: grid; grid-template-columns: minmax(0, 1fr) 16px; gap: 6px; align-items: center; padding: 7px 4px 7px 6px; border-top: 1px solid var(--linea-suave); text-decoration: none; color: inherit; border-radius: 8px; }
+a.gantt-fila:hover, a.gantt-fila:focus-visible, .gantt-fila.sel { background: var(--acento-suave); }
+.gantt-titulo { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.gantt-titulo b { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gantt-estado { font-size: 11px; font-weight: 700; white-space: nowrap; }
+.gantt-estado.bien { color: var(--bien-texto); }
+.gantt-estado.aviso { color: var(--aviso-texto); }
+.gantt-estado.mal { color: var(--mal-texto); }
+.gantt-estado.neutro { color: var(--tinta-3); font-weight: 500; }
+.gantt-pista { position: relative; height: 20px; margin-top: 4px; background: repeating-linear-gradient(to right, #F3EFE6 0 1px, transparent 1px 25%); }
+.gantt-plan, .gantt-real { position: absolute; height: 7px; border-radius: 3px; }
+.gantt-plan { top: 2px; background: #E7DCC2; }
+.gantt-real { top: 11px; background: var(--acento); }
+.gantt-hoy { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--tinta); }
+.rombo { display: inline-block; width: 11px; height: 11px; transform: rotate(45deg); border: 2px solid var(--tinta); background: #fff; flex: none; }
+.rombo.pagado { background: var(--tinta); }
+.gantt-hitos { position: relative; height: 56px; margin-top: 2px; }
+.gantt-hito { position: absolute; top: 4px; display: flex; flex-direction: column; gap: 3px; font-size: 10px; font-weight: 600; white-space: nowrap; transform: translateX(-6px); }
+.gantt-hito.fin { transform: translateX(-100%); align-items: flex-end; }
+.leyenda { display: flex; gap: 12px; font-size: 11px; color: var(--tinta-2); flex-wrap: wrap; }
+.leyenda span { display: flex; align-items: center; gap: 4px; }
+.leyenda i { display: inline-block; width: 14px; height: 7px; border-radius: 3px; }
+.barra-avance { position: relative; height: 10px; background: #F3EFE6; border-radius: 4px; }
+.barra-avance > div { height: 10px; border-radius: 4px; background: var(--acento); }
+.barra-avance > i { position: absolute; top: -3px; width: 2px; height: 16px; background: var(--tinta); }
+.decision { background: var(--acento-suave); border: 1px solid #F3D9A4; border-radius: var(--radio); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.fotos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.foto { aspect-ratio: 1; border-radius: 10px; background: repeating-linear-gradient(135deg, #EDE6D6 0 8px, #F4EFE4 8px 16px); display: flex; flex-direction: column; justify-content: flex-end; padding: 6px; font-size: 11px; font-weight: 600; color: var(--tinta); border: none; text-align: left; cursor: pointer; overflow: hidden; background-size: cover; background-position: center; }
+.foto small { font-weight: 500; color: var(--tinta-2); }
+@media (min-width: 761px) { .contenido .fotos { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.globo { border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; background: var(--fondo); }
+.globo.resp { background: var(--acento-suave); }
+.deslizador { display: grid; grid-template-columns: minmax(0, 1fr) 54px; gap: 10px; align-items: center; }
+.deslizador input[type='range'] { width: 100%; accent-color: var(--acento); min-height: 32px; }
+.check { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 13px; }
+.check input { width: 20px; height: 20px; margin: 0; accent-color: var(--acento); flex: none; }
+.kv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; font-size: 13px; }
+.kv span { display: block; font-size: 11px; color: var(--tinta-3); }
