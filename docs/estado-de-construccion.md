@@ -2,9 +2,10 @@
 
 Actualizado: 23 nov 2026. Plan: `docs/antes-de-construir/6-plan-de-construccion.md`.
 
-**Supabase de Flota (`xlhaktvymmbnpotkmdct`): núcleo 01–06 y Flota 100–106 corridas el 23 nov 2026, las 13 verificaciones en
-true.** Desde aquí esas migraciones NO se cambian en su lugar: todo cambio va en un archivo nuevo (núcleo 07+, Flota 107+).
-Huella (200+) todavía no se ha corrido en ningún lado (va en su propio proyecto, D20).
+**Supabase compartido (`xlhaktvymmbnpotkmdct`), corrido el 23 nov 2026 con todas las verificaciones en true:** núcleo 01–08,
+Flota 100–106, Huella 200–206, Fuego 300–308 y Obra 500–506 (lista exacta en `database/corridas-en-supabase.txt`). Lo corrido
+NO se cambia en su lugar: todo cambio va en un archivo nuevo (núcleo 09+, Flota 107+, Huella 207+, Fuego 309+, Obra 507+).
+**Falta correr Colonia 400–406** (`npm run supabase:pendientes`).
 
 ## Etapa 0 · Núcleo
 
@@ -38,7 +39,7 @@ Pruebas al cierre de Flota: núcleo 102 comprobaciones, Flota 194, 37 ataques (0
 25 combinaciones de capacidades iguales, funciones en verde, motor del importador 5/5, recorrido de pantallas en verde a
 1440, 1024, 390 y 375 px con el CSP de producción.
 
-## Etapa 5 · Obra (construida el 23 nov 2026; todavía no corrida en Supabase)
+## Etapa 5 · Obra (construida y corrida en Supabase el 23 nov 2026)
 
 | Paquete | Estado | Dónde |
 |---|---|---|
