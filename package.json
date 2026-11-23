@@ -14,7 +14,8 @@
     "test": "node scripts/probar-sql.mjs && node scripts/probar-sql.mjs flota && node apps/flota/tests/seguridad/ataque.mjs --estricto && node scripts/capacidades-iguales.mjs && node scripts/probar-funciones.mjs && node --test nucleo/importador/motor.test.mjs",
     "pantallas:flota": "VITE_SUPABASE_URL=http://supa.local VITE_SUPABASE_ANON_KEY=x npm --workspace apps/flota/web run build && node apps/flota/tests/pantallas/recorrido.mjs",
     "capacidades": "node scripts/capacidades-iguales.mjs",
-    "funciones": "node scripts/probar-funciones.mjs"
+    "funciones": "node scripts/probar-funciones.mjs",
+    "salida:flota": "npm run build:flota && node scripts/revisar-salida.mjs apps/flota/web/dist"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.3.0"

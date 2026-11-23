@@ -26,6 +26,11 @@ const TIPOS = { '.js': 'text/javascript', '.css': 'text/css', '.html': 'text/htm
 let fallas = 0
 const ok = (cond, msg) => { console.log(`  ${cond ? 'ok   ' : 'FALLA'} ${msg}`); if (!cond) fallas++ }
 
+// Las páginas se sirven con el mismo Content-Security-Policy de vercel.json (solo connect-src apunta al Supabase falso):
+// si algo del build necesita un script en línea o un origen no permitido, aquí falla igual que fallaría en producción.
+const CSP = JSON.parse(fs.readFileSync(path.join(RAIZ, 'apps/flota/web/vercel.json'), 'utf8')).headers.flatMap((h) => h.headers)
+  .find((h) => h.key === 'Content-Security-Policy').value.replace(/connect-src [^;]+/, 'connect-src http://supa.local')
+
 const navegador = await chromium.launch()
 async function contexto(ancho, alto) {
   const ctx = await navegador.newContext({ viewport: { width: ancho, height: alto }, locale: 'es-GT', timezoneId: 'America/Guatemala' })
@@ -37,7 +42,7 @@ async function contexto(ancho, alto) {
     const u = new URL(r.request().url())
     let f = path.join(DIST, decodeURIComponent(u.pathname))
     if (!f.startsWith(DIST) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) f = path.join(DIST, 'index.html')
-    return r.fulfill({ status: 200, contentType: TIPOS[path.extname(f)] || 'application/octet-stream', body: fs.readFileSync(f) })
+    return r.fulfill({ status: 200, contentType: TIPOS[path.extname(f)] || 'application/octet-stream', headers: { 'content-security-policy': CSP }, body: fs.readFileSync(f) })
   })
   const pagina = await ctx.newPage()
   const errores = []
