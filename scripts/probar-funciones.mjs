@@ -142,6 +142,10 @@ ok((await q(`select estado from public.recordatorios`))[0].estado === 'enviado',
 ok(wa.enlaceDe('https://flota.app/', 'vehiculo', 'u1') === 'https://flota.app/mi/unidad/u1', 'el aviso de documento abre el Garage de la unidad')
 ok(wa.enlaceDe('https://flota.app', 'unidad', 'u1') === 'https://flota.app/piloto', 'el pedido de km abre el enlace del piloto')
 ok(wa.enlaceDe('https://huella.app', 'mascota', 'm1') === 'https://huella.app/mi/mascota/m1', 'el aviso de vacuna abre el expediente de la mascota')
+ok(wa.enlaceDe('https://fuego.app', 'extintor', 'e1') === 'https://fuego.app/mi/extintor/e1' && wa.enlaceDe('https://fuego.app', 'constancia', 'k1') === 'https://fuego.app/mi/constancia/k1', 'los avisos de Fuego abren el extintor o la constancia')
+ok(wa.enlaceDe('https://obra.app', 'reporte', 'r1') === 'https://obra.app/mi/reporte/r1' && wa.enlaceDe('https://obra.app', 'cambio', 'c1') === 'https://obra.app/mi', 'los avisos de Obra abren el reporte o la obra')
+{ const m = wa.armarMensaje({ plantilla: 'obra_fase_recibida', telefono: '+50255550099', variables: { fase: 'Losa', obra: 'Casa Ana', hito: 'Pago 3', monto: 'Q 67,600.00' }, objeto: 'cobro', objeto_id: 'k1' }, 'https://obra.app')
+  ok(m.template.components[0].parameters.map((x) => x.text).join('|') === 'Losa|Casa Ana|Pago 3|Q 67,600.00|https://obra.app/mi/cuenta', 'las variables de Obra salen en el orden de la plantilla') }
 { const m = wa.armarMensaje({ plantilla: 'huella_vacuna_antes', telefono: '+50255550099', variables: { nombre: 'Ana', mascota: 'Canela', vacuna: 'antirrábica', fecha: '03/02' }, objeto: 'mascota', objeto_id: 'm1' }, 'https://huella.app')
   ok(m.template.components[0].parameters.map((x) => x.text).join('|') === 'Ana|Canela|antirrábica|03/02|https://huella.app/mi/mascota/m1', 'las variables de Huella salen en el orden de la plantilla') }
 

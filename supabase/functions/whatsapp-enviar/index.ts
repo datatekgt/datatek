@@ -24,6 +24,11 @@ export function enlaceDe(base: string, objeto: string | null, id: string | null)
   if (objeto === "vehiculo" && id) return `${b}/mi/unidad/${id}`;
   if (objeto === "mascota" && id) return `${b}/mi/mascota/${id}`;
   if (objeto === "cita") return `${b}/mi/citas`;
+  if (objeto === "extintor" && id) return `${b}/mi/extintor/${id}`;
+  if (objeto === "local" && id) return `${b}/mi/local/${id}`;
+  if (objeto === "constancia" && id) return `${b}/mi/constancia/${id}`;
+  if (objeto === "reporte" && id) return `${b}/mi/reporte/${id}`;
+  if (objeto === "visita" || objeto === "obra" || objeto === "cambio") return `${b}/mi`;
   return `${b}/`;
 }
 
@@ -46,6 +51,14 @@ export const PLANTILLAS: Record<string, string[]> = {
   huella_cita: ["mascota", "fecha", "hora", "lugar", "enlace"],
   huella_placa_escaneada: ["mascota", "zona", "enlace"],
   huella_jornada: ["negocio", "fecha", "mascota", "enlace"],
+  fuego_vencen: ["n", "local", "fecha", "enlace"],
+  fuego_visita: ["negocio", "local", "fecha", "franja"],
+  fuego_constancia: ["local", "enlace"],
+  fuego_reporte_qr: ["tipo", "ubicacion", "local", "enlace"],
+  obra_reporte: ["semana", "obra", "n", "enlace"],
+  obra_decision: ["obra", "cambio", "monto", "enlace"],
+  obra_fase_recibida: ["fase", "obra", "hito", "monto", "enlace"],
+  obra_visita: ["obra", "fecha", "enlace"],
 };
 
 const API = "https://graph.facebook.com/v21.0";

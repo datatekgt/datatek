@@ -97,6 +97,8 @@ export function App() {
         <Route path="fase/:id" element={<FaseCliente />} />
         <Route path="reporte/:id" element={<ReporteCliente />} />
         <Route path="pagos" element={<Pagos />} />
+        {/* Los avisos de cobro del núcleo abren /mi/cuenta en todos los productos; en Obra los pagos viven en /mi/pagos. */}
+        <Route path="cuenta" element={<Navigate to="/mi/pagos" replace />} />
       </Route>
       <Route path="*" element={<Navigate to={inicio} replace />} />
     </Routes>
