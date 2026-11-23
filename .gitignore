@@ -9,3 +9,4 @@ apps/obra/tests/pantallas/capturas/
 *.tsbuildinfo
 apps/colonia/tests/pantallas/capturas/
 !apps/*/web/.env.production
+tests/humo-capturas/

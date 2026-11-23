@@ -40,7 +40,8 @@
     "ataque:colonia": "node apps/colonia/tests/seguridad/ataque.mjs --estricto",
     "build:colonia": "npm --workspace apps/colonia/web run build",
     "salida:colonia": "npm run build:colonia && node scripts/revisar-salida.mjs apps/colonia/web/dist",
-    "pantallas:colonia": "VITE_SUPABASE_URL=http://supa.local VITE_SUPABASE_ANON_KEY=x npm --workspace apps/colonia/web run build && node apps/colonia/tests/pantallas/recorrido.mjs"
+    "pantallas:colonia": "VITE_SUPABASE_URL=http://supa.local VITE_SUPABASE_ANON_KEY=x npm --workspace apps/colonia/web run build && node apps/colonia/tests/pantallas/recorrido.mjs",
+    "humo": "node scripts/humo-produccion.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.3.0"
