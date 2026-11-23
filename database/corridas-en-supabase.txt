@@ -40,3 +40,11 @@
 504_obra_cobros.sql
 505_obra_importar.sql
 506_obra_solo_lectura.sql
+# 23 nov 2026 · tercera corrida, verificación pegada por Dominic, todo true
+400_colonia_base.sql
+401_colonia_equipos.sql
+402_colonia_reportes.sql
+403_colonia_gastos.sql
+404_colonia_cobros.sql
+405_colonia_importar.sql
+406_colonia_panel.sql
