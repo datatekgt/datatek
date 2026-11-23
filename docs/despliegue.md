@@ -9,7 +9,9 @@ Lo hace Dominic una vez por producto; el código ya está listo. Nada de esto co
    consulta de verificación al final (comentada): correrla y revisar que todo dé `true`.
 3. Authentication → Phone: activar el proveedor de SMS/WhatsApp (D4).
 4. Edge Functions: desplegar `recurrente-cobro`, `recurrente-aviso` y `whatsapp-enviar` (carpeta `supabase/functions`).
-   Variables: `DATATEK_APP_URL` (la dirección pública de Flota), `WHATSAPP_TOKEN`, `WHATSAPP_NUMERO_ID`.
+   Secretos: `DATATEK_APP_URL` (la dirección pública de Flota, para los enlaces de WhatsApp), `DATATEK_ORIGENES` (esa misma
+   dirección: quién puede pedir enlaces de pago), `WHATSAPP_TOKEN` y `WHATSAPP_NUMERO_ID`. Las llaves de Recurrente no van
+   aquí: cada taller conecta la suya desde Más.
 5. Programar a diario `dt_suscripciones_revisar()` (pg_cron o un programador que llame la función con service_role) y cada
    minuto `whatsapp-enviar`.
 
