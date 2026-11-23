@@ -27,7 +27,8 @@
     "ataque:fuego": "node apps/fuego/tests/seguridad/ataque.mjs --estricto",
     "build:fuego": "npm --workspace apps/fuego/web run build",
     "salida:fuego": "npm run build:fuego && node scripts/revisar-salida.mjs apps/fuego/web/dist",
-    "pantallas:fuego": "VITE_SUPABASE_URL=http://supa.local VITE_SUPABASE_ANON_KEY=x npm --workspace apps/fuego/web run build && node apps/fuego/tests/pantallas/recorrido.mjs"
+    "pantallas:fuego": "VITE_SUPABASE_URL=http://supa.local VITE_SUPABASE_ANON_KEY=x npm --workspace apps/fuego/web run build && node apps/fuego/tests/pantallas/recorrido.mjs",
+    "pantallas:huella": "VITE_SUPABASE_URL=http://supa.local VITE_SUPABASE_ANON_KEY=x npm --workspace apps/huella/web run build && node apps/huella/tests/pantallas/recorrido.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.3.0"

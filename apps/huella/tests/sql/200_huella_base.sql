@@ -58,6 +58,10 @@ select prueba.afirmar((select count(*) from public.dt_huella_plan_de(:'neg', 'pe
   and (select intervalo_dias from public.dt_huella_plan_de(:'neg', 'perro') where nombre = 'Antirrábica') = 730, 'el plan de la clínica tapa el de partida');
 select public.dt_huella_registrar_dosis(:'canela', :'rabia2', (now() at time zone 'America/Guatemala')::date - 60);
 select prueba.afirmar((select proxima from public.dt_huella_vacunas_de(:'canela') where nombre = 'Antirrábica') = (now() at time zone 'America/Guatemala')::date + 670, 'y la próxima usa su intervalo');
+-- Una dosis anotada con la vacuna de partida (antes de que la clínica la editara) sigue contando.
+select public.dt_huella_registrar_dosis(:'canela', :'rabia', (now() at time zone 'America/Guatemala')::date - 10);
+select prueba.afirmar((select dosis_puestas from public.dt_huella_vacunas_de(:'canela') where nombre = 'Antirrábica') = 2
+  and (select proxima from public.dt_huella_vacunas_de(:'canela') where nombre = 'Antirrábica') = (now() at time zone 'America/Guatemala')::date + 720, 'las dosis con la vacuna de partida siguen contando después de editarla');
 select prueba.afirmar((select count(*) from public.dt_huella_mascotas(:'neg', 'ana')) = 2, 'buscar por el nombre del dueño');
 select prueba.afirmar((select count(*) from public.dt_huella_mascotas(:'neg', '985112003456789')) = 1, 'buscar por microchip');
 select prueba.afirmar((select count(*) from public.dt_huella_mascotas(:'neg', '5555-0098')) = 1, 'buscar por teléfono');

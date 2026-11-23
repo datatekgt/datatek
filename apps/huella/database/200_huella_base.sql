@@ -122,7 +122,8 @@ returns setof public.huella_vacunas language sql stable security definer set sea
 $$;
 
 -- Estado de cada vacuna del plan para una mascota. Próxima = última dosis real + intervalo (serie de cachorro mientras falten
--- dosis y tenga menos de 16 semanas). Sin dosis: «sin_dosis» (la clínica decide si empieza el esquema).
+-- dosis y tenga menos de 16 semanas). Las dosis cuentan por nombre de vacuna: si la clínica edita una del plan de partida
+-- (lo que crea su propia fila con otro id), las dosis anteriores siguen contando. Sin dosis: «sin_dosis» (la clínica decide si empieza el esquema).
 create or replace function public.dt_huella_vacunas_de(p_mascota uuid)
 returns table (vacuna_id uuid, nombre text, tipo text, ultima date, dosis_puestas bigint, proxima date, estado text)
 language plpgsql stable security definer set search_path = public as $$
@@ -134,8 +135,8 @@ begin
   return query
   with base as (
     select v.id, v.nombre, v.tipo, v.intervalo_dias, v.cachorro_dosis, v.cachorro_cada_dias, v.orden,
-           (select max(d.realizada_en) from public.dosis d where d.mascota_id = m.id and d.vacuna_id = v.id and d.anulada_en is null) as ultima,
-           (select count(*) from public.dosis d where d.mascota_id = m.id and d.vacuna_id = v.id and d.anulada_en is null) as puestas
+           (select max(d.realizada_en) from public.dosis d where d.mascota_id = m.id and d.vacuna_id in (select x.id from public.huella_vacunas x where x.especie = v.especie and lower(x.nombre) = lower(v.nombre) and (x.negocio_id is null or x.negocio_id = m.negocio_id)) and d.anulada_en is null) as ultima,
+           (select count(*) from public.dosis d where d.mascota_id = m.id and d.vacuna_id in (select x.id from public.huella_vacunas x where x.especie = v.especie and lower(x.nombre) = lower(v.nombre) and (x.negocio_id is null or x.negocio_id = m.negocio_id)) and d.anulada_en is null) as puestas
     from public.dt_huella_plan(m.negocio_id, m.especie) v
   ), prox as (
     select b.*, case when b.ultima is null then null
