@@ -2,7 +2,7 @@
 // escaneo para registrar, ataque 13), marca el servicio con su sello, y quien certifica cierra la visita: la constancia se arma
 // sola con el estado que calcula la base (ataque 14).
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { BotonesSel, Chip } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
@@ -48,6 +48,7 @@ export function VisitaPanel() {
             ))}
           </div>
           <span className="suave chico">Cada extintor se marca escaneando su QR: así queda la fecha real en su historial.</span>
+          {abierta && puede('registrar_servicio') && <Link className="chico" to={`/panel/prestamos?local=${x.local.id}`}>¿Te llevás uno a recargar? Dejá un extintor de préstamo</Link>}
         </section>
         <div className="columna" style={{ gap: 16 }}>
           {abierta && puede('registrar_servicio') && (escaneo

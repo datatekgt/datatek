@@ -21,7 +21,10 @@ export function LocalPanel() {
     <>
       <div className="titulo-pagina">
         <div><span className="etiqueta">{local?.cliente}</span><h1>{local?.nombre || 'Local'}</h1><span className="suave chico">{[local?.direccion, local?.zona].filter(Boolean).join(' · ')}</span></div>
-        <button className="btn btn-sec" onClick={() => setAlta((v) => !v)}>{alta ? 'Cerrar' : '+ Extintor'}</button>
+        <div className="fila envolver">
+          {(ext.datos?.length ?? 0) > 0 && <Link className="btn btn-sec" to={`/panel/etiquetas?local=${id}`}>Imprimir etiquetas QR</Link>}
+          <button className="btn btn-sec" onClick={() => setAlta((v) => !v)}>{alta ? 'Cerrar' : '+ Extintor'}</button>
+        </div>
       </div>
       {alta && <AltaExtintor negocio={neg} local={id!} conRecarga={puede('importar')} alCrear={() => { setAlta(false); ext.recargar(); locales.recargar() }} />}
       <div className="grilla-2">
@@ -53,7 +56,8 @@ export function LocalPanel() {
   )
 }
 
-function AltaExtintor({ negocio, local, conRecarga, alCrear }: { negocio: string; local: string; conRecarga: boolean; alCrear: () => void }) {
+// Alta de extintor en un local, o sin local (local null): uno de la recargadora para prestar.
+export function AltaExtintor({ negocio, local, conRecarga, alCrear }: { negocio: string; local: string | null; conRecarga: boolean; alCrear: () => void }) {
   const [agente, setAgente] = useState<Agente>('pqs_abc')
   const [cap, setCap] = useState(10)
   const [unidad, setUnidad] = useState<'lb' | 'kg'>('lb')
@@ -69,7 +73,7 @@ function AltaExtintor({ negocio, local, conRecarga, alCrear }: { negocio: string
   })
   return (
     <section className="tarjeta" style={{ marginBottom: 16 }}>
-      <h2>Nuevo extintor</h2>
+      <h2>{local ? 'Nuevo extintor' : 'Nuevo extintor de préstamo'}</h2>
       <BotonesSel rotulo="Tipo" opciones={AGENTES} valor={agente} alCambiar={setAgente} />
       <div className="grilla-campos">
         <Contador rotulo="Capacidad" valor={cap} alCambiar={setCap} paso={unidad === 'lb' ? 5 : 1} min={1} />
@@ -77,8 +81,8 @@ function AltaExtintor({ negocio, local, conRecarga, alCrear }: { negocio: string
         <Contador rotulo="Año de fabricación" valor={fab} alCambiar={setFab} min={1990} max={new Date().getFullYear()} />
       </div>
       <div className="grilla-campos">
-        <div className="campo"><label htmlFor="ext-etq">Etiqueta</label><input id="ext-etq" className="entrada" placeholder="VN-01" value={etiqueta} onChange={(e) => setEtiqueta(e.target.value)} /></div>
-        <div className="campo"><label htmlFor="ext-ubi">Ubicación en el local</label><input id="ext-ubi" className="entrada" placeholder="Cocina, puerta trasera" value={ubicacion} onChange={(e) => setUbicacion(e.target.value)} /></div>
+        <div className="campo"><label htmlFor="ext-etq">Etiqueta</label><input id="ext-etq" className="entrada" placeholder={local ? 'VN-01' : 'PREST-01'} value={etiqueta} onChange={(e) => setEtiqueta(e.target.value)} /></div>
+        {local && <div className="campo"><label htmlFor="ext-ubi">Ubicación en el local</label><input id="ext-ubi" className="entrada" placeholder="Cocina, puerta trasera" value={ubicacion} onChange={(e) => setUbicacion(e.target.value)} /></div>}
         <div className="campo"><label htmlFor="ext-serie">Serie</label><input id="ext-serie" className="entrada" value={serie} onChange={(e) => setSerie(e.target.value)} /></div>
       </div>
       {conRecarga && <Fecha rotulo="Última recarga (si se sabe)" valor={recarga} alCambiar={setRecarga} max={hoyGT()} atajos="pasado" />}

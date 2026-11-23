@@ -13,6 +13,10 @@ const Clientes = lazy(() => import('./panel/Clientes').then((m) => ({ default: m
 const LocalPanel = lazy(() => import('./panel/Local').then((m) => ({ default: m.LocalPanel })))
 const Ruta = lazy(() => import('./panel/Ruta').then((m) => ({ default: m.Ruta })))
 const VisitaPanel = lazy(() => import('./panel/Visita').then((m) => ({ default: m.VisitaPanel })))
+const Etiquetas = lazy(() => import('./panel/Etiquetas').then((m) => ({ default: m.Etiquetas })))
+const Importar = lazy(() => import('./panel/Importar').then((m) => ({ default: m.Importar })))
+const Prestamos = lazy(() => import('./panel/Prestamos').then((m) => ({ default: m.Prestamos })))
+const Calendario = lazy(() => import('./panel/Calendario').then((m) => ({ default: m.Calendario })))
 const Mas = lazy(() => import('./panel/Mas').then((m) => ({ default: m.Mas })))
 const ExtintorVista = lazy(() => import('./vistas').then((m) => ({ default: m.ExtintorVista })))
 const ConstanciaVista = lazy(() => import('./vistas').then((m) => ({ default: m.ConstanciaVista })))
@@ -33,6 +37,7 @@ function MarcoPanel() {
     { a: '/panel/hoy', t: 'Hoy', cap: 'ver_panel' as const },
     { a: '/panel/clientes', t: 'Clientes', cap: 'ver_clientes' as const },
     { a: '/panel/ruta', t: 'Ruta', cap: 'ver_rutas' as const },
+    { a: '/panel/prestamos', t: 'Préstamos', cap: 'registrar_servicio' as const },
     { a: '/panel/mas', t: 'Más', cap: null },
   ].filter((p) => !p.cap || puede(p.cap))
   const miembro = negocios.filter((n) => n.como === 'miembro')
@@ -97,6 +102,10 @@ export function App() {
         <Route path="constancia/:id" element={<ConstanciaVista />} />
         <Route path="ruta" element={<Ruta />} />
         <Route path="visita/:id" element={<VisitaPanel />} />
+        <Route path="calendario" element={<Calendario />} />
+        <Route path="prestamos" element={<Prestamos />} />
+        <Route path="etiquetas" element={<Etiquetas />} />
+        <Route path="importar" element={<Importar />} />
         <Route path="mas" element={<Mas />} />
         <Route index element={<Navigate to={inicioPanel} replace />} />
       </Route>

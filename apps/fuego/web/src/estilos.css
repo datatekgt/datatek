@@ -5,7 +5,7 @@
 .cabecera { height: 64px; display: flex; align-items: center; gap: 28px; padding: 0 24px; background: #fff; border-bottom: 1px solid var(--linea); position: sticky; top: 0; z-index: 10; }
 .marca { font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 18px; white-space: nowrap; }
 .marca b { color: var(--acento-oscuro); }
-.pestanas { display: flex; gap: 2px; height: 100%; overflow-x: auto; }
+.pestanas { display: flex; gap: 2px; height: 100%; overflow-x: auto; min-width: 0; }
 .pestanas a { display: flex; align-items: center; padding: 0 14px; font-size: 14px; text-decoration: none; color: var(--tinta-2); font-weight: 500; white-space: nowrap; }
 .pestanas a.activa { color: var(--acento-oscuro); font-weight: 700; box-shadow: inset 0 -3px 0 var(--acento); }
 .cabecera .derecha { margin-left: auto; display: flex; align-items: center; gap: 12px; }
@@ -70,9 +70,53 @@
 .qr-estado { display: flex; align-items: center; gap: 10px; font-size: 26px; font-weight: 700; font-family: 'Space Grotesk', Inter, sans-serif; }
 .qr-estado .punto { width: 18px; height: 18px; border-radius: 50%; }
 
-/* La constancia se imprime sola, sin la navegación. */
+/* Un enlace con forma de botón se ve igual que el botón. */
+a.btn { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+
+/* Etiquetas QR: en pantalla, una grilla para revisar; impresas, 10 por hoja carta de 4 × 2 pulgadas (tipo Avery 5163). */
+.elegir-locales { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px 16px; }
+.hoja-etiquetas { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.etiqueta-qr { position: relative; display: flex; gap: 10px; align-items: center; padding: 30px 10px 10px; background: #fff; border: 1px dashed #D6D3D1; border-radius: 10px; min-width: 0; color: #000; }
+.etiqueta-qr.fuera { opacity: 0.4; }
+.qr-svg { width: 128px; height: 128px; flex: none; display: block; }
+.etiqueta-qr-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: 12px; line-height: 1.25; overflow-wrap: anywhere; }
+.etiqueta-qr-marca { font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--acento-oscuro); }
+.etiqueta-qr-nombre { font-family: 'Space Grotesk', Inter, sans-serif; font-size: 20px; line-height: 1.1; }
+.etiqueta-qr-local { color: #444; font-size: 11px; }
+.etiqueta-qr-pie { margin-top: 4px; font-weight: 700; font-size: 12px; }
+.etiqueta-qr-elegir { position: absolute; top: 6px; right: 8px; font-size: 12px; display: flex; align-items: center; gap: 4px; background: #fff; }
+@media (max-width: 400px) { .qr-svg { width: 104px; height: 104px; } .etiqueta-qr-nombre { font-size: 17px; } }
+@page etiquetas { size: letter; margin: 0.5in 0.16in; }
+
+/* Calendario del mes */
+.mes { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.mes-cab { font-size: 11px; font-weight: 600; color: var(--tinta-2); text-align: center; padding: 4px 0; }
+.mes-dia { min-height: 92px; display: flex; flex-direction: column; gap: 3px; align-items: stretch; text-align: left; padding: 6px; border: 1px solid var(--linea); border-radius: 8px; background: #fff; font: inherit; color: inherit; cursor: pointer; min-width: 0; }
+.mes-dia.otro-mes { background: transparent; color: var(--tinta-2); border-style: dashed; }
+.mes-dia.hoy .mes-num { color: var(--acento-oscuro); font-weight: 700; }
+.mes-dia.elegido { border-color: var(--acento); box-shadow: inset 0 0 0 1px var(--acento); }
+.mes-num { font-size: 13px; }
+.mes-visita { font-size: 11px; line-height: 1.2; padding: 2px 4px; border-radius: 4px; background: var(--acento-suave); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mes-visita.pedida { background: var(--aviso-fondo); }
+.mes-cuenta { display: none; font-size: 11px; font-weight: 700; color: var(--acento-oscuro); }
+@media (max-width: 760px) {
+  .mes-dia { min-height: 48px; padding: 4px; align-items: center; }
+  .mes-visita { display: none; }
+  .mes-cuenta { display: block; }
+}
+
+/* Impresión: la constancia y las etiquetas salen solas, sin la navegación. */
 @media print {
   .cabecera, .barra-abajo, .franja, .no-imprimir, .app-cliente .arriba { display: none !important; }
+  body { background: #fff; }
   .contenido, .app-cliente main { padding: 0; max-width: none; }
   .constancia { border: none; box-shadow: none; }
+  .hoja-etiquetas { page: etiquetas; display: grid; grid-template-columns: 4in 4in; column-gap: 0.18in; row-gap: 0; justify-content: center; }
+  .etiqueta-qr { width: 4in; height: 2in; box-sizing: border-box; padding: 0.15in 0.18in; border: none; border-radius: 0; break-inside: avoid; gap: 0.15in; }
+  .etiqueta-qr.fuera { display: none; }
+  .qr-svg { width: 1.6in; height: 1.6in; }
+  .etiqueta-qr-texto { font-size: 9pt; }
+  .etiqueta-qr-nombre { font-size: 16pt; }
+  .etiqueta-qr-marca, .etiqueta-qr-local { font-size: 8pt; }
+  .etiqueta-qr-pie { font-size: 9pt; }
 }
