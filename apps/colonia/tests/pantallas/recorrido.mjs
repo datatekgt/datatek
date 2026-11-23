@@ -1,6 +1,6 @@
 // Recorre la app de Colonia compilada contra la base real en PGlite (Supabase falso). Valida contra lo planificado:
 // la administración atiende un reporte y manda el gasto a la junta; la junta lo aprueba desde su teléfono; la administración
-// publica; el vecino ve su casa, paga su cuota, ve en qué se fue, reporta una falla y reserva el salón. Falla si algo no aparece
+// publica (el reporte nuevo sin ver se destaca en Hoy, con un punto en la pestaña, y se marca visto al abrirlo); el vecino ve su casa, paga su cuota, ve en qué se fue, reporta una falla y reserva el salón. Falla si algo no aparece
 // o si hay errores en la consola.
 //   VITE_SUPABASE_URL=http://supa.local VITE_SUPABASE_ANON_KEY=x npx vite build   (en apps/colonia/web)
 //   node apps/colonia/tests/pantallas/recorrido.mjs [carpeta-de-capturas]
@@ -72,12 +72,20 @@ console.log('Administración (1440 px)')
   await pagina.getByRole('heading', { name: 'Requiere atención' }).waitFor()
   ok(await pagina.getByText('Bomba de pozo 2').first().isVisible(), 'requiere atención: la bomba 2 vencida')
   ok(await pagina.getByText(/^\d de 4$/).first().isVisible(), 'cuotas: cuántas de las 4 casas están al día')
+  // Sin plantilla de WhatsApp para la administración, el reporte nuevo se destaca en el panel (407).
+  ok(await pagina.getByText('1 reporte nuevo sin ver').isVisible(), 'Hoy destaca el reporte nuevo que la administradora no ha visto')
+  ok(await pagina.locator('.sin-ver').getByText('Portón principal: no cierra').isVisible(), 'con su título y casa')
+  ok(await pagina.locator('.pestanas .punto').count() === 1, 'la pestaña Reportes lleva un punto')
   await foto(pagina, '00-panel-hoy')
 
-  await pagina.getByRole('link', { name: 'Reportes', exact: true }).click()
+  await pagina.getByRole('navigation', { name: 'Secciones' }).getByRole('link', { name: /^Reportes/ }).click()
   await pagina.getByRole('heading', { name: 'Reportes de vecinos' }).waitFor()
-  await pagina.getByRole('button', { name: /Portón principal: no cierra/ }).click()
+  ok(await pagina.getByRole('button', { name: /Nuevo sin ver.*Portón principal: no cierra/ }).isVisible(), 'en el tablero el reporte va marcado como nuevo sin ver')
+  await pagina.getByRole('button', { name: /Portón principal: no cierra/ }).first().click()
   await pagina.getByText('Así lo ve el vecino').waitFor()
+  await pagina.locator('.pestanas .punto').waitFor({ state: 'detached' })
+  ok((await db.query(`select count(*)::int n from public.colonia_reporte_vistos v join public.personas p on p.id = v.persona_id where p.telefono = '+50255550002'`)).rows[0].n === 1, 'abrirlo lo marca visto para ella y el punto se va')
+  ok(await pagina.getByText('Nuevo sin ver').count() === 0, 'y deja de estar marcado en el tablero')
   await pagina.getByRole('button', { name: 'Visita del proveedor' }).click()
   await pagina.getByRole('button', { name: 'Mañana' }).click()
   await pagina.getByRole('button', { name: '9–11' }).click()
@@ -213,6 +221,26 @@ console.log('Vecino de la casa 14 (375 px)')
   await ctx.close()
 }
 
+// ---------------- La administración ve el reporte nuevo del vecino en el teléfono ----------------
+console.log('Administración ve el reporte nuevo (375 px)')
+{
+  const { ctx, pagina, errores } = await contexto(375, 800)
+  await entrar(pagina, '55550002')
+  await pagina.getByRole('heading', { name: 'Hoy' }).waitFor()
+  await pagina.getByText('1 reporte nuevo sin ver').waitFor()
+  ok(await pagina.locator('.sin-ver').getByText('Luz fundida').isVisible(), 'Hoy destaca la luz fundida que acaba de reportar la casa 14')
+  ok(await pagina.locator('.sin-ver').getByText('Portón principal: no cierra').count() === 0, 'lo que ya abrió no vuelve a salir')
+  ok(await sinScrollLateral(pagina), 'el aviso no se sale de lado en 375 px')
+  await foto(pagina, '13b-panel-sin-ver-telefono')
+  await pagina.locator('.sin-ver').getByRole('link', { name: /Luz fundida/ }).click()
+  await pagina.getByText('Así lo ve el vecino').waitFor()
+  await pagina.locator('.pestanas .punto').waitFor({ state: 'detached' })
+  ok(true, 'tocarlo abre el reporte y lo marca visto')
+  ok(await sinScrollLateral(pagina), 'Reportes no se sale de lado en 375 px')
+  ok(limpios(errores).length === 0, 'sin errores en la consola')
+  await ctx.close()
+}
+
 // ---------------- Mantenimiento (sin dinero) ----------------
 console.log('Técnico de mantenimiento (1024 px)')
 {
@@ -223,7 +251,15 @@ console.log('Técnico de mantenimiento (1024 px)')
   ok(await pagina.getByRole('link', { name: 'Gasto', exact: true }).count() === 0, 'el técnico no ve la pestaña Gasto')
   ok(await pagina.getByRole('link', { name: 'Cobros', exact: true }).count() === 0, 'ni Cobros')
   ok(await pagina.getByRole('link', { name: 'Hoy', exact: true }).count() === 0, 'ni el panel con dinero')
+  // Lo que abrió la administradora no le cuenta al técnico: tiene sus dos reportes sin ver, el más viejo primero.
+  await pagina.getByText('2 reportes nuevos sin ver').waitFor()
+  const orden = await pagina.locator('.sin-ver .filtro').allTextContents()
+  ok(orden.length === 2 && orden[0].startsWith('Portón principal') && orden[1].startsWith('Luz fundida'), 'el técnico ve sus dos reportes sin ver, el que más espera primero')
+  ok(await pagina.locator('.pestanas .punto').count() === 1, 'con el punto en la pestaña')
   await foto(pagina, '14-tecnico')
+  await pagina.getByRole('button', { name: 'Marcar todos como vistos' }).click()
+  await pagina.locator('.sin-ver').waitFor({ state: 'detached' })
+  ok(await pagina.locator('.pestanas .punto').count() === 0, '«marcar todos como vistos» quita el aviso y el punto')
   ok(limpios(errores).length === 0, 'sin errores en la consola')
   await ctx.close()
 }

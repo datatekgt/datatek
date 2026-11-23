@@ -77,3 +77,12 @@ span.estrella { font-size: 16px; min-width: 0; min-height: 0; padding: 0; cursor
 .meses .columna-mes.pasado { background: var(--mal); }
 .foto-reporte { max-width: 100%; border-radius: 12px; border: 1px solid var(--linea); }
 .franjas { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+
+/* Reportes nuevos sin ver (407): el punto de la pestaña, la tarjeta resaltada del tablero y la lista de «Hoy». */
+.punto { width: 8px; height: 8px; border-radius: 4px; background: var(--mal); margin-left: 6px; flex: none; }
+.solo-lector { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tarjeta-rep.nuevo { border-color: var(--mal); box-shadow: inset 3px 0 0 var(--mal); }
+.tarjeta-rep.nuevo[aria-pressed='true'] { box-shadow: inset 3px 0 0 var(--mal), inset 0 0 0 1px var(--acento); }
+.sin-ver { margin-bottom: 16px; }
+.sin-ver .lista-filas a { text-decoration: none; color: inherit; }
+.tarjeta-rep .chip { align-self: flex-start; }

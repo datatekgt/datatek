@@ -17,6 +17,7 @@ export type Mantenimiento = { id: string; tipo: string; programada_para: string 
 export type Programado = { id: string; equipo_id: string; equipo: string; area: string; tipo: string; programada_para: string; hasta: string | null; proveedor: string | null; estado: string }
 export type Aviso = { id: string; texto: string; desde: string; hasta: string; whatsapp: number }
 export type ReporteFila = { id: string; folio: number; titulo: string; lugar: string | null; casas: string[]; vecinos: number; paso: Paso; proveedor: string | null; visita_desde: string | null; creado_en: string; resuelto_en: string | null; calificacion: number | null; tiene_foto: boolean }
+export type ReporteSinVer = { id: string; folio: number; titulo: string; lugar: string | null; casas: string[]; vecinos: number; paso: Paso; creado_en: string }
 export type Abierto = { id: string; titulo: string; lugar: string | null; paso: Paso; vecinos: number; mio: boolean; creado_en: string }
 export type MiReporte = { id: string; folio: number; titulo: string; lugar: string | null; paso: Paso; vecinos: number; creado_en: string; resuelto_en: string | null; mis_estrellas: number | null }
 export type Reporte = {
@@ -91,6 +92,9 @@ export const Colonia = {
 
   // Reportes
   reportes: (condominio: string, abiertos = true) => rpc<ReporteFila[]>('dt_colonia_reportes', { p_condominio: condominio, p_abiertos: abiertos }),
+  // Nuevos sin ver (407): por persona, el que más espera primero. Abrir un reporte lo marca visto.
+  reportesSinVer: (condominio: string) => rpc<ReporteSinVer[]>('dt_colonia_reportes_sin_ver', { p_condominio: condominio }),
+  marcarVistos: (reportes: string[]) => rpc<number>('dt_colonia_marcar_vistos', { p_reportes: reportes }),
   reportesAbiertos: (condominio: string) => rpc<Abierto[]>('dt_colonia_reportes_abiertos', { p_condominio: condominio }),
   misReportes: (negocio: string) => rpc<MiReporte[]>('dt_colonia_mis_reportes', { p_negocio: negocio }),
   reporte: (id: string) => rpc<Reporte>('dt_colonia_reporte', { p_reporte: id }),

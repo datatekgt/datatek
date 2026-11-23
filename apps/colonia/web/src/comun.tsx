@@ -4,7 +4,7 @@ import { useSesion } from '@nucleo/acceso/Sesion'
 import { useCarga } from '@nucleo/datos/useCarga'
 import { fechaCorta as fechaCortaNucleo, hoyGT } from '@nucleo/formato'
 import { Pasos, type PasoVivo } from '@nucleo/controles'
-import { Colonia, PASOS, PASO_TEXTO, type Condominio, type MiCasa, type Reporte } from './datos'
+import { Colonia, PASOS, PASO_TEXTO, type Condominio, type MiCasa, type Reporte, type ReporteSinVer } from './datos'
 
 export { Error } from '@nucleo/controles'
 
@@ -39,6 +39,30 @@ export function useCondominio() {
   const c = useContext(CondominioCtx)
   if (!c) throw new globalThis.Error('useCondominio fuera de ProveedorCondominio')
   return c
+}
+
+// Reportes nuevos sin ver de la persona que entra (407), para la pestaña (el punto), «Hoy» y el tablero. No hay plantilla de
+// WhatsApp para avisarle a la administración: el aviso vive aquí y se vuelve a pedir cada minuto.
+type CtxSinVer = { lista: ReporteSinVer[]; ids: Set<string>; recargar: () => void; marcar: (ids: string[]) => Promise<void> }
+const SinVerCtx = createContext<CtxSinVer>({ lista: [], ids: new Set(), recargar: () => {}, marcar: async () => {} })
+export function ProveedorSinVer({ condominio, activo, children }: { condominio: string | null; activo: boolean; children: ReactNode }) {
+  const r = useCarga(() => (activo && condominio ? Colonia.reportesSinVer(condominio) : Promise.resolve([] as ReporteSinVer[])), [condominio, activo])
+  const { recargar } = r
+  useEffect(() => { if (!activo) return; const t = window.setInterval(recargar, 60000); return () => window.clearInterval(t) }, [activo, recargar])
+  const lista = r.datos || []
+  const marcar = async (ids: string[]) => { if (!ids.length) return; await Colonia.marcarVistos(ids); recargar() }
+  return <SinVerCtx.Provider value={{ lista, ids: new Set(lista.map((x) => x.id)), recargar, marcar }}>{children}</SinVerCtx.Provider>
+}
+export const useSinVer = () => useContext(SinVerCtx)
+
+// Cuánto lleva esperando: «hace 5 min», «hace 2 h», «hace 3 días».
+export function esperando(v: string) {
+  const min = Math.max(0, Math.floor((Date.now() - new Date(v).getTime()) / 60000))
+  if (min < 1) return 'recién'
+  if (min < 60) return `hace ${min} min`
+  if (min < 1440) return `hace ${Math.floor(min / 60)} h`
+  const d = Math.floor(min / 1440)
+  return `hace ${d} ${d === 1 ? 'día' : 'días'}`
 }
 
 // Las casas del vecino (casi siempre una), cargadas una vez para toda su herramienta. La primera es la que se muestra.

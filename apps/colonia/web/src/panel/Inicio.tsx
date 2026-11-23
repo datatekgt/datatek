@@ -5,19 +5,21 @@ import { Chip } from '@nucleo/controles'
 import { useCarga } from '@nucleo/datos/useCarga'
 import { dinero } from '@nucleo/formato'
 import { Colonia } from '../datos'
-import { Error, useCondominio } from '../comun'
+import { Error, esperando, useCondominio, useSinVer } from '../comun'
 
 export function Inicio() {
   const { puede } = useSesion()
   const { actual } = useCondominio()
+  const sinVer = useSinVer().lista
   const { datos: p, error } = useCarga(() => Colonia.panel(actual!.id), [actual!.id])
   if (!p) return <><div className="titulo-pagina"><h1>Hoy</h1></div><Error texto={error} /></>
   const pct = p.presupuesto_mes ? Math.min(100, Math.round((Number(p.gasto_mes) / Number(p.presupuesto_mes)) * 100)) : null
   return (
     <>
       <div className="titulo-pagina"><div><h1>Hoy</h1><span className="suave">{p.condominio}</span></div></div>
+      {sinVer.length > 0 && <SinVer lista={sinVer} />}
       <div className="cifras">
-        <Link to="/panel/reportes" className="tarjeta cifra"><span className="suave chico">Reportes de vecinos</span><span className="cifra-valor">{p.reportes_nuevos}</span><span className="chico">nuevos · {p.reportes_abiertos} abiertos</span></Link>
+        <Link to="/panel/reportes" className="tarjeta cifra"><span className="suave chico">Reportes de vecinos</span><span className="cifra-valor">{p.reportes_nuevos}</span><span className="chico">sin asignar · {p.reportes_abiertos} abiertos{sinVer.length ? ` · ${sinVer.length} sin ver` : ''}</span></Link>
         <Link to="/panel/equipos" className="tarjeta cifra"><span className="suave chico">Equipos</span><span className="cifra-valor">{p.equipos - p.equipos_vencidos} de {p.equipos}</span><span className="chico">al día · {p.equipos_vencidos} vencidos · {p.preventivos_semana} esta semana</span></Link>
         {p.gasto_mes != null ? (
           <Link to="/panel/gasto" className="tarjeta cifra"><span className="suave chico">Gasto del mes</span><span className="cifra-valor">{dinero(p.gasto_mes)}</span>
@@ -52,5 +54,26 @@ export function Inicio() {
         </section>
       </div>
     </>
+  )
+}
+
+// Los reportes que la persona todavía no abrió, el que más lleva esperando primero (no hay WhatsApp para avisarle: es esto).
+function SinVer({ lista }: { lista: ReturnType<typeof useSinVer>['lista'] }) {
+  return (
+    <section className="aviso-caja sin-ver" aria-labelledby="sin-ver-titulo">
+      <div className="fila-entre envolver">
+        <strong id="sin-ver-titulo">{lista.length === 1 ? '1 reporte nuevo sin ver' : `${lista.length} reportes nuevos sin ver`}</strong>
+        <Link to="/panel/reportes" className="btn-texto">Ver en Reportes</Link>
+      </div>
+      <div className="lista-filas">
+        {lista.slice(0, 5).map((r) => (
+          <Link key={r.id} to={`/panel/reportes?r=${r.id}`} className="fila-dato">
+            <div><div className="titulo">{r.titulo}</div><div className="sub">{r.casas.length ? `Casa ${r.casas.join(', ')}` : 'Administración'}{r.lugar ? ` · ${r.lugar}` : ''}{r.vecinos > 1 ? ` · ${r.vecinos} vecinos` : ''}</div></div>
+            <span className="chico">{esperando(r.creado_en)}</span>
+          </Link>
+        ))}
+      </div>
+      {lista.length > 5 && <span className="chico">y {lista.length - 5} más en Reportes.</span>}
+    </section>
   )
 }
