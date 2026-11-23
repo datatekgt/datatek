@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Flota · garage de una unidad</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E3A8A}a:hover{color:#0F172A}
+</style>
+</helmet>
+<div style="width: 390px; height: 1324px; box-sizing: border-box; font-family: Inter, system-ui, sans-serif; color: #0F172A; background: #F7F9FC; display: flex; flex-direction: column; overflow: hidden">
+<header style="height: 60px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; background: #FFFFFF; border-bottom: 1px solid #E2E8F0">
+<div style="display: flex; flex-direction: column">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 17px">Distribuidora Ejemplo</span>
+<span style="font-size: 12px; color: #475569">Mi flota · D-TEK Flotas</span>
+</div>
+<button type="button" aria-label="Avisos" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E2E8F0; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: #0F172A"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0112 0v5l2 2H4zM10 21h4"></path></svg></button>
+</header>
+<main style="flex: 1; min-height: 0; overflow: hidden; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box">
+<a href="#" style="display: flex; align-items: center; gap: 6px; min-height: 32px; font-size: 13px; font-weight: 600; text-decoration: none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>Mi flota</a>
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; gap: 6px">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px"><h1 style="margin: 0; font-size: 20px">P-123ABC · Hilux 2019</h1><span style="flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #166534"><span style="width: 8px; height: 8px; border-radius: 4px; background: #0ca30c"></span>Operando</span></div>
+<span style="font-size: 13px; color: #475569">Piloto: Luis Ramírez</span>
+<button type="button" style="align-self: flex-start; min-height: 44px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 4px 12px; border-radius: 10px; border: 1px dashed #93C5FD; background: #EFF6FF; font: inherit; color: #0F172A"><span style="font-size: 15px; font-weight: 700">148,200 km</span><span style="font-size: 11px; color: #475569">lo reportó el piloto ayer · tocá para actualizar</span></button>
+</section>
+<section style="border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; background: #FFF8E6; border: 1px solid #F6D98B">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #854D0E">LO PRÓXIMO</span>
+<span style="font-size: 17px; font-weight: 700">Frenos delanteros</span>
+<span style="font-size: 13px; color: #44403C">Pastillas al 30 % en la última revisión. Cambiarlas en unos 3,000 km (alrededor del 15 dic).</span>
+<div style="display: flex; gap: 14px; font-size: 12px; color: #44403C"><span><b>1</b> ahora</span><span><b>2</b> cerca</span><span><b>21</b> de 26 piezas revisadas</span></div>
+<button type="button" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: none; background: #1D4ED8; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">Solicitar servicio</button>
+</section>
+<div style="display: flex; background: #EEF2F7; border-radius: 12px; padding: 4px" role="tablist" aria-label="Información de la unidad">
+<button type="button" role="tab" aria-selected="true" style="flex: 1; min-height: 40px; border: none; border-radius: 9px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; color: #0F172A">Estado</button>
+<button type="button" role="tab" aria-selected="false" style="flex: 1; min-height: 40px; border: none; border-radius: 9px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #475569">Historial</button>
+<button type="button" role="tab" aria-selected="false" style="flex: 1; min-height: 40px; border: none; border-radius: 9px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #475569">Unidad</button>
+</div>
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; gap: 4px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px"><h2 style="margin: 0; font-size: 15px">Salud por sistema</h2><span style="font-size: 12px; color: #475569">tocá un sistema</span></div>
+<svg width="100%" height="256" viewBox="0 0 340 256" role="img" aria-label="Salud por sistema de P-123ABC: seguridad 42 %, filtros 64 %, el resto arriba de 75 %"><polygon points="170.0,97.6 193.7,109.1 199.6,134.8 183.2,155.4 156.8,155.4 140.4,134.8 146.3,109.1" fill="none" stroke="#E2E8F0" stroke-width="1"></polygon><polygon points="170.0,67.3 217.5,90.1 229.2,141.5 196.3,182.7 143.7,182.7 110.8,141.5 122.5,90.1" fill="none" stroke="#E2E8F0" stroke-width="1"></polygon><polygon points="170.0,36.0 241.9,70.6 259.7,148.5 209.9,210.9 130.1,210.9 80.3,148.5 98.1,70.6" fill="none" stroke="#E2E8F0" stroke-width="1"></polygon><line x1="170" y1="128" x2="170.0" y2="36.0" stroke="#E2E8F0" stroke-width="1"></line><line x1="170" y1="128" x2="241.9" y2="70.6" stroke="#E2E8F0" stroke-width="1"></line><line x1="170" y1="128" x2="259.7" y2="148.5" stroke="#E2E8F0" stroke-width="1"></line><line x1="170" y1="128" x2="209.9" y2="210.9" stroke="#E2E8F0" stroke-width="1"></line><line x1="170" y1="128" x2="130.1" y2="210.9" stroke="#E2E8F0" stroke-width="1"></line><line x1="170" y1="128" x2="80.3" y2="148.5" stroke="#E2E8F0" stroke-width="1"></line><line x1="170" y1="128" x2="98.1" y2="70.6" stroke="#E2E8F0" stroke-width="1"></line><polygon points="170.0,47.0 227.5,82.1 207.7,136.6 200.3,191.0 132.9,205.1 112.6,141.1 108.9,79.2" fill="#1D4ED8" fill-opacity="0.12" stroke="#1D4ED8" stroke-width="2" stroke-linejoin="round"></polygon><circle cx="170.0" cy="47.0" r="3.5" fill="#1D4ED8" stroke="#FFFFFF" stroke-width="2"><title>Motor: 88 %</title></circle><circle cx="227.5" cy="82.1" r="3.5" fill="#1D4ED8" stroke="#FFFFFF" stroke-width="2"><title>Fluidos: 80 %</title></circle><circle cx="207.7" cy="136.6" r="5" fill="#fab219" stroke="#FFFFFF" stroke-width="2"><title>Seguridad: 42 %</title></circle><circle cx="200.3" cy="191.0" r="3.5" fill="#1D4ED8" stroke="#FFFFFF" stroke-width="2"><title>Chasis: 76 %</title></circle><circle cx="132.9" cy="205.1" r="3.5" fill="#1D4ED8" stroke="#FFFFFF" stroke-width="2"><title>Eléctrico: 93 %</title></circle><circle cx="112.6" cy="141.1" r="5" fill="#fab219" stroke="#FFFFFF" stroke-width="2"><title>Filtros: 64 %</title></circle><circle cx="108.9" cy="79.2" r="3.5" fill="#1D4ED8" stroke="#FFFFFF" stroke-width="2"><title>Confort: 85 %</title></circle><text x="170.0" y="24.0" text-anchor="middle" font-size="11" font-family="Inter, sans-serif" fill="#334155" font-weight="500">Motor</text><text x="259.1" y="64.7" text-anchor="start" font-size="11" font-family="Inter, sans-serif" fill="#334155" font-weight="500">Fluidos</text><text x="281.1" y="156.0" text-anchor="start" font-size="11" font-family="Inter, sans-serif" fill="#854D0E" font-weight="700">Seguridad</text><text x="219.5" y="229.3" text-anchor="start" font-size="11" font-family="Inter, sans-serif" fill="#334155" font-weight="500">Chasis</text><text x="120.5" y="229.3" text-anchor="end" font-size="11" font-family="Inter, sans-serif" fill="#334155" font-weight="500">Eléctrico</text><text x="58.9" y="156.0" text-anchor="end" font-size="11" font-family="Inter, sans-serif" fill="#854D0E" font-weight="700">Filtros</text><text x="80.9" y="64.7" text-anchor="end" font-size="11" font-family="Inter, sans-serif" fill="#334155" font-weight="500">Confort</text></svg>
+</section>
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; gap: 0">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px"><h2 style="margin: 0; font-size: 15px">Pide atención</h2></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 0; "><div style="display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 14px; font-weight: 600">Frenos delanteros</span><span style="font-size: 12px; color: #57534E">Seguridad · pastillas al 30 %</span></div><span style="flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #854D0E"><span style="width: 8px; height: 8px; border-radius: 4px; background: #fab219"></span>Ahora</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid #F1F1EF; "><div style="display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 14px; font-weight: 600">Filtro de aire del motor</span><span style="font-size: 12px; color: #57534E">Filtros · cambiar en el servicio de 150,000 km</span></div><span style="flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #57534E"><span style="width: 8px; height: 8px; border-radius: 4px; background: #A8A29E"></span>Cerca</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid #F1F1EF; "><div style="display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 14px; font-weight: 600">Llantas traseras</span><span style="font-size: 12px; color: #57534E">Seguridad · 4 mm, revisar en diciembre</span></div><span style="flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #57534E"><span style="width: 8px; height: 8px; border-radius: 4px; background: #A8A29E"></span>Cerca</span></div>
+</section>
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; flex-direction: row; gap: 0; padding: 0">
+<a href="#" style="flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 2px; text-decoration: none; color: inherit; border-right: 1px solid #E2E8F0"><span style="font-size: 11px; color: #475569">Próxima cita</span><span style="font-size: 13px; font-weight: 700">20 dic · patio</span></a>
+<div style="flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 2px; border-right: 1px solid #E2E8F0"><span style="font-size: 11px; color: #475569">Último trabajo</span><span style="font-size: 13px; font-weight: 700">12 nov · servicio</span></div>
+<div style="flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 11px; color: #475569">Costo del año</span><span style="font-size: 13px; font-weight: 700">Q 28,400</span></div>
+</section>
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; flex-direction: row; align-items: center; gap: 12px">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 700">Último escaneo: sin códigos de falla</span><span style="font-size: 12px; color: #475569">Lo hizo el técnico en el patio · 12 nov</span></div>
+<a href="#" style="font-size: 13px; font-weight: 600">Ver</a>
+</section>
+<p style="margin: 0; font-size: 12px; color: #475569">Las fechas y el kilometraje son estimados; el estado real de una pieza solo cambia cuando el taller la revisa.</p>
+</main>
+<nav style="height: 64px; flex: none; display: flex; background: #FFFFFF; border-top: 1px solid #E2E8F0; padding: 0 4px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+<a href="#" style="{{t.estilo}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.d}}"></path></svg>{{t.n}}</a>
+</sc-for>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1324}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tabs = [['Mi flota', 'M2 6h12v10H2zM14 10h4l3 3v3h-7M7 19a2 2 0 100-4 2 2 0 000 4zM17 19a2 2 0 100-4 2 2 0 000 4z'], ['Solicitar', 'M12 5v14M5 12h14'], ['Órdenes', 'M14 7l3-3 3 3-3 3M14 7L4 17l3 3 10-10'], ['Documentos', 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7'], ['Cuenta', 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0']].map((t, i) => ({ n: t[0], d: t[1],
+      estilo: 'flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; ' + (i === 0 ? 'color: #1E3A8A; font-weight: 700' : 'color: #475569; font-weight: 500') }));
+    return { tabs: tabs };
+  }
+}
+</script>
+</body>
+</html>

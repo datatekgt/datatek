@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Huella · placa en modo perdido</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#6D28D9}a:hover{color:#4C1D95}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F5F3FF; font-family: Inter, system-ui, sans-serif; color: #111827; display: flex; flex-direction: column">
+<sc-if value="{{perdida}}" hint-placeholder-val="{{true}}">
+<div style="background: #B91C1C; color: #FFFFFF; padding: 16px 20px; display: flex; align-items: center; gap: 10px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" aria-hidden="true"><path d="M12 3l9 16H3z"></path><path d="M12 10v4M12 17h.01"></path></svg>
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 0.02em">ESTOY PERDIDA</span>
+</div>
+</sc-if>
+
+<div style="padding: 20px; display: flex; flex-direction: column; gap: 16px; flex: 1">
+<div style="width: 100%; height: 280px; border-radius: 18px; background: #DDD6FE; display: flex; align-items: center; justify-content: center; color: #4C1D95; font-size: 14px; font-weight: 600">[ foto de Canela ]</div>
+
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 32px">Canela</span>
+<span style="font-size: 15px; color: #4B5563">Perra mestiza · mediana · color miel</span>
+</div>
+
+<div style="background: #FFFFFF; border-radius: 14px; padding: 14px 16px; font-size: 15px; line-height: 1.5; border: 1px solid #DDD6FE">{{mensaje}}</div>
+
+<sc-if value="{{perdida}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<a href="#" style="min-height: 52px; border-radius: 12px; background: #6D28D9; color: #FFFFFF; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; font-weight: 700; text-decoration: none">Llamar a mi familia</a>
+<a href="#" style="min-height: 52px; border-radius: 12px; background: #FFFFFF; color: #4C1D95; border: 1.5px solid #6D28D9; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; text-decoration: none">Escribir por WhatsApp</a>
+<a href="#" style="min-height: 52px; border-radius: 12px; background: #FFFFFF; color: #4C1D95; border: 1.5px solid #6D28D9; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; text-decoration: none">Mandar dónde estoy</a>
+<span style="font-size: 12px; color: #4B5563; text-align: center">Tu ubicación solo se manda si lo aceptás en tu teléfono.</span>
+</div>
+</sc-if>
+<sc-if value="{{normal}}" hint-placeholder-val="{{false}}">
+<a href="#" style="min-height: 52px; border-radius: 12px; background: #6D28D9; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; text-decoration: none">Contactar a mi familia</a>
+</sc-if>
+
+<span style="margin-top: auto; font-size: 12px; color: #4B5563; text-align: center">Placa de Veterinaria Patitas · DATATEK Huella</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"modoPerdido":{"editor":"boolean","default":true},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const perdida = this.props.modoPerdido ?? true;
+    return {
+      perdida: perdida,
+      normal: !perdida,
+      mensaje: perdida
+        ? 'Soy tímida: no me persigas. Si me hablás bajito me acerco. Mi familia me busca desde el sábado.'
+        : 'Hola, soy Canela. Mi familia me cuida. Si me ves solita, avisales.'
+    };
+  }
+}
+</script>
+</body>
+</html>

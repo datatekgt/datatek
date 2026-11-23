@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Fuego · panel en el teléfono</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#9A3412}a:hover{color:#1C1917}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; font-family: Inter, system-ui, sans-serif; color: #1C1917; background: #FAFAF9; display: flex; flex-direction: column; overflow: hidden">
+
+<header style="height: 60px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; background: #FFFFFF; border-bottom: 1px solid #E7E5E4">
+<div style="display: flex; flex-direction: column">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 17px">Extintores Ejemplo</span>
+<span style="font-size: 12px; color: #57534E">Hoy · martes 24 nov</span>
+</div>
+<button type="button" aria-label="Avisos" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E7E5E4; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: #1C1917"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0112 0v5l2 2H4zM10 21h4"></path></svg></button>
+</header>
+
+<main style="flex: 1; min-height: 0; overflow: hidden; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box">
+<section style="background: #FFFFFF; border: 1px solid #E7E5E4; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h1 style="margin: 0; font-size: 15px">Vencen en diciembre</h1>
+<a href="#" style="font-size: 13px; font-weight: 600">Avisar a clientes</a>
+</div>
+<div style="display: flex; align-items: baseline; gap: 10px">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 40px; font-weight: 700; line-height: 1">41</span>
+<span style="font-size: 13px; color: #57534E">extintores · marzo trae 62</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; align-items: end; height: 96px; border-bottom: 1px solid #D6D3D1">
+<sc-for list="{{meses}}" as="m" hint-placeholder-count="12"><div style="{{m.barra}}" title="{{m.tip}}"></div></sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; margin-top: -4px">
+<sc-for list="{{meses}}" as="m" hint-placeholder-count="12"><span style="font-size: 10px; color: #78716C; text-align: center">{{m.n}}</span></sc-for>
+</div>
+</section>
+
+<section style="background: #FFFFFF; border: 1px solid #E7E5E4; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-size: 15px">Ruta de hoy</h2>
+<span style="font-size: 13px; color: #57534E">2 de 4 listas</span>
+</div>
+<div style="display: flex; flex-direction: column">
+<sc-for list="{{ruta}}" as="p" hint-placeholder-count="4">
+<div style="display: grid; grid-template-columns: 44px 14px minmax(0, 1fr); gap: 10px; min-height: 52px">
+<span style="font-size: 13px; font-weight: 600; color: #44403C; padding-top: 1px">{{p.hora}}</span>
+<div style="display: flex; flex-direction: column; align-items: center"><span style="{{p.punto}}"></span><span style="{{p.linea}}"></span></div>
+<div style="display: flex; flex-direction: column; gap: 1px; padding-bottom: 10px"><span style="font-size: 14px; font-weight: 600">{{p.lugar}}</span><span style="font-size: 12px; color: #57534E">{{p.detalle}}</span></div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="background: #FFF4ED; border: 1px solid #FED7AA; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-size: 12px; font-weight: 700; color: #9A3412; letter-spacing: 0.04em">SE USÓ · REPORTE DEL QR</span>
+<span style="font-size: 12px; color: #57534E">hace 25 min</span>
+</div>
+<span style="font-size: 14px; font-weight: 600">Restaurante La Ceiba · cocina</span>
+<button type="button" style="min-height: 44px; border-radius: 12px; border: none; background: #C2410C; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">Llevar uno de préstamo</button>
+</section>
+</main>
+
+<nav style="height: 64px; flex: none; display: flex; background: #FFFFFF; border-top: 1px solid #E7E5E4; padding: 0 4px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+<a href="#" style="{{t.estilo}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.d}}"></path></svg>{{t.n}}</a>
+</sc-for>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tabs = [['Hoy', 'M3 11l9-8 9 8M5 10v10h14V10'], ['Clientes', 'M4 6h16M4 12h16M4 18h10'], ['Ruta', 'M12 21s-7-6.5-7-12a7 7 0 0114 0c0 5.5-7 12-7 12zM12 11.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z'], ['Dinero', 'M3 7h18v10H3zM12 15a3 3 0 100-6 3 3 0 000 6z'], ['Más', 'M5 12h.01M12 12h.01M19 12h.01']].map((t, i) => ({ n: t[0], d: t[1],
+      estilo: 'flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; ' + (i === 0 ? 'color: #9A3412; font-weight: 700' : 'color: #57534E; font-weight: 500') }));
+    const datos = [['D', 41], ['E', 28], ['F', 35], ['M', 62], ['A', 30], ['M', 22], ['J', 18], ['J', 25], ['A', 31], ['S', 27], ['O', 20], ['N', 24]];
+    const largos = ['dic', 'ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov'];
+    const meses = datos.map((d, i) => ({ n: d[0], tip: largos[i] + ': ' + d[1] + ' extintores vencen',
+      barra: 'border-radius: 4px 4px 0 0; height: ' + Math.round(d[1] * 1.5) + 'px; background: ' + (i === 0 ? '#C2410C' : '#FDBA74') }));
+    const ruta = [
+      { hora: '8:30', lugar: 'Farmacia Central', detalle: '4 recargas · listo', e: 'hecho' },
+      { hora: '10:00', lugar: 'Clínica Dental Sonrisa', detalle: '3 recargas · listo', e: 'hecho' },
+      { hora: '13:00', lugar: 'Restaurante La Ceiba', detalle: '8 recargas · en camino', e: 'ahora' },
+      { hora: '15:30', lugar: 'Colegio San Ejemplo', detalle: '7 recargas y 1 préstamo', e: 'luego' }
+    ].map((p, i, arr) => Object.assign({}, p, {
+      punto: 'flex: none; width: 14px; height: 14px; border-radius: 7px; box-sizing: border-box; ' + (p.e === 'hecho' ? 'background: #0ca30c' : p.e === 'ahora' ? 'background: #FFFFFF; border: 4px solid #C2410C' : 'border: 2px solid #A8A29E'),
+      linea: 'flex: 1; width: 2px; background: ' + (i === arr.length - 1 ? 'transparent' : '#E7E5E4') }));
+    return { tabs: tabs, meses: meses, ruta: ruta };
+  }
+}
+</script>
+</body>
+</html>

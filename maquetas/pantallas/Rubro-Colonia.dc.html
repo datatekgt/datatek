@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Colonia · panel de la administración</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F766E}a:hover{color:#115E59}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; font-family: Inter, system-ui, sans-serif; color: #10201E; background: #F7FAF9; display: flex; flex-direction: column">
+
+<header style="height: 64px; flex: none; display: flex; align-items: center; gap: 32px; padding: 0 32px; background: #FFFFFF; border-bottom: 1px solid #E3ECEA">
+<div style="display: flex; flex-direction: column">
+<span style="font-weight: 700; font-size: 15px">Condominio Ejemplo</span>
+<a href="#" style="font-size: 12px; text-decoration: none">Administración · cambiar condominio (4)</a>
+</div>
+<nav style="display: flex; gap: 4px; height: 100%">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+<a href="#" style="{{t.estilo}}">{{t.n}}</a>
+</sc-for>
+</nav>
+<div style="margin-left: auto; display: flex; align-items: center; gap: 12px">
+<button type="button" style="min-height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid #99F6E4; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">Informe para la junta</button>
+<button type="button" style="min-height: 40px; padding: 0 16px; border-radius: 10px; border: none; background: #0F766E; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">+ Orden</button>
+</div>
+</header>
+
+<main style="flex: 1; min-height: 0; padding: 24px 32px; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 20px; box-sizing: border-box">
+
+<section style="background: #FFFFFF; border: 1px solid #E3ECEA; border-radius: 16px; padding: 22px 24px; display: flex; flex-direction: column; gap: 16px; min-height: 0">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<div style="display: flex; align-items: baseline; gap: 16px">
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 26px">El condominio hoy</h1>
+<span style="font-size: 14px; color: #47605C">13 equipos · 10 al día · 2 con preventivo vencido · 1 falla</span>
+</div>
+<div style="display: flex; gap: 14px; font-size: 13px; color: #2F4441">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 5px; background: #0ca30c"></span>Al día</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 5px; background: #fab219"></span>Preventivo vencido</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 5px; background: #d03b3b"></span>Falla</span>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start">
+<sc-for list="{{areas}}" as="a" hint-placeholder-count="4">
+<div style="border: 1px solid #E3ECEA; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: #FBFDFC">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-size: 15px; font-weight: 700">{{a.n}}</span>
+<span style="font-size: 12px; color: #47605C">{{a.resumen}}</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{a.equipos}}" as="e" hint-placeholder-count="2">
+<div style="{{e.estilo}}" title="{{e.tip}}">
+<div style="display: flex; align-items: center; gap: 8px"><span style="{{e.punto}}"></span><span style="font-size: 14px; font-weight: 600">{{e.n}}</span></div>
+<span style="font-size: 12px; font-weight: 600; color: #2F4441">{{e.estado}}</span>
+<span style="font-size: 12px; color: #47605C">{{e.detalle}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div style="margin-top: auto; border-top: 1px solid #E3ECEA; padding-top: 14px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 15px; font-weight: 700">Esta semana</span>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{semana}}" as="s" hint-placeholder-count="3">
+<div style="display: flex; gap: 12px; align-items: center">
+<div style="flex: none; width: 48px; height: 48px; border-radius: 10px; background: #E6F2EF; color: #115E59; display: flex; flex-direction: column; align-items: center; justify-content: center"><span style="font-size: 11px">{{s.dia}}</span><span style="font-size: 16px; font-weight: 700; line-height: 1">{{s.num}}</span></div>
+<div style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{s.que}}</span><span style="font-size: 12px; color: #47605C">{{s.quien}}</span></div>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<div style="display: flex; flex-direction: column; gap: 20px; min-height: 0">
+<section style="background: #FFFFFF; border: 1px solid #E3ECEA; border-radius: 16px; padding: 20px 24px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-size: 16px">Gasto de noviembre</h2>
+<span style="font-size: 13px; color: #47605C">Presupuesto Q 29,000</span>
+</div>
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 36px; font-weight: 700; line-height: 1">Q 18,450</span>
+<div style="position: relative; height: 18px; background: #E6F2EF; border-radius: 4px" title="Gastado Q 18,450 de Q 29,000; a esta altura del mes se esperaba Q 23,200">
+<div style="width: 63.6%; height: 18px; background: #0F766E; border-radius: 4px"></div>
+<div style="position: absolute; left: 80%; top: -4px; width: 2px; height: 26px; background: #10201E"></div>
+</div>
+<span style="font-size: 12px; color: #47605C">La raya marca lo esperado a esta fecha (Q 23,200): vamos por debajo.</span>
+<span style="font-size: 12px; font-weight: 600; color: #115E59">Los vecinos ven este gasto con sus facturas · noviembre en revisión de la junta</span>
+</section>
+
+<section style="background: #FFFFFF; border: 1px solid #E3ECEA; border-radius: 16px; padding: 20px 24px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 16px">Qué equipo cuesta más · últimos 6 meses</h2>
+<sc-for list="{{costos}}" as="c" hint-placeholder-count="5">
+<div style="display: grid; grid-template-columns: 120px minmax(0, 1fr) 72px; gap: 10px; align-items: center" title="{{c.tip}}">
+<span style="font-size: 13px">{{c.n}}</span>
+<div style="height: 12px; background: #F1F6F5; border-radius: 0 4px 4px 0"><div style="{{c.barra}}"></div></div>
+<span style="font-size: 13px; font-weight: 600; text-align: right">{{c.v}}</span>
+</div>
+</sc-for>
+</section>
+
+<section style="background: #FFFFFF; border: 1px solid #E3ECEA; border-radius: 16px; padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; flex: 1">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-size: 16px">Reportes de vecinos abiertos</h2>
+<span style="font-size: 13px; color: #47605C">4</span>
+</div>
+<sc-for list="{{edades}}" as="r" hint-placeholder-count="3">
+<div style="display: grid; grid-template-columns: 120px minmax(0, 1fr) 24px; gap: 10px; align-items: center">
+<span style="font-size: 13px">{{r.n}}</span>
+<div style="display: flex; gap: 3px">
+<sc-for list="{{r.cuadros}}" as="q" hint-placeholder-count="3"><span style="width: 18px; height: 18px; border-radius: 4px; background: #0F766E"></span></sc-for>
+</div>
+<span style="font-size: 13px; font-weight: 600; text-align: right">{{r.v}}</span>
+</div>
+</sc-for>
+<span style="font-size: 12px; color: #47605C">Ninguno lleva más de una semana sin respuesta.</span>
+</section>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tabs = ['Condominio', 'Órdenes', 'Calendario', 'Informe', 'Más'].map((n, i) => ({ n: n,
+      estilo: 'display: flex; align-items: center; padding: 0 14px; font-size: 14px; text-decoration: none; ' + (i === 0 ? 'color: #115E59; font-weight: 700; box-shadow: inset 0 -3px 0 #0F766E' : 'color: #2F4441; font-weight: 500') }));
+    const est = {
+      ok: { c: '#0ca30c', bg: '#FFFFFF', b: '#E3ECEA', t: 'Al día' },
+      a: { c: '#fab219', bg: '#FFF8E6', b: '#F6D98B', t: 'Preventivo vencido' },
+      r: { c: '#d03b3b', bg: '#FDECEC', b: '#F2B8B8', t: 'Falla reportada' }
+    };
+    const eq = (n, s, detalle) => ({ n: n, estado: est[s].t, detalle: detalle, tip: n + ': ' + est[s].t + ' · ' + detalle,
+      estilo: 'border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; background: ' + est[s].bg + '; border: 1px solid ' + est[s].b,
+      punto: 'flex: none; width: 10px; height: 10px; border-radius: 5px; background: ' + est[s].c });
+    const areas = [
+      { n: 'Entrada', resumen: '1 falla', equipos: [eq('Portón principal', 'r', 'No cierra · 2 reportes · Portones Seguros'), eq('Control de acceso', 'ok', 'Próximo: 15 ene')] },
+      { n: 'Cuarto de máquinas', resumen: '2 vencidos', equipos: [eq('Bomba de pozo 1', 'ok', 'Próximo: 20 dic'), eq('Bomba de pozo 2', 'a', 'Venció hace 9 días · Hidro Servicios'), eq('Planta eléctrica', 'a', '250 h cumplidas · Energía Total'), eq('Cisterna', 'ok', 'Próximo: 3 feb')] },
+      { n: 'Área social', resumen: 'al día', equipos: [eq('Piscina', 'ok', 'Limpieza: jueves'), eq('Salón', 'ok', 'Próximo: 10 ene'), eq('Gimnasio', 'ok', 'Próximo: 22 dic'), eq('Jardín central', 'ok', 'Riego arreglado ayer')] },
+      { n: 'Calles', resumen: 'al día', equipos: [eq('Alumbrado', 'ok', 'Revisión: 5 dic'), eq('Portón de servicio', 'ok', 'Próximo: 18 dic'), eq('Drenajes', 'ok', 'Antes de lluvias: abr')] }
+    ];
+    const datosC = [['Portón principal', 9800], ['Bombas de pozo', 7400], ['Piscina', 6900], ['Planta eléctrica', 4200], ['Jardín', 3600]];
+    const costos = datosC.map((c) => ({ n: c[0], v: 'Q ' + c[1].toLocaleString('en-US'), tip: c[0] + ': Q ' + c[1].toLocaleString('en-US') + ' en 6 meses',
+      barra: 'height: 12px; border-radius: 0 4px 4px 0; background: #0F766E; width: ' + Math.round(c[1] / 9800 * 100) + '%' }));
+    const edades = [['0 a 2 días', 3], ['3 a 7 días', 1], ['Más de 7 días', 0]].map((r) => ({ n: r[0], v: String(r[1]), cuadros: Array.from({ length: r[1] }, (_, i) => i) }));
+    const semana = [
+      { dia: 'Mié', num: '25', que: 'Portón principal', quien: 'Portones Seguros · visita por la falla' },
+      { dia: 'Jue', num: '26', que: 'Limpieza de piscina', quien: 'Aqua Ejemplo · semanal' },
+      { dia: 'Vie', num: '27', que: 'Preventivo bomba 2', quien: 'Hidro Servicios · vencido' }
+    ];
+    return { tabs: tabs, areas: areas, costos: costos, edades: edades, semana: semana };
+  }
+}
+</script>
+</body>
+</html>

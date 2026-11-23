@@ -1,5 +1,7 @@
 # Herramienta del cliente · qué sí, qué después, qué no
 
+> Actualizado el 24 nov: las decisiones abiertas de este documento quedaron cerradas en `antes-de-construir/0-decisiones.md`.
+
 Fecha: 22 nov 2026. Etapa: planificación. Sale de las 18 pantallas de la página «Herramienta del cliente» del lienzo
 y del estudio `docs/herramienta-cliente.md`.
 
@@ -28,7 +30,7 @@ avisa algo, lo que le deja actuar (aprobar, agendar, pagar) y lo que le da prueb
 | Recordatorios por WhatsApp | V1 | A | recordatorios de DtekPro | Sin aviso, el cliente no entra. |
 | Compartir con otra persona | Después | R | `Compartido` | Útil, pero nadie lo pide el primer mes. |
 | Documentos en PDF (constancia, carné, factura) | V1 | A | PDF de órdenes | Es lo que el cliente le enseña a un tercero. |
-| Pagar en línea | Después | N | — | Depende de pasarela y contrato; en V1 se paga como hoy. |
+| Pagar en línea | V1 | R | Recurrente (DtekPro 122) | Decidido el 24 nov: cuenta de Recurrente de cada negocio, FEL por Recurrente (`antes-de-construir/0-decisiones.md` D7, D8). |
 | Puntos y premios | No | — | `Puntos` | No mueve a ninguno de estos clientes. |
 
 ## Flota · lo que ve la empresa
@@ -109,7 +111,7 @@ más pieza nueva (Gantt, fases, hitos de pago).
 | Función | Pantalla | Decisión | Esfuerzo | Reutiliza | Por qué |
 |---|---|---|---|---|---|
 | Estado de mi cuota | Mi casa | V1 | N | — | Es lo primero que busca el vecino. |
-| Pagar la cuota en línea | Mi casa | Después | N | — | Ver piezas comunes. |
+| Pagar la cuota en línea | Mi casa | V1 | R | Recurrente | Ver piezas comunes. Pantalla Colonia-C4. |
 | Reportar una falla con foto y seguirla en vivo | Mi reporte | V1 | A | `OrdenEnVivo` | Quita la llamada a la garita. |
 | Calificar cuando se resuelve | Mi reporte | V1 | A | encuesta de DtekPro | Le da al administrador prueba de su trabajo. |
 | En qué se fue mi cuota (barra por rubro) | Mi casa | V1 | N | — | La desconfianza sobre la cuota es la queja número uno en la región. |
@@ -129,7 +131,7 @@ puede no querer mostrar sus números. Hay que preguntarlo en la validación ante
 | Flota | 4 de 4 | R (Garage) | Costo por km, aprobación automática, escáner |
 | Huella | 3 de 4 (expediente corto) | A | Peso, consultas, modo perdido, GPS/NFC |
 | Fuego | 2 de 3 | A | Plano del local |
-| Colonia | 3 de 3 (sin pago ni votación) | N | Pago en línea, fondo de reserva, votar, reservas |
+| Colonia | 3 de 3, con pago de cuota (sin votación) | N | Fondo de reserva, votar, reservas |
 | Obra | 4 de 4 (sin cámara ni materiales) | N | Cámara 24/7, materiales detallados, preguntas en app |
 
 **Orden que recomiendo:** Flota → Huella → Fuego → Colonia → Obra. Va de lo que ya tenemos hecho a lo que es todo

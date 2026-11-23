@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Flota · página pública de D-TEK Flotas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1D4ED8}a:hover{color:#1E3A8A}
+</style>
+</helmet>
+<div style="width: 1280px; height: 844px; box-sizing: border-box; font-family: Inter, system-ui, sans-serif; color: #111827; background: #FFFFFF; display: flex; flex-direction: column">
+<header style="display: flex; justify-content: space-between; align-items: center; padding: 20px 64px; border-bottom: 1px solid #F3F4F6">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 20px">D-TEK <span style="color: #1D4ED8">Flotas</span></span>
+<div style="display: flex; align-items: center; gap: 28px; font-size: 15px">
+<a href="#" style="color: #1F2937; text-decoration: none">Qué resolvemos</a>
+<a href="#" style="color: #1F2937; text-decoration: none">Extraurbanos y escolares</a>
+<a href="#" style="color: #1F2937; text-decoration: none">Portal de empresas</a>
+<a href="#" style="min-height: 44px; display: flex; align-items: center; padding: 0 18px; border-radius: 10px; background: #1D4ED8; color: #FFFFFF; font-weight: 600; text-decoration: none">Pedir diagnóstico</a>
+</div>
+</header>
+
+<section style="display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 56px; padding: 52px 64px 36px; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<span style="font-size: 14px; font-weight: 600; color: #1D4ED8">Mantenimiento de flotas · Ciudad de Guatemala</span>
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 54px; line-height: 1.05">Tu flota al día sin sacarla del patio.</h1>
+<p style="margin: 0; font-size: 18px; line-height: 1.55; color: #374151">El mecánico llega a tu patio, atiende varias unidades en una visita y cada una queda con su historial. Vos ves lo que vence, cuánto te cuesta cada unidad y cuántos días estuvo parada.</p>
+<div style="display: flex; gap: 12px">
+<a href="#" style="min-height: 52px; display: flex; align-items: center; padding: 0 24px; border-radius: 12px; background: #1D4ED8; color: #FFFFFF; font-size: 16px; font-weight: 700; text-decoration: none">Pedir diagnóstico de flota</a>
+<a href="#" style="min-height: 52px; display: flex; align-items: center; padding: 0 24px; border-radius: 12px; border: 1.5px solid #1D4ED8; color: #1E3A8A; font-size: 16px; font-weight: 700; text-decoration: none">Hablar por WhatsApp</a>
+</div>
+</div>
+<form style="background: #EFF6FF; border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 12px; border: 1px solid #BFDBFE">
+<span style="font-size: 17px; font-weight: 700">Diagnóstico de tu flota</span>
+<label for="empresa" style="font-size: 13px; font-weight: 600">Empresa</label>
+<input id="empresa" style="min-height: 44px; border: 1px solid #93C5FD; border-radius: 10px; padding: 0 12px; font: inherit; font-size: 15px">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="unidades" style="font-size: 13px; font-weight: 600">Unidades</label><input id="unidades" value="12" style="min-height: 44px; border: 1px solid #93C5FD; border-radius: 10px; padding: 0 12px; font: inherit; font-size: 15px"></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="tipo" style="font-size: 13px; font-weight: 600">Tipo</label><select id="tipo" style="min-height: 44px; border: 1px solid #93C5FD; border-radius: 10px; padding: 0 10px; font: inherit; font-size: 15px; background: #FFFFFF"><option>Pick-ups y paneles</option></select></div>
+</div>
+<label for="zona" style="font-size: 13px; font-weight: 600">¿Dónde duermen?</label>
+<input id="zona" value="Zona 12" style="min-height: 44px; border: 1px solid #93C5FD; border-radius: 10px; padding: 0 12px; font: inherit; font-size: 15px">
+<button type="button" style="min-height: 48px; border-radius: 10px; border: none; background: #1E3A8A; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 600">Agendar el diagnóstico</button>
+</form>
+</section>
+
+<section style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding: 0 64px">
+<sc-for list="{{beneficios}}" as="b" hint-placeholder-count="4">
+<div style="border: 1px solid #DBEAFE; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 16px; font-weight: 700">{{b.t}}</span>
+<span style="font-size: 14px; color: #4B5563; line-height: 1.4">{{b.d}}</span>
+</div>
+</sc-for>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { beneficios: [
+      { t: 'Preventivo por unidad', d: 'Por kilometraje o tiempo, con aviso antes de que toque.' },
+      { t: 'Documentos al día', d: 'Seguros, tarjetas y licencias de cada piloto.' },
+      { t: 'Costo y días parados', d: 'Por unidad y por mes, para decidir con números.' },
+      { t: 'Factura electrónica', d: 'Cada servicio con su FEL a nombre de la empresa.' }
+    ] };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Obra · supervisión en el teléfono</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#854D0E}a:hover{color:#1C1917}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; font-family: Inter, system-ui, sans-serif; color: #1C1917; background: #FAF9F6; display: flex; flex-direction: column; overflow: hidden">
+
+<header style="height: 60px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; background: #FFFFFF; border-bottom: 1px solid #ECE8DF">
+<div style="display: flex; flex-direction: column">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 17px">D-TEK Obra</span>
+<span style="font-size: 12px; color: #57534E">Supervisión</span>
+</div>
+<button type="button" aria-label="Avisos" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #ECE8DF; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: #1C1917"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0112 0v5l2 2H4zM10 21h4"></path></svg></button>
+</header>
+
+<main style="flex: 1; min-height: 0; overflow: hidden; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box">
+<button type="button" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 56px; padding: 8px 14px; border-radius: 14px; border: 1px solid #ECE8DF; background: #FFFFFF; font: inherit; color: #1C1917; text-align: left">
+<span style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 15px; font-weight: 700">Casa familia López</span><span style="font-size: 12px; color: #57534E">San Marcos · semana 14 de 20 · 1 de 5 obras</span></span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+</button>
+
+<section style="background: #FFFFFF; border: 1px solid #ECE8DF; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 28px; font-weight: 700; line-height: 1">58 %</span>
+<span style="font-size: 13px; font-weight: 700; color: #854D0E">2 semanas de atraso</span>
+</div>
+<div style="position: relative; height: 10px; background: #F3EFE6; border-radius: 4px" title="Real 58 %, plan a hoy 62 %">
+<div style="width: 58%; height: 10px; background: #A16207; border-radius: 4px"></div>
+<div style="position: absolute; left: 62%; top: -3px; width: 2px; height: 16px; background: #1C1917"></div>
+</div>
+<span style="font-size: 12px; color: #57534E">Avance real · la raya es lo planeado a hoy (62 %)</span>
+</section>
+
+<section style="background: #FFFFFF; border: 1px solid #ECE8DF; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; gap: 6px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h1 style="margin: 0; font-size: 15px">Fases</h1>
+<div style="display: flex; gap: 10px; font-size: 11px; color: #44403C">
+<span style="display: flex; align-items: center; gap: 4px"><span style="width: 12px; height: 6px; border-radius: 3px; background: #E7DCC2"></span>Plan</span>
+<span style="display: flex; align-items: center; gap: 4px"><span style="width: 12px; height: 6px; border-radius: 3px; background: #A16207"></span>Real</span>
+<span style="display: flex; align-items: center; gap: 4px"><span style="width: 2px; height: 10px; background: #1C1917"></span>Hoy</span>
+</div>
+</div>
+<div style="position: relative; height: 12px; font-size: 10px; color: #78716C"><span style="position: absolute; left: 0">Sem. 0</span><span style="position: absolute; left: 50%; transform: translateX(-50%)">10</span><span style="position: absolute; left: 70%; transform: translateX(-50%); font-weight: 700; color: #1C1917">14</span><span style="position: absolute; right: 0">20</span></div>
+<sc-for list="{{fases}}" as="f" hint-placeholder-count="8">
+<div style="display: flex; flex-direction: column; gap: 3px; padding-top: 4px; border-top: 1px solid #F3EFE6" title="{{f.tip}}">
+<div style="display: flex; justify-content: space-between; gap: 8px"><span style="font-size: 12px; font-weight: 600">{{f.n}}</span><span style="{{f.estadoEstilo}}">{{f.estado}}</span></div>
+<div style="position: relative; height: 16px; background: repeating-linear-gradient(to right, #F3EFE6 0 1px, transparent 1px 25%)">
+<div style="position: absolute; left: 70%; top: -2px; bottom: -2px; width: 2px; background: #1C1917"></div>
+<div style="{{f.planBarra}}"></div>
+<sc-if value="{{f.hayReal}}"><div style="{{f.realBarra}}"></div></sc-if>
+</div>
+</div>
+</sc-for>
+</section>
+
+<section style="background: #FEF9EC; border: 1px solid #F3D9A4; border-radius: 16px; padding: 12px 14px; display: flex; align-items: center; gap: 12px">
+<span style="flex: none; width: 12px; height: 12px; transform: rotate(45deg); border: 2px solid #1C1917; box-sizing: border-box; background: #FFFFFF"></span>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 1px"><span style="font-size: 13px; font-weight: 700">Pago 3 espera la losa</span><span style="font-size: 12px; color: #57534E">Plan sem. 11 · losa al 60 %</span></div>
+<button type="button" style="min-height: 44px; padding: 0 14px; border-radius: 12px; border: none; background: #A16207; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600">Avisar al dueño</button>
+</section>
+</main>
+
+<nav style="height: 64px; flex: none; display: flex; background: #FFFFFF; border-top: 1px solid #ECE8DF; padding: 0 4px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+<a href="#" style="{{t.estilo}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.d}}"></path></svg>{{t.n}}</a>
+</sc-for>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tabs = [['Obras', 'M3 11l9-8 9 8M5 10v10h14V10'], ['Visitas', 'M12 21s-7-6.5-7-12a7 7 0 0114 0c0 5.5-7 12-7 12zM12 11.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z'], ['Reportes', 'M3 8h4l2-3h6l2 3h4v12H3zM12 17a4 4 0 100-8 4 4 0 000 8z'], ['Cobros', 'M3 7h18v10H3zM12 15a3 3 0 100-6 3 3 0 000 6z'], ['Más', 'M5 12h.01M12 12h.01M19 12h.01']].map((t, i) => ({ n: t[0], d: t[1],
+      estilo: 'flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; ' + (i === 0 ? 'color: #854D0E; font-weight: 700' : 'color: #57534E; font-weight: 500') }));
+    const pct = (w) => (w / 20 * 100).toFixed(2) + '%';
+    const barra = (ini, fin, top, color) => 'position: absolute; top: ' + top + 'px; height: 6px; border-radius: 3px; left: ' + pct(ini) + '; width: ' + pct(fin - ini) + '; background: ' + color;
+    const estF = { ok: 'font-size: 11px; font-weight: 600; color: #166534', a: 'font-size: 11px; font-weight: 700; color: #854D0E', r: 'font-size: 11px; font-weight: 700; color: #991B1B', n: 'font-size: 11px; color: #78716C' };
+    const fases = [
+      { n: 'Trazo y preliminares', p: [0, 1], r: [0, 1], estado: 'Listo', s: 'ok' },
+      { n: 'Cimentación', p: [1, 4], r: [1, 5], estado: 'Listo · 1 sem. tarde', s: 'ok' },
+      { n: 'Levantado de muros', p: [4, 8], r: [5, 10], estado: 'Listo · 2 sem. tarde', s: 'a' },
+      { n: 'Losa', p: [8, 11], r: [10, 14], estado: 'En curso · 60 %', s: 'a' },
+      { n: 'Instalaciones', p: [9, 13], r: [11, 14], estado: 'En curso · 50 %', s: 'a' },
+      { n: 'Repello y cernido', p: [12, 15], r: null, estado: 'Debió empezar sem. 12', s: 'r' },
+      { n: 'Pisos y azulejo', p: [15, 18], r: null, estado: 'Por iniciar', s: 'n' },
+      { n: 'Acabados y pintura', p: [17, 20], r: null, estado: 'Por iniciar', s: 'n' }
+    ].map((f) => ({ n: f.n, estado: f.estado, estadoEstilo: estF[f.s], hayReal: !!f.r,
+      tip: f.n + ' · plan sem. ' + f.p[0] + ' a ' + f.p[1] + (f.r ? ' · real sem. ' + f.r[0] + ' a ' + f.r[1] : ' · sin empezar'),
+      planBarra: barra(f.p[0], f.p[1], 1, '#E7DCC2'),
+      realBarra: f.r ? barra(f.r[0], f.r[1], 9, '#A16207') : '' }));
+    return { tabs: tabs, fases: fases };
+  }
+}
+</script>
+</body>
+</html>

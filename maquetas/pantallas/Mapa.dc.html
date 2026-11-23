@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>DATATEK · funciones y dependencias</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#1D4ED8}a:hover{color:#1E3A8A}
+</style>
+</helmet>
+<div style="background: #F5F6F8; font-family: Inter, system-ui, sans-serif; color: #111827">
+<div style="max-width: 1200px; margin: 0 auto; padding: 48px 24px 72px; display: flex; flex-direction: column; gap: 48px">
+
+<section style="display: flex; flex-direction: column; gap: 12px; max-width: 860px">
+<span style="font-size: 14px; font-weight: 600; color: #4B5563; letter-spacing: 0.06em">FUNCIONES Y DEPENDENCIAS</span>
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 44px; line-height: 1.1">No copiamos DtekPro: lo usamos como caja de herramientas.</h1>
+<p style="margin: 0; font-size: 18px; line-height: 1.55; color: #374151">Cada pieza ya funciona en producción. Cada nicho toma solo las que necesita y las adapta a su modo; lo que no existe se construye una vez y lo aprovechan varios.</p>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 24px">La caja de herramientas: 33 piezas de DtekPro</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px">
+<sc-for list="{{grupos}}" as="g" hint-placeholder-count="6">
+<div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 15px; font-weight: 700">{{g.t}}</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{g.items}}" as="it" hint-placeholder-count="4">
+<span style="font-size: 13px; background: #F3F4F6; border-radius: 6px; padding: 4px 8px; color: #1F2937"><strong>{{it.c}}</strong> {{it.n}}</span>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 24px">Qué toma cada producto</h2>
+<div style="display: flex; gap: 16px; font-size: 13px; color: #374151">
+<span><strong style="font-size: 15px">●</strong> la usa tal cual</span>
+<span><strong style="font-size: 15px">◐</strong> la usa adaptada a fondo</span>
+<span><strong style="font-size: 15px; color: #9CA3AF">·</strong> no la usa</span>
+</div>
+</div>
+<div style="overflow-x: auto; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px">
+<table style="width: 100%; min-width: 760px; border-collapse: collapse; font-size: 14px">
+<thead>
+<tr style="background: #F9FAFB">
+<th style="text-align: left; padding: 12px 16px; font-weight: 600; border-bottom: 1px solid #E5E7EB">Herramienta</th>
+<sc-for list="{{nichos}}" as="n" hint-placeholder-count="5">
+<th style="{{n.th}}">{{n.nombre}}</th>
+</sc-for>
+</tr>
+</thead>
+<tbody>
+<sc-for list="{{filas}}" as="f" hint-placeholder-count="20">
+<tr>
+<td style="padding: 9px 16px; border-bottom: 1px solid #F3F4F6"><strong style="color: #4B5563">{{f.c}}</strong> {{f.n}}</td>
+<sc-for list="{{f.celdas}}" as="x" hint-placeholder-count="5">
+<td style="{{x.estilo}}">{{x.s}}</td>
+</sc-for>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 24px">Lo que no existe en DtekPro y hay que construir</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px">
+<sc-for list="{{nuevas}}" as="nv" hint-placeholder-count="7">
+<div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline">
+<span style="font-size: 15px; font-weight: 700">{{nv.c}} · {{nv.t}}</span>
+<span style="{{nv.prioridadEstilo}}">{{nv.prioridad}}</span>
+</div>
+<span style="font-size: 14px; line-height: 1.45; color: #4B5563">{{nv.d}}</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{nv.quien}}" as="q" hint-placeholder-count="3">
+<span style="{{q.estilo}}">{{q.n}}</span>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 24px">Qué tan lejos está cada uno</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px">
+<sc-for list="{{distancia}}" as="d" hint-placeholder-count="5">
+<div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+<div style="{{d.barra}}"></div>
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 20px">{{d.nombre}}</span>
+<div style="display: flex; gap: 18px">
+<div style="display: flex; flex-direction: column"><span style="font-size: 28px; font-weight: 700">{{d.h}}</span><span style="font-size: 12px; color: #4B5563">piezas de DtekPro</span></div>
+<div style="display: flex; flex-direction: column"><span style="font-size: 28px; font-weight: 700">{{d.n}}</span><span style="font-size: 12px; color: #4B5563">piezas nuevas</span></div>
+</div>
+<span style="font-size: 13px; line-height: 1.45; color: #374151">{{d.nota}}</span>
+</div>
+</sc-for>
+</div>
+<div style="background: #111827; color: #F9FAFB; border-radius: 14px; padding: 22px 24px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 16px; font-weight: 700">Orden sugerido para construir lo nuevo</span>
+<span style="font-size: 15px; line-height: 1.55; color: #E5E7EB">1) Avisos automáticos (N-04) y página del QR (N-03): los piden casi todos. 2) El bien genérico con padre (N-01) y el cliente organización (N-02). 3) Trabajador externo (N-05) para Colonia y Obra. 4) Documentos con vencimiento (N-06) y producto físico (N-07) cuando el nicho que los pide entre a piloto.</span>
+</div>
+</section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const colores = { Fuego: '#C2410C', Huella: '#7C3AED', Colonia: '#0F766E', Flota: '#1D4ED8', Obra: '#A16207' };
+    const nombres = ['Fuego', 'Huella', 'Colonia', 'Flota', 'Obra'];
+    const nichos = nombres.map((n) => ({ nombre: n,
+      th: 'padding: 12px 10px; font-weight: 700; text-align: center; border-bottom: 1px solid #E5E7EB; color: ' + colores[n] }));
+    const grupos = [
+      { t: 'Lo que ve el público', items: [['H-01','Página con marca'],['H-02','Agenda pública'],['H-03','Horario y bloqueos']] },
+      { t: 'El bien y su historial', items: [['H-04','Expediente del bien'],['H-05','Qué le toca'],['H-06','Compartir'],['H-07','Importador']] },
+      { t: 'El trabajo', items: [['H-08','Catálogo'],['H-09','Cotizar y aprobar'],['H-10','Orden y bitácora'],['H-11','Recepción'],['H-12','Pasos'],['H-13','Evidencia'],['H-14','Enlace sin cuenta'],['H-15','Orden en vivo'],['H-16','Informe con QR'],['H-17','Integridad'],['H-18','Cupos y ruta']] },
+      { t: 'El dinero', items: [['H-19','Cobros y caja'],['H-20','Pago en línea y FEL'],['H-21','Costos e indicadores'],['H-22','Comisiones'],['H-23','Inventario'],['H-24','Contador']] },
+      { t: 'El negocio', items: [['H-25','Roles y capacidades'],['H-26','Alta con semilla'],['H-27','Panel de plataforma'],['H-28','Puntos'],['H-29','Avisos WhatsApp'],['H-30','Asistente'],['H-31','Escáner OBD']] },
+      { t: 'Lo que protege todo', items: [['H-32','Seguridad en la base'],['H-33','Pruebas y despliegue']] }
+    ].map((g) => ({ t: g.t, items: g.items.map((i) => ({ c: i[0], n: i[1] })) }));
+    const datos = [
+      ['H-01','Página pública con marca','●●◐●◐'],
+      ['H-02','Agenda pública','●●◐◐◐'],
+      ['H-04','Expediente del bien','◐◐◐●◐'],
+      ['H-05','Qué le toca (vencimientos)','◐◐◐●·'],
+      ['H-06','Compartir expediente','·●●●●'],
+      ['H-09','Cotizar y aprobar por ítem','··◐●◐'],
+      ['H-10','Orden y bitácora','●●●●●'],
+      ['H-13','Hallazgos y evidencia','●●●●◐'],
+      ['H-14','Enlace sin cuenta','●●◐●◐'],
+      ['H-16','Informe con QR','◐·◐●◐'],
+      ['H-17','Cadena de integridad','●·●●●'],
+      ['H-18','Cupos, ruta, tiempos','◐◐·●◐'],
+      ['H-19','Cobros y caja','●●·◐◐'],
+      ['H-20','Pago en línea y FEL','●●·●◐'],
+      ['H-21','Costos e indicadores','●●◐●◐'],
+      ['H-23','Inventario','◐●·●·'],
+      ['H-25','Roles y capacidades','●●●●●'],
+      ['H-28','Puntos y referidos','·●···'],
+      ['H-31','Escáner OBD','···●·'],
+      ['H-32','Seguridad en la base','●●●●●']
+    ];
+    const filas = datos.map((d) => ({ c: d[0], n: d[1], celdas: d[2].split('').map((s, i) => ({
+      s: s,
+      estilo: 'padding: 9px 10px; text-align: center; font-size: 16px; border-bottom: 1px solid #F3F4F6; color: ' + (s === '·' ? '#9CA3AF' : colores[nombres[i]])
+    })) }));
+    const pastilla = (n) => ({ n: n, estilo: 'font-size: 12px; font-weight: 600; border-radius: 999px; padding: 3px 10px; color: #FFFFFF; background: ' + colores[n] });
+    const nuevas = [
+      { c: 'N-04', t: 'Avisos automáticos', d: 'Cola de avisos por vencimiento; primero WhatsApp con un toque, después WhatsApp Business.', quien: nombres, prioridad: 'Primero' },
+      { c: 'N-03', t: 'Página del QR', d: 'Un teléfono sin sesión escanea el bien y ve lo mínimo. Etiquetas imprimibles.', quien: ['Fuego','Huella','Colonia','Flota'], prioridad: 'Primero' },
+      { c: 'N-01', t: 'Bien genérico con padre', d: 'Local → extintor; condominio → área → equipo; obra → fase.', quien: ['Fuego','Huella','Colonia','Obra'], prioridad: 'Segundo' },
+      { c: 'N-02', t: 'Cliente organización o familia', d: 'Varios usuarios y sedes; roles del lado del cliente: dueño, encargado, solo mirar.', quien: ['Fuego','Colonia','Flota','Obra'], prioridad: 'Segundo' },
+      { c: 'N-05', t: 'Trabajador externo', d: 'El proveedor del condominio o el maestro de obra con su propio enlace.', quien: ['Colonia','Obra'], prioridad: 'Tercero' },
+      { c: 'N-06', t: 'Documentos con vencimiento', d: 'Licencias, seguros, tarjetas y certificados que no son trabajos.', quien: ['Flota','Fuego'], prioridad: 'Con su nicho' },
+      { c: 'N-07', t: 'Producto físico', d: 'Etiquetas QR y placas QR/NFC con inventario e impresión por proveedor.', quien: ['Fuego','Huella'], prioridad: 'Con su nicho' }
+    ].map((nv) => Object.assign({}, nv, {
+      quien: nv.quien.map(pastilla),
+      prioridadEstilo: 'flex: none; font-size: 12px; font-weight: 600; color: #374151; background: #F3F4F6; border-radius: 6px; padding: 2px 8px'
+    }));
+    const distancia = [
+      { nombre: 'Fuego', h: 22, n: 7, nota: 'Lo nuevo es el QR público, el certificado del local y las etiquetas.' },
+      { nombre: 'Huella', h: 22, n: 8, nota: 'Lo nuevo es el modo perdido, el plan de vacunas y las placas.' },
+      { nombre: 'Colonia', h: 15, n: 8, nota: 'El modelo se invierte: la administración maneja proveedores externos.' },
+      { nombre: 'Flota', h: 25, n: 8, nota: 'Casi DtekPro con cuenta de empresa, pilotos y documentos.' },
+      { nombre: 'Obra', h: 15, n: 9, nota: 'El más nuevo: cronograma, reporte semanal y pagos por hito.' }
+    ].map((d) => Object.assign({}, d, { barra: 'height: 6px; width: 48px; border-radius: 3px; background: ' + colores[d.nombre] }));
+    return { nichos: nichos, grupos: grupos, filas: filas, nuevas: nuevas, distancia: distancia };
+  }
+}
+</script>
+</body>
+</html>

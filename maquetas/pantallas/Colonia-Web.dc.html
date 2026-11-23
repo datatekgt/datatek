@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Colonia · página pública del producto</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F766E}a:hover{color:#115E59}
+</style>
+</helmet>
+<div style="width: 1280px; height: 844px; box-sizing: border-box; font-family: Inter, system-ui, sans-serif; color: #111827; background: #FFFFFF; display: flex; flex-direction: column">
+<header style="display: flex; justify-content: space-between; align-items: center; padding: 20px 64px; border-bottom: 1px solid #F3F4F6">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 20px"><span style="letter-spacing: 0.04em">DATATEK</span> <span style="color: #0F766E">Colonia</span></span>
+<div style="display: flex; align-items: center; gap: 28px; font-size: 15px">
+<a href="#" style="color: #1F2937; text-decoration: none">Cómo funciona</a>
+<a href="#" style="color: #1F2937; text-decoration: none">Para administradoras</a>
+<a href="#" style="color: #1F2937; text-decoration: none">Entrar</a>
+<a href="#" style="min-height: 44px; display: flex; align-items: center; padding: 0 18px; border-radius: 10px; background: #0F766E; color: #FFFFFF; font-weight: 600; text-decoration: none">Pedir demostración</a>
+</div>
+</header>
+
+<section style="display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 56px; padding: 52px 64px 36px; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<span style="font-size: 14px; font-weight: 600; color: #0F766E">Para administradoras y juntas directivas</span>
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 52px; line-height: 1.05">La colonia al día, sin perseguir proveedores.</h1>
+<p style="margin: 0; font-size: 18px; line-height: 1.55; color: #374151">Cada bomba, portón y piscina con su historial. Los vecinos reportan con un QR, los proveedores suben fotos de lo que hicieron y la junta recibe el informe del mes sin que nadie lo arme a mano.</p>
+<div style="display: flex; gap: 12px">
+<a href="#" style="min-height: 52px; display: flex; align-items: center; padding: 0 24px; border-radius: 12px; background: #0F766E; color: #FFFFFF; font-size: 16px; font-weight: 700; text-decoration: none">Pedir demostración</a>
+<a href="#" style="min-height: 52px; display: flex; align-items: center; padding: 0 24px; border-radius: 12px; border: 1.5px solid #0F766E; color: #115E59; font-size: 16px; font-weight: 700; text-decoration: none">Ver un informe de ejemplo</a>
+</div>
+</div>
+<div style="background: #F0FDFA; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 12px; border: 1px solid #99F6E4">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-size: 16px; font-weight: 700">Informe de noviembre</span>
+<span style="font-size: 12px; color: #4B5563">Residencial Los Pinos</span>
+</div>
+<sc-for list="{{resumen}}" as="r" hint-placeholder-count="4">
+<div style="display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; border-radius: 10px; padding: 10px 12px; font-size: 14px">
+<span>{{r.t}}</span><strong>{{r.v}}</strong>
+</div>
+</sc-for>
+<span style="font-size: 12px; color: #4B5563">Firmado con cadena de integridad: nadie puede cambiarlo después.</span>
+</div>
+</section>
+
+<section style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 0 64px">
+<sc-for list="{{pasos}}" as="p" hint-placeholder-count="3">
+<div style="border: 1px solid #CCFBF1; border-radius: 14px; padding: 18px; display: flex; gap: 14px; align-items: flex-start">
+<span style="flex: none; width: 32px; height: 32px; border-radius: 16px; background: #0F766E; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700">{{p.n}}</span>
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 16px; font-weight: 700">{{p.t}}</span><span style="font-size: 14px; color: #4B5563; line-height: 1.4">{{p.d}}</span></div>
+</div>
+</sc-for>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const pasos = [
+      { t: 'Registrás los equipos', d: 'Áreas comunes, bombas, portones, piscina y planta, con su plan de mantenimiento.' },
+      { t: 'Asignás proveedores', d: 'Cada uno recibe sus órdenes por WhatsApp y sube la evidencia.' },
+      { t: 'La junta ve todo', d: 'Estado en semáforo, cotizaciones por aprobar e informe del mes.' }
+    ].map((p, i) => Object.assign({}, p, { n: String(i + 1) }));
+    const resumen = [
+      { t: 'Órdenes cerradas', v: '14' },
+      { t: 'Reportes de vecinos resueltos', v: '9 de 10' },
+      { t: 'Preventivos al día', v: '11 de 13' },
+      { t: 'Gasto del mes', v: 'Q 18,450' }
+    ];
+    return { pasos: pasos, resumen: resumen };
+  }
+}
+</script>
+</body>
+</html>

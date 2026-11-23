@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Obra · página pública de D-TEK Obra</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#A16207}a:hover{color:#713F12}
+</style>
+</helmet>
+<div style="width: 1280px; height: 844px; box-sizing: border-box; font-family: Inter, system-ui, sans-serif; color: #111827; background: #FFFFFF; display: flex; flex-direction: column">
+<header style="display: flex; justify-content: space-between; align-items: center; padding: 20px 64px; border-bottom: 1px solid #F3F4F6">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 20px">D-TEK <span style="color: #A16207">Obra</span></span>
+<div style="display: flex; align-items: center; gap: 28px; font-size: 15px">
+<a href="#" style="color: #1F2937; text-decoration: none">Cómo funciona</a>
+<a href="#" style="color: #1F2937; text-decoration: none">Precio</a>
+<a href="#" style="color: #1F2937; text-decoration: none">Mi obra</a>
+<a href="#" style="min-height: 44px; display: flex; align-items: center; padding: 0 18px; border-radius: 10px; background: #A16207; color: #FFFFFF; font-weight: 600; text-decoration: none">Agendar llamada</a>
+</div>
+</header>
+
+<section style="display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 56px; padding: 52px 64px 36px; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<span style="font-size: 14px; font-weight: 600; color: #A16207">Para quien construye en Guatemala desde el extranjero</span>
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 54px; line-height: 1.05">Mirá tu casa crecer desde donde estés.</h1>
+<p style="margin: 0; font-size: 18px; line-height: 1.55; color: #374151">Mandás el dinero y no sabés qué se hizo. Nosotros visitamos tu obra cada semana, verificamos el avance con fotos que llevan fecha y lugar, y vos aprobás cada etapa antes de pagarla.</p>
+<div style="display: flex; gap: 12px; align-items: center">
+<a href="#" style="min-height: 52px; display: flex; align-items: center; padding: 0 24px; border-radius: 12px; background: #A16207; color: #FFFFFF; font-size: 16px; font-weight: 700; text-decoration: none">Agendar una llamada</a>
+<span style="font-size: 14px; color: #4B5563">En tu horario: Los Ángeles, Houston, Nueva York…</span>
+</div>
+</div>
+<div style="background: #FEFCE8; border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 12px; border: 1px solid #FDE68A">
+<span style="font-size: 13px; font-weight: 600; color: #713F12">EJEMPLO DE REPORTE SEMANAL</span>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<div style="height: 96px; border-radius: 10px; background: #FDE68A; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #713F12">foto de la losa</div>
+<div style="height: 96px; border-radius: 10px; background: #FDE68A; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #713F12">foto de muros</div>
+<div style="height: 96px; border-radius: 10px; background: #78350F; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #FFFFFF">video</div>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 14px"><span>Avance total</span><strong>58 %</strong></div>
+<div style="height: 8px; background: #FEF3C7; border-radius: 4px; overflow: hidden"><div style="height: 8px; width: 58%; background: #A16207"></div></div>
+<span style="font-size: 13px; color: #166534; font-weight: 600">Verificado en visita por un supervisor D-TEK</span>
+</div>
+</section>
+
+<section style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 0.9fr); gap: 16px; padding: 0 64px">
+<sc-for list="{{pasos}}" as="p" hint-placeholder-count="3">
+<div style="border: 1px solid #FEF3C7; border-radius: 14px; padding: 18px; display: flex; gap: 14px; align-items: flex-start">
+<span style="flex: none; width: 32px; height: 32px; border-radius: 16px; background: #A16207; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700">{{p.n}}</span>
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 16px; font-weight: 700">{{p.t}}</span><span style="font-size: 14px; color: #4B5563; line-height: 1.4">{{p.d}}</span></div>
+</div>
+</sc-for>
+<div style="background: #1C1917; color: #FFFFFF; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 4px; justify-content: center">
+<span style="font-size: 13px; color: #D6D3D1">Por obra, al mes</span>
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 26px; font-weight: 700">US$ [TU PRECIO]</span>
+<span style="font-size: 13px; color: #D6D3D1">Visita semanal y reporte firmado</span>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const pasos = [
+      { t: 'Registramos tu obra', d: 'Presupuesto, etapas y quién construye.' },
+      { t: 'Visita cada semana', d: 'Fotos y video verificados en tu perfil.' },
+      { t: 'Aprobás y pagás', d: 'Cada etapa contra lo que de verdad se hizo.' }
+    ].map((p, i) => Object.assign({}, p, { n: String(i + 1) }));
+    return { pasos: pasos };
+  }
+}
+</script>
+</body>
+</html>

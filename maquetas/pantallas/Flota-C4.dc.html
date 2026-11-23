@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Flota · historial y costos de una unidad</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E3A8A}a:hover{color:#0F172A}
+</style>
+</helmet>
+<div style="width: 390px; height: 1116px; box-sizing: border-box; font-family: Inter, system-ui, sans-serif; color: #0F172A; background: #F7F9FC; display: flex; flex-direction: column; overflow: hidden">
+<header style="height: 60px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; background: #FFFFFF; border-bottom: 1px solid #E2E8F0">
+<div style="display: flex; flex-direction: column">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 17px">Distribuidora Ejemplo</span>
+<span style="font-size: 12px; color: #475569">Mi flota · D-TEK Flotas</span>
+</div>
+<button type="button" aria-label="Avisos" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E2E8F0; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: #0F172A"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0112 0v5l2 2H4zM10 21h4"></path></svg></button>
+</header>
+<main style="flex: 1; min-height: 0; overflow: hidden; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box">
+<a href="#" style="display: flex; align-items: center; gap: 6px; min-height: 32px; font-size: 13px; font-weight: 600; text-decoration: none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>P-123ABC · Hilux 2019</a>
+<div style="display: flex; background: #EEF2F7; border-radius: 12px; padding: 4px" role="tablist" aria-label="Información de la unidad">
+<button type="button" role="tab" aria-selected="false" style="flex: 1; min-height: 40px; border: none; border-radius: 9px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #475569">Estado</button>
+<button type="button" role="tab" aria-selected="true" style="flex: 1; min-height: 40px; border: none; border-radius: 9px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; color: #0F172A">Historial</button>
+<button type="button" role="tab" aria-selected="false" style="flex: 1; min-height: 40px; border: none; border-radius: 9px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #475569">Unidad</button>
+</div>
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px"><h2 style="margin: 0; font-size: 15px">Costo de esta unidad</h2><span style="font-size: 12px; color: #475569">Q 0.38 por km</span></div>
+<div style="display: flex; align-items: baseline; gap: 4px 8px; flex-wrap: wrap"><span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 30px; font-weight: 700; line-height: 1; white-space: nowrap">Q 28,400</span><span style="font-size: 13px; color: #57534E">en 2026 · la flota promedia Q 31,900</span></div>
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; align-items: end; height: 64px; border-bottom: 1px solid #D6D3D1"><div style="border-radius: 4px 4px 0 0; height: 29px; background: #1D4ED880" title="jun: Q 3,100"></div><div style="border-radius: 4px 4px 0 0; height: 11px; background: #1D4ED880" title="jul: Q 1,150"></div><div style="border-radius: 4px 4px 0 0; height: 2px; background: #1D4ED880" title="ago: Q 0"></div><div style="border-radius: 4px 4px 0 0; height: 64px; background: #1D4ED8" title="sep: Q 6,900"></div><div style="border-radius: 4px 4px 0 0; height: 26px; background: #1D4ED880" title="oct: Q 2,800"></div><div style="border-radius: 4px 4px 0 0; height: 11px; background: #1D4ED880" title="nov: Q 1,150"></div></div><div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; margin-top: -6px"><span style="font-size: 10px; color: #78716C; text-align: center">jun</span><span style="font-size: 10px; color: #78716C; text-align: center">jul</span><span style="font-size: 10px; color: #78716C; text-align: center">ago</span><span style="font-size: 10px; color: #78716C; text-align: center">sep</span><span style="font-size: 10px; color: #78716C; text-align: center">oct</span><span style="font-size: 10px; color: #78716C; text-align: center">nov</span></div>
+<p style="margin: 0; font-size: 12px; color: #475569">Septiembre: suspensión delantera completa.</p>
+</section>
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px"><h2 style="margin: 0; font-size: 15px">Trabajos y diagnósticos</h2><a href="#" style="font-size: 13px; font-weight: 600">Filtrar</a></div>
+<div style="display: flex; flex-direction: column"><div style="display: grid; grid-template-columns: 56px 12px minmax(0, 1fr); gap: 10px"><span style="font-size: 12px; font-weight: 600; color: #57534E; padding-top: 1px">12 nov</span><div style="display: flex; flex-direction: column; align-items: center"><span style="flex: none; width: 12px; height: 12px; border-radius: 6px; box-sizing: border-box; background: #1D4ED8"></span><span style="flex: 1; width: 2px; background: #E7E5E4"></span></div><div style="display: flex; flex-direction: column; gap: 1px; padding-bottom: 10px"><span style="font-size: 13px; font-weight: 600">Servicio de 145,000 km</span><span style="font-size: 12px; color: #57534E">Aceite, filtros y revisión de 26 piezas · Q 1,150 · factura</span></div></div><div style="display: grid; grid-template-columns: 56px 12px minmax(0, 1fr); gap: 10px"><span style="font-size: 12px; font-weight: 600; color: #57534E; padding-top: 1px">2 oct</span><div style="display: flex; flex-direction: column; align-items: center"><span style="flex: none; width: 12px; height: 12px; border-radius: 6px; box-sizing: border-box; background: #1D4ED8"></span><span style="flex: 1; width: 2px; background: #E7E5E4"></span></div><div style="display: flex; flex-direction: column; gap: 1px; padding-bottom: 10px"><span style="font-size: 13px; font-weight: 600">Llantas delanteras</span><span style="font-size: 12px; color: #57534E">2 llantas 265/65 R17 · Q 2,800 · factura</span></div></div><div style="display: grid; grid-template-columns: 56px 12px minmax(0, 1fr); gap: 10px"><span style="font-size: 12px; font-weight: 600; color: #57534E; padding-top: 1px">18 sep</span><div style="display: flex; flex-direction: column; align-items: center"><span style="flex: none; width: 12px; height: 12px; border-radius: 6px; box-sizing: border-box; background: #1D4ED8"></span><span style="flex: 1; width: 2px; background: #E7E5E4"></span></div><div style="display: flex; flex-direction: column; gap: 1px; padding-bottom: 10px"><span style="font-size: 13px; font-weight: 600">Suspensión delantera</span><span style="font-size: 12px; color: #57534E">Amortiguadores y bujes · Q 6,900 · fotos antes y después</span></div></div><div style="display: grid; grid-template-columns: 56px 12px minmax(0, 1fr); gap: 10px"><span style="font-size: 12px; font-weight: 600; color: #57534E; padding-top: 1px">5 sep</span><div style="display: flex; flex-direction: column; align-items: center"><span style="flex: none; width: 12px; height: 12px; border-radius: 6px; box-sizing: border-box; background: #1D4ED8"></span><span style="flex: 1; width: 2px; background: #E7E5E4"></span></div><div style="display: flex; flex-direction: column; gap: 1px; padding-bottom: 10px"><span style="font-size: 13px; font-weight: 600">Diagnóstico por ruido</span><span style="font-size: 12px; color: #57534E">Escaneo sin códigos · encontró bujes rotos</span></div></div><div style="display: grid; grid-template-columns: 56px 12px minmax(0, 1fr); gap: 10px"><span style="font-size: 12px; font-weight: 600; color: #57534E; padding-top: 1px">14 jun</span><div style="display: flex; flex-direction: column; align-items: center"><span style="flex: none; width: 12px; height: 12px; border-radius: 6px; box-sizing: border-box; background: #1D4ED8"></span><span style="flex: 1; width: 2px; background: transparent"></span></div><div style="display: flex; flex-direction: column; gap: 1px; padding-bottom: 10px"><span style="font-size: 13px; font-weight: 600">Servicio de 135,000 km</span><span style="font-size: 12px; color: #57534E">Aceite y filtros · Q 1,100</span></div></div></div>
+</section>
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; gap: 0">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px"><h2 style="margin: 0; font-size: 15px">Documentos de la unidad</h2></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 0; "><div style="display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 14px; font-weight: 600">Seguro</span><span style="font-size: 12px; color: #57534E">Vence el 12 de enero · póliza en PDF</span></div><span style="flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #57534E"><span style="width: 8px; height: 8px; border-radius: 4px; background: #A8A29E"></span>En 7 semanas</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid #F1F1EF; "><div style="display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 14px; font-weight: 600">Tarjeta de circulación</span><span style="font-size: 12px; color: #57534E">Pago anual el 15 de enero</span></div><span style="flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #57534E"><span style="width: 8px; height: 8px; border-radius: 4px; background: #A8A29E"></span>En 8 semanas</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid #F1F1EF; "><div style="display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 14px; font-weight: 600">Licencia del piloto</span><span style="font-size: 12px; color: #57534E">Luis Ramírez · tipo B · vigente a 2028</span></div><span style="flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #166534"><span style="width: 8px; height: 8px; border-radius: 4px; background: #0ca30c"></span>Al día</span></div>
+</section>
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; flex-direction: row; align-items: center; gap: 12px">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 700">Quién más ve esta unidad</span><span style="font-size: 12px; color: #475569">Luis (piloto) ve su unidad y reporta kilometraje</span></div>
+<a href="#" style="font-size: 13px; font-weight: 600">Cambiar</a>
+</section>
+</main>
+<nav style="height: 64px; flex: none; display: flex; background: #FFFFFF; border-top: 1px solid #E2E8F0; padding: 0 4px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+<a href="#" style="{{t.estilo}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.d}}"></path></svg>{{t.n}}</a>
+</sc-for>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1116}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tabs = [['Mi flota', 'M2 6h12v10H2zM14 10h4l3 3v3h-7M7 19a2 2 0 100-4 2 2 0 000 4zM17 19a2 2 0 100-4 2 2 0 000 4z'], ['Solicitar', 'M12 5v14M5 12h14'], ['Órdenes', 'M14 7l3-3 3 3-3 3M14 7L4 17l3 3 10-10'], ['Documentos', 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7'], ['Cuenta', 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0']].map((t, i) => ({ n: t[0], d: t[1],
+      estilo: 'flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; ' + (i === 0 ? 'color: #1E3A8A; font-weight: 700' : 'color: #475569; font-weight: 500') }));
+    return { tabs: tabs };
+  }
+}
+</script>
+</body>
+</html>

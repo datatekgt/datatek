@@ -1,0 +1,876 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Colonia-Panel.dc.html": {
+      "h": 820,
+      "title": "Colonia · panel de la administración",
+      "w": 1280,
+      "x": 470,
+      "y": 4728
+    },
+    "Colonia-Reporte.dc.html": {
+      "h": 844,
+      "title": "Colonia · vecino reporta una falla",
+      "w": 390,
+      "x": 0,
+      "y": 4728
+    },
+    "Colonia-Web.dc.html": {
+      "h": 844,
+      "title": "Colonia · página pública del producto",
+      "w": 1280,
+      "x": 1830,
+      "y": 4728
+    },
+    "Flota-Inspeccion.dc.html": {
+      "h": 844,
+      "title": "Flota · inspección del piloto",
+      "w": 390,
+      "x": 0,
+      "y": 5952
+    },
+    "Flota-Portal.dc.html": {
+      "h": 820,
+      "title": "Flota · portal de la empresa",
+      "w": 1280,
+      "x": 470,
+      "y": 5952
+    },
+    "Flota-Web.dc.html": {
+      "h": 844,
+      "title": "Flota · página pública de D-TEK Flotas",
+      "w": 1280,
+      "x": 1830,
+      "y": 5952
+    },
+    "Fuego-Panel.dc.html": {
+      "h": 820,
+      "title": "Fuego · panel de la recargadora",
+      "w": 1280,
+      "x": 470,
+      "y": 2280
+    },
+    "Fuego-QR.dc.html": {
+      "h": 844,
+      "title": "Fuego · lo que ve quien escanea el extintor",
+      "w": 390,
+      "x": 0,
+      "y": 2280
+    },
+    "Fuego-Web.dc.html": {
+      "h": 844,
+      "title": "Fuego · página pública de la recargadora",
+      "w": 1280,
+      "x": 1830,
+      "y": 2280
+    },
+    "Huella-Expediente.dc.html": {
+      "h": 844,
+      "title": "Huella · expediente del dueño",
+      "w": 390,
+      "x": 470,
+      "y": 3504
+    },
+    "Huella-Placa.dc.html": {
+      "h": 844,
+      "title": "Huella · placa en modo perdido",
+      "w": 390,
+      "x": 0,
+      "y": 3504
+    },
+    "Huella-Web.dc.html": {
+      "h": 844,
+      "title": "Huella · página pública de la veterinaria",
+      "w": 1280,
+      "x": 1830,
+      "y": 3504
+    },
+    "Main.dc.html": {
+      "expand": "fill",
+      "h": 1800,
+      "title": "1 · La propuesta",
+      "w": 1280,
+      "x": 4,
+      "y": 0
+    },
+    "Mapa.dc.html": {
+      "expand": "fill",
+      "h": 1900,
+      "title": "2 · Funciones y dependencias",
+      "w": 1280,
+      "x": 1360,
+      "y": 0
+    },
+    "Obra-Perfil.dc.html": {
+      "h": 844,
+      "title": "Obra · perfil de mi obra",
+      "w": 390,
+      "x": 0,
+      "y": 7176
+    },
+    "Obra-Reporte.dc.html": {
+      "h": 844,
+      "title": "Obra · reporte semanal",
+      "w": 390,
+      "x": 470,
+      "y": 7176
+    },
+    "Obra-Web.dc.html": {
+      "h": 844,
+      "title": "Obra · página pública de D-TEK Obra",
+      "w": 1280,
+      "x": 1830,
+      "y": 7176
+    },
+    "Panel-Datatek.dc.html": {
+      "h": 820,
+      "title": "3 · Panel de DATATEK (nosotros)",
+      "w": 1280,
+      "x": 2720,
+      "y": 0
+    },
+    "Rubro-Colonia.dc.html": {
+      "h": 900,
+      "page": "paneles",
+      "title": "Colonia · panel de la administración",
+      "w": 1440,
+      "x": 0,
+      "y": 1020
+    },
+    "Rubro-Flota.dc.html": {
+      "h": 900,
+      "page": "paneles",
+      "title": "Flota · panel del taller D-TEK Flotas",
+      "w": 1440,
+      "x": 1520,
+      "y": 1020
+    },
+    "Rubro-Fuego.dc.html": {
+      "h": 900,
+      "page": "paneles",
+      "title": "Fuego · panel de la recargadora",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "Rubro-Huella.dc.html": {
+      "h": 900,
+      "page": "paneles",
+      "title": "Huella · panel de la veterinaria",
+      "w": 1440,
+      "x": 1520,
+      "y": 0
+    },
+    "Rubro-Obra.dc.html": {
+      "h": 900,
+      "page": "paneles",
+      "title": "Obra · panel de supervisión D-TEK",
+      "w": 1440,
+      "x": 0,
+      "y": 2029
+    },
+    "Movil-Fuego.dc.html": {
+      "x": 0,
+      "y": 3450,
+      "w": 390,
+      "h": 844,
+      "page": "paneles",
+      "title": "Fuego · panel en el teléfono"
+    },
+    "Movil-Huella.dc.html": {
+      "x": 470,
+      "y": 3450,
+      "w": 390,
+      "h": 844,
+      "page": "paneles",
+      "title": "Huella · agenda en el teléfono"
+    },
+    "Movil-Colonia.dc.html": {
+      "x": 940,
+      "y": 3450,
+      "w": 390,
+      "h": 844,
+      "page": "paneles",
+      "title": "Colonia · administración en el teléfono"
+    },
+    "Movil-Flota.dc.html": {
+      "x": 1410,
+      "y": 3450,
+      "w": 390,
+      "h": 844,
+      "page": "paneles",
+      "title": "Flota · taller en el teléfono"
+    },
+    "Movil-Obra.dc.html": {
+      "x": 1880,
+      "y": 3450,
+      "w": 390,
+      "h": 844,
+      "page": "paneles",
+      "title": "Obra · supervisión en el teléfono"
+    },
+    "Flota-C1.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 1106,
+      "page": "cliente",
+      "title": "Flota · Mi flota"
+    },
+    "Flota-C2.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 1324,
+      "page": "cliente",
+      "title": "Flota · Garage de una unidad"
+    },
+    "Flota-C3.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 1213,
+      "page": "cliente",
+      "title": "Flota · Orden en vivo y aprobación por línea"
+    },
+    "Flota-C4.dc.html": {
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 1116,
+      "page": "cliente",
+      "title": "Flota · Historial y costos de la unidad"
+    },
+    "Obra-C1.dc.html": {
+      "x": 0,
+      "y": 1744,
+      "w": 390,
+      "h": 1056,
+      "page": "cliente",
+      "title": "Obra · Mi obra"
+    },
+    "Obra-C2.dc.html": {
+      "x": 470,
+      "y": 1744,
+      "w": 390,
+      "h": 1091,
+      "page": "cliente",
+      "title": "Obra · Avance por fases (Gantt)"
+    },
+    "Obra-C3.dc.html": {
+      "x": 940,
+      "y": 1744,
+      "w": 390,
+      "h": 1862,
+      "page": "cliente",
+      "title": "Obra · Una fase por dentro: fotos, costos, materiales"
+    },
+    "Obra-C4.dc.html": {
+      "x": 1410,
+      "y": 1744,
+      "w": 390,
+      "h": 1201,
+      "page": "cliente",
+      "title": "Obra · Pagos atados a hitos y cambios"
+    },
+    "Huella-C1.dc.html": {
+      "x": 0,
+      "y": 4026,
+      "w": 390,
+      "h": 888,
+      "page": "cliente",
+      "title": "Huella · Mis mascotas y lo que toca"
+    },
+    "Huella-C2.dc.html": {
+      "x": 470,
+      "y": 4026,
+      "w": 390,
+      "h": 1054,
+      "page": "cliente",
+      "title": "Huella · Línea de tiempo de vacunas"
+    },
+    "Huella-C3.dc.html": {
+      "x": 940,
+      "y": 4026,
+      "w": 390,
+      "h": 1018,
+      "page": "cliente",
+      "title": "Huella · Una vacuna por dentro"
+    },
+    "Huella-C4.dc.html": {
+      "x": 1410,
+      "y": 4026,
+      "w": 390,
+      "h": 1182,
+      "page": "cliente",
+      "title": "Huella · Expediente de la mascota"
+    },
+    "Fuego-C1.dc.html": {
+      "x": 0,
+      "y": 5628,
+      "w": 390,
+      "h": 1009,
+      "page": "cliente",
+      "title": "Fuego · Mis extintores"
+    },
+    "Fuego-C2.dc.html": {
+      "x": 470,
+      "y": 5628,
+      "w": 390,
+      "h": 844,
+      "page": "cliente",
+      "title": "Fuego · Plano del local"
+    },
+    "Fuego-C3.dc.html": {
+      "x": 940,
+      "y": 5628,
+      "w": 390,
+      "h": 1103,
+      "page": "cliente",
+      "title": "Fuego · Vida completa de un extintor"
+    },
+    "Colonia-C1.dc.html": {
+      "x": 0,
+      "y": 7151,
+      "w": 390,
+      "h": 907,
+      "page": "cliente",
+      "title": "Colonia · Mi casa"
+    },
+    "Colonia-C2.dc.html": {
+      "x": 470,
+      "y": 7151,
+      "w": 390,
+      "h": 1040,
+      "page": "cliente",
+      "title": "Colonia · En qué se va mi cuota"
+    },
+    "Colonia-C3.dc.html": {
+      "x": 940,
+      "y": 7151,
+      "w": 390,
+      "h": 1013,
+      "page": "cliente",
+      "title": "Colonia · Seguimiento de mi reporte"
+    },
+    "Admin-Flota-Orden.dc.html": {
+      "x": 0,
+      "y": 4760,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Flota · orden de trabajo y cotización"
+    },
+    "Admin-Flota-Unidades.dc.html": {
+      "x": 1520,
+      "y": 4760,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Flota · unidades de una flota"
+    },
+    "Admin-Obra-Plan.dc.html": {
+      "x": 0,
+      "y": 6080,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Obra · plan, fases y pagos por hito"
+    },
+    "Admin-Obra-Visita.dc.html": {
+      "x": 1520,
+      "y": 6080,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Obra · visita del supervisor"
+    },
+    "Admin-Huella-Consulta.dc.html": {
+      "x": 0,
+      "y": 7400,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Huella · registrar vacuna en la consulta"
+    },
+    "Admin-Huella-Recordatorios.dc.html": {
+      "x": 1520,
+      "y": 7400,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Huella · atrasadas y recordatorios"
+    },
+    "Admin-Fuego-Visita.dc.html": {
+      "x": 0,
+      "y": 8720,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Fuego · visita de recarga"
+    },
+    "Admin-Fuego-Clientes.dc.html": {
+      "x": 1520,
+      "y": 8720,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Fuego · clientes y constancias"
+    },
+    "Admin-Colonia-Gasto.dc.html": {
+      "x": 0,
+      "y": 10040,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Colonia · gasto y lo que ven los vecinos"
+    },
+    "Admin-Colonia-Reportes.dc.html": {
+      "x": 1520,
+      "y": 10040,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Colonia · reportes de vecinos"
+    },
+    "Admin-Flota-Calendario.dc.html": {
+      "x": 3040,
+      "y": 4760,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Flota · calendario de servicios"
+    },
+    "Admin-Obra-Calendario.dc.html": {
+      "x": 3040,
+      "y": 6080,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Obra · calendario de visitas e hitos"
+    },
+    "Admin-Huella-Calendario.dc.html": {
+      "x": 3040,
+      "y": 7400,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Huella · calendario de vacunas"
+    },
+    "Admin-Fuego-Calendario.dc.html": {
+      "x": 3040,
+      "y": 8720,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Fuego · calendario de rutas y vencimientos"
+    },
+    "Admin-Colonia-Calendario.dc.html": {
+      "x": 3040,
+      "y": 10040,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Colonia · calendario de mantenimientos"
+    },
+    "Flota-C5.dc.html": {
+      "x": 1880,
+      "y": 0,
+      "w": 390,
+      "h": 855,
+      "page": "cliente",
+      "title": "Flota · estado de cuenta y pago"
+    },
+    "Obra-C5.dc.html": {
+      "x": 1880,
+      "y": 1744,
+      "w": 390,
+      "h": 844,
+      "page": "cliente",
+      "title": "Obra · pagos con su regla"
+    },
+    "Huella-C5.dc.html": {
+      "x": 1880,
+      "y": 4026,
+      "w": 390,
+      "h": 845,
+      "page": "cliente",
+      "title": "Huella · pagar la consulta"
+    },
+    "Fuego-C4.dc.html": {
+      "x": 1410,
+      "y": 5628,
+      "w": 390,
+      "h": 907,
+      "page": "cliente",
+      "title": "Fuego · pagar la visita"
+    },
+    "Colonia-C4.dc.html": {
+      "x": 1410,
+      "y": 7151,
+      "w": 390,
+      "h": 844,
+      "page": "cliente",
+      "title": "Colonia · pagar la cuota"
+    },
+    "Admin-Flota-Cobros.dc.html": {
+      "x": 4560,
+      "y": 4760,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Flota · cobros, Recurrente y suscripción"
+    },
+    "Admin-Obra-Cobros.dc.html": {
+      "x": 4560,
+      "y": 6080,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Obra · cobros, Recurrente y suscripción"
+    },
+    "Admin-Huella-Cobros.dc.html": {
+      "x": 4560,
+      "y": 7400,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Huella · cobros, Recurrente y suscripción"
+    },
+    "Admin-Fuego-Cobros.dc.html": {
+      "x": 4560,
+      "y": 8720,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Fuego · cobros, Recurrente y suscripción"
+    },
+    "Admin-Colonia-Cobros.dc.html": {
+      "x": 4560,
+      "y": 10040,
+      "w": 1440,
+      "h": 900,
+      "page": "paneles",
+      "title": "Colonia · cobros, Recurrente y suscripción"
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-11-22T18:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "p0": {
+      "kind": "title1",
+      "maxW": 2960,
+      "page": "paneles",
+      "text": "Paneles por rubro · menos es más",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "p1": {
+      "fill": "gray",
+      "page": "paneles",
+      "size": 24,
+      "text": "Cómo están pensados estos paneles\n\n1. Arriba, cinco pestañas como máximo. El resto de las funciones vive dentro de cada pestaña o en «Más», no en un menú de once renglones.\n\n2. Cada rubro abre con la pregunta que más se hace ese negocio, contestada con el gráfico adecuado:\n• Fuego: ¿qué vence y cuándo? → barras por mes.\n• Huella: ¿quién viene hoy y dónde? → agenda por carril.\n• Colonia: ¿qué está fallando en el condominio? → mapa de equipos por área.\n• Flota: ¿cuántas unidades estuvieron disponibles? → franja de días por unidad.\n• Obra: ¿qué obra se está atrasando y en qué fase? → avance contra plan y Gantt de fases.\n\n3. Un solo color por producto para los datos; verde, ámbar y rojo solo para estados, siempre con su palabra al lado.\n\n4. Pasá el puntero sobre barras y celdas para ver el detalle.\n\nTodos los datos son de ejemplo.",
+      "w": 640,
+      "x": 1520,
+      "y": 2040
+    },
+    "t0": {
+      "kind": "title1",
+      "maxW": 4000,
+      "text": "Propuesta DATATEK · borrador para conversar",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "t1": {
+      "kind": "title1",
+      "maxW": 3110,
+      "text": "DATATEK Fuego · extintores",
+      "w": 240,
+      "x": 0,
+      "y": 2020
+    },
+    "t2": {
+      "kind": "title1",
+      "maxW": 3110,
+      "text": "DATATEK Huella · veterinarias y pet care",
+      "w": 240,
+      "x": 0,
+      "y": 3244
+    },
+    "t3": {
+      "kind": "title1",
+      "maxW": 3110,
+      "text": "DATATEK Colonia · condominios",
+      "w": 240,
+      "x": 0,
+      "y": 4468
+    },
+    "t4": {
+      "kind": "title1",
+      "maxW": 3110,
+      "text": "DATATEK Flota · flotas de vehículos",
+      "w": 240,
+      "x": 0,
+      "y": 5692
+    },
+    "t5": {
+      "kind": "title1",
+      "maxW": 3110,
+      "text": "DATATEK Obra · supervisión a distancia",
+      "w": 240,
+      "x": 0,
+      "y": 6916
+    },
+    "p2": {
+      "kind": "title1",
+      "maxW": 2230,
+      "page": "paneles",
+      "text": "Los mismos paneles en el teléfono",
+      "w": 240,
+      "x": 0,
+      "y": 3150
+    },
+    "c0": {
+      "kind": "title1",
+      "maxW": 1830,
+      "page": "cliente",
+      "text": "Herramienta del cliente · una por nicho",
+      "w": 240,
+      "x": 0,
+      "y": -640
+    },
+    "cr0": {
+      "kind": "title1",
+      "maxW": 1830,
+      "page": "cliente",
+      "size": "l",
+      "text": "DATATEK Flota · lo que ve la empresa (el Garage de DtekPro, para varias unidades)",
+      "w": 240,
+      "x": 0,
+      "y": -260
+    },
+    "cr1": {
+      "kind": "title1",
+      "maxW": 1830,
+      "page": "cliente",
+      "size": "l",
+      "text": "DATATEK Obra · lo que ve el dueño (Gantt con cada fase por dentro)",
+      "w": 240,
+      "x": 0,
+      "y": 1484
+    },
+    "cr2": {
+      "kind": "title1",
+      "maxW": 1830,
+      "page": "cliente",
+      "size": "l",
+      "text": "DATATEK Huella · lo que ve el dueño de la mascota",
+      "w": 240,
+      "x": 0,
+      "y": 3766
+    },
+    "cr3": {
+      "kind": "title1",
+      "maxW": 1830,
+      "page": "cliente",
+      "size": "l",
+      "text": "DATATEK Fuego · lo que ve el negocio que contrata",
+      "w": 240,
+      "x": 0,
+      "y": 5368
+    },
+    "cr4": {
+      "kind": "title1",
+      "maxW": 1830,
+      "page": "cliente",
+      "size": "l",
+      "text": "DATATEK Colonia · lo que ve el vecino",
+      "w": 240,
+      "x": 0,
+      "y": 6891
+    },
+    "c1": {
+      "fill": "gray",
+      "page": "cliente",
+      "size": 22,
+      "w": 620,
+      "x": 2400,
+      "y": 0,
+      "text": "Cinco herramientas separadas, una por nicho\n\nCada cliente ve solo la de su rubro, con la marca del negocio que lo atiende. No hay una app que junte todo.\n\nCada fila es un nicho. Las pantallas son de teléfono y se muestran completas, como si uno bajara con el dedo.\n\nLo que se repite por dentro (solo para nosotros):\n• Lo próximo, con un solo botón para actuar.\n• Historial que nadie puede borrar.\n• Seguimiento en vivo paso a paso.\n• Aprobar línea por línea lo que cuesta dinero.\n• Compartir con otra persona.\n\nLo que es propio de cada rubro:\n• Flota: radar de salud por sistema, como el Garage.\n• Obra: Gantt donde cada fase se abre.\n• Huella: línea de tiempo de vacunas con el atraso marcado.\n• Fuego: plano del local y vida completa del extintor.\n• Colonia: en qué se va la cuota, con facturas.\n\nTodos los datos son de ejemplo."
+    },
+    "pa0": {
+      "kind": "title1",
+      "maxW": 6000,
+      "page": "paneles",
+      "size": "l",
+      "text": "Taller D-TEK Flotas: la orden con la cotización que aprueba el cliente, y las unidades que alimentan su Garage",
+      "w": 240,
+      "x": 0,
+      "y": 4500
+    },
+    "pa1": {
+      "kind": "title1",
+      "maxW": 6000,
+      "page": "paneles",
+      "size": "l",
+      "text": "Supervisión D-TEK Obra: el plan que el dueño ve como Gantt, y la visita que arma su reporte",
+      "w": 240,
+      "x": 0,
+      "y": 5820
+    },
+    "pa2": {
+      "kind": "title1",
+      "maxW": 6000,
+      "page": "paneles",
+      "size": "l",
+      "text": "Veterinaria: registrar la dosis real que ve el dueño, y perseguir las atrasadas",
+      "w": 240,
+      "x": 0,
+      "y": 7140
+    },
+    "pa3": {
+      "kind": "title1",
+      "maxW": 6000,
+      "page": "paneles",
+      "size": "l",
+      "text": "Recargadora: la visita que arma la constancia, y los clientes con lo que ven",
+      "w": 240,
+      "x": 0,
+      "y": 8460
+    },
+    "pa4": {
+      "kind": "title1",
+      "maxW": 6000,
+      "page": "paneles",
+      "size": "l",
+      "text": "Administración: el gasto que ven los vecinos, y los reportes que siguen en vivo",
+      "w": 240,
+      "x": 0,
+      "y": 9780
+    },
+    "pa9": {
+      "fill": "gray",
+      "page": "paneles",
+      "size": 24,
+      "w": 640,
+      "x": 6080,
+      "y": 4760,
+      "text": "Herramientas del negocio\n\nCada pantalla de abajo es lo que el negocio usa para producir lo que ve su cliente. Por eso cada una trae un recuadro punteado: «así lo ve el cliente».\n\n• Flota: el panel ahora es del taller D-TEK Flotas (antes mostraba el portal de la empresa, que pasó a ser la herramienta del cliente).\n• Obra: el plan alimenta el Gantt del dueño; un pago solo se libera cuando el supervisor recibe la fase.\n• Huella: la dosis se anota con fecha real, lote y foto; las atrasadas se persiguen por WhatsApp.\n• Fuego: la visita se marca escaneando cada QR y la constancia se arma sola.\n• Colonia: cada factura se marca visible para los vecinos y pasa por la junta antes de publicarse.\n\nTodos los datos son de ejemplo."
+    },
+    "pa8": {
+      "fill": "gray",
+      "page": "paneles",
+      "size": 24,
+      "w": 640,
+      "x": 6080,
+      "y": 6080,
+      "text": "Elegir en vez de escribir\n\n• Fechas: calendario que se despliega, con «Hoy», «Ayer» y «Hace una semana».\n• Semanas del plan de obra: se tocan la de inicio y la de fin, o se arrastra la barra.\n• Avance: deslizador de 5 en 5, con +5, +10 y «Terminada».\n• Peso y cantidades: botones − y +.\n• Opciones cortas (vacuna, rubro, prioridad, zona): botones para tocar; primero salen las más probables.\n• Repuestos y proveedores: buscador que sugiere mientras escribís.\n• Horarios: franjas para tocar.\n• Fotos de facturas y etiquetas: tocar para tomar la foto.\n• Lote: escanear el código del frasco.\n• Listas largas: filtros arriba con el número de cada uno.\n• Donde algo puede confundir, un «?» lo explica al pasar el puntero.\n\nCada nicho tiene ahora su pestaña Calendario."
+    },
+    "pa7": {
+      "fill": "gray",
+      "page": "paneles",
+      "size": 24,
+      "w": 640,
+      "x": 6080,
+      "y": 7400,
+      "text": "Cobros (cuarta columna)\n\n• Cada negocio conecta su propia cuenta de Recurrente: el dinero de sus clientes va directo a su banco. DATATEK no lo toca.\n• La factura electrónica (FEL) la emite Recurrente con el NIT del negocio.\n• Un cobro nunca se borra: se anula con motivo y queda en la bitácora.\n• Obra: un hito solo se cobra cuando el supervisor recibe la fase.\n• Abajo a la derecha de cada pantalla: la suscripción del negocio a DATATEK y los mensajes de WhatsApp usados.\n\nDel lado del cliente, cada nicho tiene su pantalla de pago (última de cada fila en «Herramienta del cliente»)."
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Mapa.dc.html",
+    "Panel-Datatek.dc.html",
+    "Fuego-QR.dc.html",
+    "Fuego-Panel.dc.html",
+    "Fuego-Web.dc.html",
+    "Huella-Placa.dc.html",
+    "Huella-Expediente.dc.html",
+    "Huella-Web.dc.html",
+    "Colonia-Reporte.dc.html",
+    "Colonia-Panel.dc.html",
+    "Colonia-Web.dc.html",
+    "Flota-Inspeccion.dc.html",
+    "Flota-Portal.dc.html",
+    "Flota-Web.dc.html",
+    "Obra-Perfil.dc.html",
+    "Obra-Reporte.dc.html",
+    "Obra-Web.dc.html",
+    "Rubro-Fuego.dc.html",
+    "Rubro-Huella.dc.html",
+    "Rubro-Colonia.dc.html",
+    "Rubro-Flota.dc.html",
+    "Rubro-Obra.dc.html",
+    "Movil-Fuego.dc.html",
+    "Movil-Huella.dc.html",
+    "Movil-Colonia.dc.html",
+    "Movil-Flota.dc.html",
+    "Movil-Obra.dc.html",
+    "Flota-C1.dc.html",
+    "Flota-C2.dc.html",
+    "Flota-C3.dc.html",
+    "Flota-C4.dc.html",
+    "Obra-C1.dc.html",
+    "Obra-C2.dc.html",
+    "Obra-C3.dc.html",
+    "Obra-C4.dc.html",
+    "Huella-C1.dc.html",
+    "Huella-C2.dc.html",
+    "Huella-C3.dc.html",
+    "Huella-C4.dc.html",
+    "Fuego-C1.dc.html",
+    "Fuego-C2.dc.html",
+    "Fuego-C3.dc.html",
+    "Colonia-C1.dc.html",
+    "Colonia-C2.dc.html",
+    "Colonia-C3.dc.html",
+    "Admin-Flota-Orden.dc.html",
+    "Admin-Flota-Unidades.dc.html",
+    "Admin-Obra-Plan.dc.html",
+    "Admin-Obra-Visita.dc.html",
+    "Admin-Huella-Consulta.dc.html",
+    "Admin-Huella-Recordatorios.dc.html",
+    "Admin-Fuego-Visita.dc.html",
+    "Admin-Fuego-Clientes.dc.html",
+    "Admin-Colonia-Gasto.dc.html",
+    "Admin-Colonia-Reportes.dc.html",
+    "Admin-Flota-Calendario.dc.html",
+    "Admin-Obra-Calendario.dc.html",
+    "Admin-Huella-Calendario.dc.html",
+    "Admin-Fuego-Calendario.dc.html",
+    "Admin-Colonia-Calendario.dc.html",
+    "Flota-C5.dc.html",
+    "Obra-C5.dc.html",
+    "Huella-C5.dc.html",
+    "Fuego-C4.dc.html",
+    "Colonia-C4.dc.html",
+    "Admin-Flota-Cobros.dc.html",
+    "Admin-Obra-Cobros.dc.html",
+    "Admin-Huella-Cobros.dc.html",
+    "Admin-Fuego-Cobros.dc.html",
+    "Admin-Colonia-Cobros.dc.html"
+  ],
+  "pages": [
+    {
+      "id": "propuesta",
+      "name": "Propuesta y maquetas"
+    },
+    {
+      "id": "paneles",
+      "name": "Paneles por rubro"
+    },
+    {
+      "id": "cliente",
+      "name": "Herramienta del cliente"
+    }
+  ],
+  "title": "Propuesta DATATEK"
+}

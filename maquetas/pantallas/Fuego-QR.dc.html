@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Fuego · página del extintor</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#C2410C}a:hover{color:#9A3412}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFF7ED; font-family: Inter, system-ui, sans-serif; color: #111827; display: flex; flex-direction: column">
+<div style="padding: 20px; display: flex; align-items: center; gap: 10px; background: #FFFFFF; border-bottom: 1px solid #FED7AA">
+<div style="width: 36px; height: 36px; border-radius: 8px; background: #C2410C; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px">EE</div>
+<div style="display: flex; flex-direction: column">
+<span style="font-weight: 700; font-size: 15px">Extintores El Ejemplo</span>
+<span style="font-size: 12px; color: #4B5563">Recarga y mantenimiento</span>
+</div>
+</div>
+
+<div style="padding: 20px; display: flex; flex-direction: column; gap: 16px; flex: 1">
+<div style="{{tarjeta}}">
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l2.5 2.5L16 9.5"></path></svg>
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 28px; letter-spacing: 0.02em">{{estadoTexto}}</span>
+</div>
+<span style="font-size: 16px; font-weight: 500">{{estadoDetalle}}</span>
+</div>
+
+<div style="background: #FFFFFF; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px; border: 1px solid #FED7AA">
+<span style="font-size: 18px; font-weight: 700">Extintor PQS ABC · 10 lb</span>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; font-size: 13px">
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="color: #4B5563">Ubicación</span><span style="font-weight: 600">Cocina, puerta trasera</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="color: #4B5563">Última recarga</span><span style="font-weight: 600">14 mar 2026</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="color: #4B5563">Serie</span><span style="font-weight: 600">PQS-10-48213</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="color: #4B5563">Prueba hidrostática</span><span style="font-weight: 600">Al día (2022)</span></div>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px; border: 1px solid #FED7AA">
+<span style="font-size: 15px; font-weight: 700">¿Algo está mal con este extintor?</span>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button type="button" style="min-height: 44px; border-radius: 10px; border: 1px solid #FDBA74; background: #FFF7ED; font: inherit; font-size: 14px; font-weight: 600; color: #9A3412">Se usó</button>
+<button type="button" style="min-height: 44px; border-radius: 10px; border: 1px solid #FDBA74; background: #FFF7ED; font: inherit; font-size: 14px; font-weight: 600; color: #9A3412">Está vacío</button>
+<button type="button" style="min-height: 44px; border-radius: 10px; border: 1px solid #FDBA74; background: #FFF7ED; font: inherit; font-size: 14px; font-weight: 600; color: #9A3412">Dañado</button>
+<button type="button" style="min-height: 44px; border-radius: 10px; border: 1px solid #FDBA74; background: #FFF7ED; font: inherit; font-size: 14px; font-weight: 600; color: #9A3412">No está</button>
+</div>
+<span style="font-size: 12px; color: #4B5563">Tu reporte le llega a la recargadora. No pedimos tus datos.</span>
+</div>
+
+<a href="#" style="margin-top: auto; text-align: center; font-size: 14px; font-weight: 600; padding: 12px">¿Sos el encargado del local? Entrá a tu portal</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"estado":{"editor":"enum","options":["vigente","vence pronto","vencido"],"default":"vigente"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const estado = this.props.estado ?? 'vigente';
+    const m = {
+      'vigente': { bg: '#15803D', t: 'VIGENTE', d: 'Vence el 14 de marzo de 2027' },
+      'vence pronto': { bg: '#A16207', t: 'VENCE PRONTO', d: 'Vence en 18 días: 14 de marzo de 2027' },
+      'vencido': { bg: '#B91C1C', t: 'VENCIDO', d: 'Venció el 14 de marzo de 2026. Avisale al encargado.' }
+    }[estado];
+    return {
+      estadoTexto: m.t,
+      estadoDetalle: m.d,
+      tarjeta: 'background: ' + m.bg + '; color: #FFFFFF; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 8px'
+    };
+  }
+}
+</script>
+</body>
+</html>

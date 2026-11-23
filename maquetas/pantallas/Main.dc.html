@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>DATATEK · la propuesta</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#1D4ED8}a:hover{color:#1E3A8A}
+</style>
+</helmet>
+<div style="background: #F5F6F8; font-family: Inter, system-ui, sans-serif; color: #111827">
+<div style="max-width: 1200px; margin: 0 auto; padding: 48px 24px 72px; display: flex; flex-direction: column; gap: 56px">
+
+<header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 40px; height: 40px; border-radius: 10px; background: #111827; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>
+</div>
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 26px; letter-spacing: 0.04em">DATATEK</span>
+</div>
+<span style="font-size: 14px; color: #4B5563">Propuesta de ecosistema · noviembre 2026 · borrador para conversar</span>
+</header>
+
+<section style="display: flex; flex-direction: column; gap: 20px; max-width: 860px">
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 52px; line-height: 1.05; font-weight: 700">Cinco sectores de Guatemala que todavía se manejan por WhatsApp y cuaderno.</h1>
+<p style="margin: 0; font-size: 19px; line-height: 1.55; color: #374151">En DtekPro ya construimos y probamos en producción todo lo que hace falta para dar seguimiento a algo que necesita mantenimiento: agenda, historial, órdenes con evidencia, enlace para el técnico, informes verificables y cobro. DATATEK lleva esas herramientas a cinco nichos donde nadie lo resolvió todavía.</p>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 24px">El mismo ciclo en los cinco</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<sc-for list="{{ciclo}}" as="paso" hint-placeholder-count="5">
+<div style="display: flex; align-items: center; gap: 10px">
+<div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 12px; padding: 14px 18px; display: flex; flex-direction: column; gap: 4px; min-width: 170px">
+<span style="font-size: 12px; font-weight: 600; color: #4B5563">{{paso.n}}</span>
+<span style="font-size: 16px; font-weight: 600">{{paso.t}}</span>
+</div>
+<sc-if value="{{paso.flecha}}" hint-placeholder-val="{{true}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</sc-if>
+</div>
+</sc-for>
+</div>
+<p style="margin: 0; font-size: 15px; color: #4B5563">Lo único que cambia es qué es «el bien»: un extintor, una mascota, un equipo del condominio, un vehículo o una obra.</p>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 24px">Los cinco productos</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px">
+<sc-for list="{{productos}}" as="p" hint-placeholder-count="5">
+<article style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="{{p.barra}}"></div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 22px">{{p.nombre}}</span>
+<span style="font-size: 13px; font-weight: 600; color: #4B5563">{{p.sector}}</span>
+</div>
+<p style="margin: 0; font-size: 15px; line-height: 1.45; font-weight: 500">{{p.promesa}}</p>
+<div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 1.45; color: #374151">
+<span><strong>Paga:</strong> {{p.paga}}</span>
+<span><strong>Por qué ahora:</strong> {{p.dato}}</span>
+</div>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 12px; font-weight: 600; color: #4B5563">Cercanía a DtekPro: {{p.cercania}}</span>
+<div style="height: 6px; background: #E5E7EB; border-radius: 3px; overflow: hidden"><div style="{{p.medidor}}"></div></div>
+</div>
+</article>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 24px">Cada producto tiene seis caras</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px">
+<sc-for list="{{caras}}" as="c" hint-placeholder-count="6">
+<div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 16px; font-weight: 600">{{c.t}}</span>
+<span style="font-size: 14px; line-height: 1.45; color: #4B5563">{{c.d}}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px">
+<div style="background: #111827; color: #F9FAFB; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 24px">Cómo avanzamos</h2>
+<sc-for list="{{etapas}}" as="e" hint-placeholder-count="4">
+<div style="display: flex; gap: 14px; align-items: flex-start">
+<span style="{{e.estilo}}">{{e.n}}</span>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 16px; font-weight: 600">{{e.t}}</span>
+<span style="font-size: 14px; line-height: 1.45; color: #D1D5DB">{{e.d}}</span>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 24px">Lo que tenemos que decidir juntos</h2>
+<ol style="margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 10px; font-size: 15px; line-height: 1.5; color: #1F2937">
+<li>¿Los cinco machotes están bien? ¿Cuál quitaríamos o cambiaríamos?</li>
+<li>¿Por cuál empezamos el piloto? Flota es el más cercano a lo que ya tenemos; Fuego, el que tiene la obligación legal más clara.</li>
+<li>Contactos para validar: una recargadora, una veterinaria, una administración de condominio, una empresa con flota y un migrante que esté construyendo.</li>
+<li>Cuánto invertimos (tiempo y dinero) antes de tener el primer cliente pagando.</li>
+<li>Marcas y dominios definitivos (los nombres de aquí son de trabajo).</li>
+</ol>
+</div>
+</section>
+
+<footer style="font-size: 13px; line-height: 1.5; color: #4B5563; border-top: 1px solid #E5E7EB; padding-top: 16px">Cifras: investigación propia de noviembre 2026, en su mayoría leída desde resúmenes del buscador. Hay que verificarlas en la fuente original antes de usarlas en material de venta. Las pantallas de este lienzo son maquetas con datos de ejemplo.</footer>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const pasos = ['Un bien con historial', 'Algo vence o se pide', 'Cita o visita', 'Orden con evidencia', 'Informe y cobro'];
+    const ciclo = pasos.map((t, i) => ({ n: 'Paso ' + (i + 1), t: t, flecha: i < pasos.length - 1 }));
+    const base = [
+      { nombre: 'Fuego', sector: 'Extintores', color: '#C2410C', pct: 80, cercania: 'alta',
+        promesa: 'Cada extintor con su QR: el público ve si está vigente y la recargadora nunca pierde una recarga.',
+        paga: 'la recargadora (software)',
+        dato: 'la NRD-2 de CONRED aplica a todo edificio de acceso público y no encontramos software de extintores en español.' },
+      { nombre: 'Huella', sector: 'Veterinarias y pet care', color: '#7C3AED', pct: 75, cercania: 'alta',
+        promesa: 'Expediente de la mascota, vacunas a tiempo y una placa que la trae de vuelta si se pierde.',
+        paga: 'la veterinaria (software) y el dueño (placa)',
+        dato: 'la venta de alimento para mascotas creció 72 % entre 2022 y 2024 (Kantar).' },
+      { nombre: 'Colonia', sector: 'Condominios', color: '#0F766E', pct: 55, cercania: 'media',
+        promesa: 'Bombas, portones y piscinas con historial, proveedores controlados y la junta informada.',
+        paga: 'la administración (software)',
+        dato: 'las apps de condominio cobran cuotas y controlan la garita; ninguna gestiona a los proveedores.' },
+      { nombre: 'Flota', sector: 'Flotas de vehículos', color: '#1D4ED8', pct: 90, cercania: 'muy alta',
+        promesa: 'Unidades y pilotos al día: mantenimiento, documentos y costos, con el mecánico en tu patio.',
+        paga: 'la empresa (servicio D-TEK con software incluido)',
+        dato: '406,850 vehículos comerciales (SAT, dic 2025); el AG 140-2025 exige bitácora a los extraurbanos.' },
+      { nombre: 'Obra', sector: 'Supervisión de construcción', color: '#A16207', pct: 45, cercania: 'media',
+        promesa: 'El que vive afuera ve su casa crecer: fotos verificadas cada semana y pagos contra avance.',
+        paga: 'el dueño en el extranjero (servicio D-TEK)',
+        dato: 'remesas 2025: US$25,530 millones; una parte grande se va a construir casa.' }
+    ];
+    const productos = base.map((p) => Object.assign({}, p, {
+      barra: 'height: 6px; width: 48px; border-radius: 3px; background: ' + p.color,
+      medidor: 'height: 6px; width: ' + p.pct + '%; background: ' + p.color
+    }));
+    const caras = [
+      { t: 'Página pública', d: 'Presenta el servicio y deja pedir una cita o visita.' },
+      { t: 'Panel del negocio', d: 'Clientes, bienes, vencimientos, órdenes, cobros y equipo.' },
+      { t: 'Portal del cliente', d: 'El cliente ve sus bienes, lo que vence, informes y aprueba trabajos.' },
+      { t: 'Enlace de quien trabaja', d: 'El técnico abre una orden por WhatsApp, sin cuenta: pasos, fotos y listo.' },
+      { t: 'Página del QR', d: 'Cualquiera escanea el bien y ve lo mínimo: vigente, perdido o reportar falla.' },
+      { t: 'Panel de DATATEK', d: 'Nosotros: negocios dados de alta, uso, mensualidades.' }
+    ];
+    const datosEtapas = [
+      { t: 'Machote', d: 'Necesidades, pantallas y herramientas de cada nicho. Hecho: es este lienzo.', hecho: true },
+      { t: 'Validar', d: 'Llamadas con las preguntas de cada machote a clientes reales.', hecho: false },
+      { t: 'Jalar de DtekPro', d: 'Tomar solo las herramientas que cada nicho usa y adaptarlas a su modo.', hecho: false },
+      { t: 'Prototipo y piloto', d: 'Un cliente real por nicho validado, 60 días.', hecho: false }
+    ];
+    const etapas = datosEtapas.map((e, i) => Object.assign({}, e, {
+      n: String(i + 1),
+      estilo: 'flex: none; width: 30px; height: 30px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; ' +
+        (e.hecho ? 'background: #FFFFFF; color: #111827' : 'border: 1.5px solid #9CA3AF; color: #F9FAFB')
+    }));
+    return { ciclo: ciclo, productos: productos, caras: caras, etapas: etapas };
+  }
+}
+</script>
+</body>
+</html>

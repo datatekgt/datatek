@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Huella · panel en el teléfono</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#5B21B6}a:hover{color:#1E1B2E}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; font-family: Inter, system-ui, sans-serif; color: #1E1B2E; background: #FAF9FE; display: flex; flex-direction: column; overflow: hidden">
+
+<header style="height: 60px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; background: #FFFFFF; border-bottom: 1px solid #E9E5F5">
+<div style="display: flex; flex-direction: column">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 17px">Veterinaria Ejemplo</span>
+<span style="font-size: 12px; color: #5B5670">Agenda · martes 24 nov</span>
+</div>
+<button type="button" aria-label="Avisos" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E9E5F5; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: #1E1B2E"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0112 0v5l2 2H4zM10 21h4"></path></svg></button>
+</header>
+
+<main style="flex: 1; min-height: 0; overflow: hidden; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box">
+<div style="display: flex; gap: 8px">
+<sc-for list="{{filtros}}" as="f" hint-placeholder-count="4"><button type="button" style="{{f.estilo}}">{{f.n}}</button></sc-for>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; padding: 0 2px">
+<h1 style="margin: 0; font-size: 15px">11 citas hoy</h1>
+<a href="#" style="font-size: 13px; font-weight: 600">Ver 4 anteriores</a>
+</div>
+<section style="background: #FFFFFF; border: 1px solid #E9E5F5; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; gap: 0; padding: 6px 14px">
+<sc-for list="{{citas}}" as="k" hint-placeholder-count="8">
+<sc-if value="{{k.ahora}}"><div style="display: flex; align-items: center; gap: 8px; padding: 4px 0"><span style="font-size: 11px; font-weight: 700; color: #5B21B6">Ahora 11:20</span><span style="flex: 1; height: 2px; background: #7C3AED"></span></div></sc-if>
+<div style="display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid #F1EEF9" title="{{k.tip}}">
+<span style="{{k.horaEstilo}}">{{k.h}}</span>
+<div style="{{k.caja}}"><span style="font-size: 14px; font-weight: 600">{{k.mascota}}</span><span style="font-size: 12px; color: #5B5670">{{k.que}}</span></div>
+<span style="{{k.carrilEstilo}}">{{k.carril}}</span>
+</div>
+</sc-for>
+</section>
+<section style="background: #FFFFFF; border: 1px solid #E9E5F5; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; flex-direction: row; align-items: center; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; color: #5B5670">Vuelven a tiempo a su vacuna</span>
+<span style="font-size: 12px; color: #5B5670">17 vacunas vencen esta semana</span>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<svg width="64" height="28" viewBox="0 0 64 28" role="img" aria-label="Últimas 12 semanas: de 73 % a 82 %"><polyline points="{{puntos}}" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></polyline></svg>
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 26px; font-weight: 700; white-space: nowrap">82 %</span>
+</div>
+</section>
+</main>
+
+<nav style="height: 64px; flex: none; display: flex; background: #FFFFFF; border-top: 1px solid #E9E5F5; padding: 0 4px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+<a href="#" style="{{t.estilo}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.d}}"></path></svg>{{t.n}}</a>
+</sc-for>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tabs = [['Agenda', 'M4 6h16v15H4zM4 10h16M8 3v4M16 3v4'], ['Mascotas', 'M4 6h16M4 12h16M4 18h10'], ['Vacunas', 'M18 2l4 4M15 5l4 4M7 13l4 4M17 7L7 17l-3 1 1-3L15 5z'], ['Caja', 'M3 7h18v10H3zM12 15a3 3 0 100-6 3 3 0 000 6z'], ['Más', 'M5 12h.01M12 12h.01M19 12h.01']].map((t, i) => ({ n: t[0], d: t[1],
+      estilo: 'flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; ' + (i === 0 ? 'color: #5B21B6; font-weight: 700' : 'color: #5B5670; font-weight: 500') }));
+    const filtros = ['Todas', 'Clínica', 'Domicilio', 'Baño'].map((n, i) => ({ n: n,
+      estilo: 'min-height: 40px; padding: 0 14px; border-radius: 20px; font: inherit; font-size: 13px; font-weight: 600; ' + (i === 0 ? 'background: #7C3AED; color: #FFFFFF; border: 1px solid #7C3AED' : 'background: #FFFFFF; color: #3B3355; border: 1px solid #DDD6FE') }));
+    const citas = [
+      { h: '10:00', mascota: 'Lola', que: 'Corte de raza · hasta 12:00', carril: 'Baño', paso: true },
+      { h: '10:30', mascota: 'Simba y Nala', que: 'Vacunas · Zona 16', carril: 'Domicilio', paso: true },
+      { h: '11:30', mascota: 'Rocky', que: 'Control de peso', carril: 'Clínica', ahora: true },
+      { h: '13:00', mascota: 'Mía', que: 'Cirugía menor · 2 horas', carril: 'Clínica' },
+      { h: '14:00', mascota: 'Coco', que: 'Consulta · sin confirmar', carril: 'Domicilio', pend: true },
+      { h: '14:30', mascota: 'Firulais', que: 'Baño', carril: 'Baño' },
+      { h: '15:30', mascota: 'Toby', que: 'Antirrábica · sin confirmar', carril: 'Clínica', pend: true }
+    ].map((k) => Object.assign({ ahora: false }, k, {
+      tip: k.mascota + ' · ' + k.que + ' · ' + k.h + ' h',
+      horaEstilo: 'font-size: 13px; font-weight: 600; color: ' + (k.paso ? '#8A84A0' : '#1E1B2E'),
+      caja: 'display: flex; flex-direction: column; gap: 1px; min-width: 0; ' + (k.pend ? 'border-left: 2px dashed #A78BFA; padding-left: 8px' : '') + (k.paso ? 'opacity: 0.75' : ''),
+      carrilEstilo: 'font-size: 11px; font-weight: 600; color: #4C1D95; background: #EDE9FE; border-radius: 6px; padding: 3px 7px' }));
+    const serie = [73, 74, 72, 75, 76, 75, 78, 77, 79, 80, 81, 82];
+    const puntos = serie.map((v, i) => (2 + i * 5.45).toFixed(1) + ',' + (26 - (v - 72) * 2.4).toFixed(1)).join(' ');
+    return { tabs: tabs, filtros: filtros, citas: citas, puntos: puntos };
+  }
+}
+</script>
+</body>
+</html>

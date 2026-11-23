@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Flota · estado de cuenta y pago</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E3A8A}a:hover{color:#0F172A}
+</style>
+</helmet>
+<div style="width: 390px; height: 855px; box-sizing: border-box; font-family: Inter, system-ui, sans-serif; color: #0F172A; background: #F7F9FC; display: flex; flex-direction: column; overflow: hidden">
+<header style="height: 60px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; background: #FFFFFF; border-bottom: 1px solid #E2E8F0">
+<div style="display: flex; flex-direction: column">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 17px">Distribuidora Ejemplo</span>
+<span style="font-size: 12px; color: #475569">Cuenta · D-TEK Flotas</span>
+</div>
+<button type="button" aria-label="Avisos" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E2E8F0; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: #0F172A"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0112 0v5l2 2H4zM10 21h4"></path></svg></button>
+</header>
+<main style="flex: 1; min-height: 0; overflow: hidden; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box">
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<h1 style="margin: 0; font-size: 17px">Estado de cuenta · noviembre</h1>
+<div style="display: flex; align-items: baseline; gap: 4px 8px; flex-wrap: wrap"><span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 30px; font-weight: 700; line-height: 1; white-space: nowrap">Q 9,870</span><span style="font-size: 13px; color: #57534E">por pagar · vence el 15 dic</span></div>
+<div style="position: relative; height: 10px; background: #EEF2F7; border-radius: 4px" title="Pagado Q 11,430 de Q 21,300"><div style="width: 54%; height: 10px; background: #1D4ED8; border-radius: 4px"></div><div style="position: absolute; left: 54%; top: -3px; width: 2px; height: 16px; background: #1C1917"></div></div>
+<span style="font-size: 12px; color: #475569">Pagado Q 11,430 de Q 21,300 · crédito a 15 días</span>
+</section>
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; gap: 0">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px"><h2 style="margin: 0; font-size: 15px">Órdenes del mes</h2><a href="#" style="font-size: 13px; font-weight: 600">Descargar todo</a></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 0; "><div style="display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 14px; font-weight: 600">Orden 2305 · P-456DEF</span><span style="font-size: 12px; color: #57534E">Falla de embrague · 4 nov</span></div><div style="flex: none; white-space: nowrap"><span style="font-size: 13px; font-weight: 700">Q 5,450</span></div></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid #F1F1EF; "><div style="display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 14px; font-weight: 600">Orden 2301 · C-987PQR</span><span style="font-size: 12px; color: #57534E">Falla de arranque · 23 nov</span></div><div style="flex: none; white-space: nowrap"><span style="font-size: 13px; font-weight: 700">Q 4,420</span></div></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid #F1F1EF; "><div style="display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 14px; font-weight: 600">Orden 2290 · P-123ABC</span><span style="font-size: 12px; color: #57534E">Servicio 145,000 km · pagada</span></div><span style="flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #166534"><span style="width: 8px; height: 8px; border-radius: 4px; background: #0ca30c"></span>Factura</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid #F1F1EF; "><div style="display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 14px; font-weight: 600">7 órdenes más</span><span style="font-size: 12px; color: #57534E">Pagadas · con factura</span></div><div style="flex: none; white-space: nowrap"><a href="#" style="font-size: 13px; font-weight: 600">Ver</a></div></div>
+</section>
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px"><h2 style="margin: 0; font-size: 15px">Pagar lo pendiente</h2></div>
+<div style="display: flex; gap: 8px"><button type="button" aria-pressed="true" style="flex: 1; min-height: 56px; border-radius: 12px; font: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: #EFF6FF; border: 1.5px solid #1D4ED8; color: #1C1917"><span style="font-size: 14px; font-weight: 700">Tarjeta</span><span style="font-size: 11px; color: #57534E">con Recurrente</span></button><button type="button" aria-pressed="false" style="flex: 1; min-height: 56px; border-radius: 12px; font: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: #FFFFFF; border: 1px solid #D6D3D1; color: #1C1917"><span style="font-size: 14px; font-weight: 700">Transferencia</span><span style="font-size: 11px; color: #57534E">sin costo</span></button><button type="button" aria-pressed="false" style="flex: 1; min-height: 56px; border-radius: 12px; font: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: #FFFFFF; border: 1px solid #D6D3D1; color: #1C1917"><span style="font-size: 14px; font-weight: 700">Efectivo</span><span style="font-size: 11px; color: #57534E">al técnico</span></button></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: #F5F5F4"><div style="display: flex; flex-direction: column"><span style="font-size: 12px; color: #57534E">Factura a nombre de</span><span style="font-size: 14px; font-weight: 700">Distribuidora Ejemplo, S.A. · NIT 1234567-8</span></div><a href="#" style="font-size: 13px; font-weight: 600">Cambiar</a></div>
+<button type="button" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: none; background: #1D4ED8; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">Pagar Q 9,870</button>
+<p style="margin: 0; font-size: 11px; color: #57534E; display: flex; gap: 6px; align-items: flex-start"><span aria-hidden="true" style="color: #166534">✓</span>El pago va directo a la cuenta del negocio por Recurrente. La factura electrónica te llega al correo y queda aquí.</p>
+</section>
+</main>
+<nav style="height: 64px; flex: none; display: flex; background: #FFFFFF; border-top: 1px solid #E2E8F0; padding: 0 4px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+<a href="#" style="{{t.estilo}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.d}}"></path></svg>{{t.n}}</a>
+</sc-for>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":855}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tabs = [['Mi flota', 'M2 6h12v10H2zM14 10h4l3 3v3h-7M7 19a2 2 0 100-4 2 2 0 000 4zM17 19a2 2 0 100-4 2 2 0 000 4z'], ['Solicitar', 'M12 5v14M5 12h14'], ['Órdenes', 'M14 7l3-3 3 3-3 3M14 7L4 17l3 3 10-10'], ['Documentos', 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7'], ['Cuenta', 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0']].map((t, i) => ({ n: t[0], d: t[1],
+      estilo: 'flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 11px; ' + (i === 4 ? 'color: #1E3A8A; font-weight: 700' : 'color: #475569; font-weight: 500') }));
+    return { tabs: tabs };
+  }
+}
+</script>
+</body>
+</html>

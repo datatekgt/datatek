@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Fuego · página pública de la recargadora</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#C2410C}a:hover{color:#9A3412}
+</style>
+</helmet>
+<div style="width: 1280px; height: 844px; box-sizing: border-box; font-family: Inter, system-ui, sans-serif; color: #111827; background: #FFFFFF; display: flex; flex-direction: column">
+<header style="display: flex; justify-content: space-between; align-items: center; padding: 20px 64px; border-bottom: 1px solid #F5F5F4">
+<div style="display: flex; align-items: center; gap: 10px">
+<div style="width: 36px; height: 36px; border-radius: 8px; background: #C2410C; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px">EE</div>
+<span style="font-weight: 700; font-size: 17px">Extintores El Ejemplo</span>
+</div>
+<div style="display: flex; align-items: center; gap: 28px; font-size: 15px">
+<a href="#" style="color: #1C1917; text-decoration: none">Servicios</a>
+<a href="#" style="color: #1C1917; text-decoration: none">Verificar certificado</a>
+<a href="#" style="color: #1C1917; text-decoration: none">Portal de clientes</a>
+<a href="#" style="min-height: 44px; display: flex; align-items: center; padding: 0 18px; border-radius: 10px; background: #C2410C; color: #FFFFFF; font-weight: 600; text-decoration: none">WhatsApp</a>
+</div>
+</header>
+
+<section style="display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 56px; padding: 56px 64px 40px; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<span style="font-size: 14px; font-weight: 600; color: #9A3412">Recarga, mantenimiento y venta de extintores</span>
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 54px; line-height: 1.05">Tus extintores al día, con QR y certificado.</h1>
+<p style="margin: 0; font-size: 18px; line-height: 1.55; color: #44403C">Cada extintor lleva su código. Te avisamos antes de que venza, hacemos la recarga en tu local y recibís el certificado en tu teléfono, listo para la inspección.</p>
+<div style="display: flex; gap: 12px">
+<a href="#" style="min-height: 52px; display: flex; align-items: center; padding: 0 24px; border-radius: 12px; background: #C2410C; color: #FFFFFF; font-size: 16px; font-weight: 700; text-decoration: none">Pedir visita</a>
+<a href="#" style="min-height: 52px; display: flex; align-items: center; padding: 0 24px; border-radius: 12px; border: 1.5px solid #C2410C; color: #9A3412; font-size: 16px; font-weight: 700; text-decoration: none">Ver precios</a>
+</div>
+</div>
+<div style="background: #FFF7ED; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 14px; border: 1px solid #FED7AA">
+<span style="font-size: 15px; font-weight: 700">Verificá un certificado</span>
+<span style="font-size: 14px; color: #57534E">Escaneá el QR del certificado o escribí su código.</span>
+<label for="codigo" style="font-size: 13px; font-weight: 600">Código del certificado</label>
+<input id="codigo" value="EE-2026-0481" style="min-height: 48px; border: 1px solid #FDBA74; border-radius: 10px; padding: 0 14px; font: inherit; font-size: 16px">
+<button type="button" style="min-height: 48px; border-radius: 10px; border: none; background: #1C1917; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 600">Verificar</button>
+<div style="display: flex; align-items: center; gap: 10px; background: #DCFCE7; border-radius: 10px; padding: 12px; font-size: 14px; color: #14532D">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l2.5 2.5L16 9.5"></path></svg>
+<span><strong>Auténtico.</strong> Restaurante La Ceiba · Zona 10 · 8 extintores vigentes</span>
+</div>
+</div>
+</section>
+
+<section style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding: 0 64px">
+<sc-for list="{{servicios}}" as="s" hint-placeholder-count="4">
+<div style="border: 1px solid #E7E5E4; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 16px; font-weight: 700">{{s.t}}</span>
+<span style="font-size: 14px; color: #57534E; line-height: 1.4">{{s.d}}</span>
+<span style="font-size: 14px; font-weight: 600; color: #9A3412">desde Q [TU PRECIO]</span>
+</div>
+</sc-for>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { servicios: [
+      { t: 'Recarga', d: 'PQS ABC, CO₂, clase K y agua, en tu local.' },
+      { t: 'Prueba hidrostática', d: 'Para CO₂ y cilindros que la necesitan.' },
+      { t: 'Venta e instalación', d: 'Extintores nuevos con su QR desde el día uno.' },
+      { t: 'Contrato anual', d: 'Todos tus locales, avisos y certificados incluidos.' }
+    ] };
+  }
+}
+</script>
+</body>
+</html>

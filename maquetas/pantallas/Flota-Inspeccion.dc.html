@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Flota · inspección del piloto</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1D4ED8}a:hover{color:#1E3A8A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #EFF6FF; font-family: Inter, system-ui, sans-serif; color: #111827; display: flex; flex-direction: column">
+<div style="padding: 20px; background: #1E3A8A; color: #FFFFFF; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 13px; color: #BFDBFE; font-weight: 600">Distribuidora Ejemplo · Patio zona 12</span>
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 24px">P-123ABC</span>
+<span style="font-size: 14px; color: #DBEAFE">Toyota Hilux 2019 · ruta Escuintla</span>
+</div>
+
+<form style="padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; flex: 1">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="piloto" style="font-size: 14px; font-weight: 600">Piloto</label>
+<select id="piloto" style="min-height: 44px; border: 1px solid #BFDBFE; border-radius: 10px; padding: 0 10px; font: inherit; font-size: 15px; background: #FFFFFF"><option>Juan Pérez · licencia A</option></select>
+</div>
+
+<fieldset style="border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+<legend style="font-size: 15px; font-weight: 700; margin-bottom: 8px">Antes de salir</legend>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{revision}}" as="r" hint-placeholder-count="6">
+<label style="{{r.estilo}}"><input type="checkbox" checked="{{r.ok}}" style="width: 18px; height: 18px; accent-color: #1D4ED8"> {{r.t}}</label>
+</sc-for>
+</div>
+</fieldset>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="km" style="font-size: 14px; font-weight: 600">Kilometraje</label>
+<input id="km" value="145,230" style="min-height: 44px; border: 1px solid #BFDBFE; border-radius: 10px; padding: 0 10px; font: inherit; font-size: 15px">
+</div>
+<button type="button" style="align-self: end; min-height: 44px; border-radius: 10px; border: 1.5px dashed #60A5FA; background: #FFFFFF; color: #1E3A8A; font: inherit; font-size: 13px; font-weight: 600">Foto del tablero</button>
+</div>
+
+<button type="button" style="min-height: 44px; border-radius: 10px; border: 1.5px solid #B91C1C; background: #FFFFFF; color: #991B1B; font: inherit; font-size: 14px; font-weight: 700">Reportar algo raro</button>
+<button type="button" style="min-height: 52px; border-radius: 12px; border: none; background: #1D4ED8; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 700">Listo para salir</button>
+
+<div style="margin-top: auto; background: #FFFFFF; border: 1px solid #BFDBFE; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 700">Lo que viene para esta unidad</span>
+<sc-for list="{{proximo}}" as="p" hint-placeholder-count="3">
+<div style="display: flex; justify-content: space-between; font-size: 13px">
+<span>{{p.t}}</span><span style="{{p.chip}}">{{p.v}}</span>
+</div>
+</sc-for>
+</div>
+</form>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const revision = [['Luces', true], ['Llantas', true], ['Frenos', true], ['Aceite', false], ['Agua', true], ['Documentos', true]]
+      .map((r) => ({ t: r[0], ok: r[1], estilo: 'min-height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: #FFFFFF; border-radius: 10px; font-size: 14px; font-weight: 600; border: 1px solid ' + (r[1] ? '#BFDBFE' : '#F59E0B') }));
+    const chip = (a) => 'font-size: 12px; font-weight: 600; border-radius: 6px; padding: 2px 8px; ' + (a ? 'background: #FEF3C7; color: #854D0E' : 'background: #DBEAFE; color: #1E3A8A');
+    const proximo = [
+      { t: 'Servicio de 150,000 km', v: 'en 4,770 km', a: false },
+      { t: 'Seguro', v: 'vence 12 ene', a: true },
+      { t: 'Tarjeta de circulación', v: 'al día', a: false }
+    ].map((p) => Object.assign({}, p, { chip: chip(p.a) }));
+    return { revision: revision, proximo: proximo };
+  }
+}
+</script>
+</body>
+</html>

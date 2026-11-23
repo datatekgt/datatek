@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Fuego · panel de la recargadora</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#C2410C}a:hover{color:#9A3412}
+</style>
+</helmet>
+<div style="width: 1280px; height: 820px; box-sizing: border-box; display: flex; font-family: Inter, system-ui, sans-serif; color: #111827; background: #F5F6F8">
+<nav style="width: 220px; flex: none; background: #1C1917; color: #F5F5F4; padding: 20px 14px; display: flex; flex-direction: column; gap: 4px; box-sizing: border-box">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 8px 18px">
+<div style="width: 32px; height: 32px; border-radius: 8px; background: #C2410C; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px">EE</div>
+<span style="font-weight: 700; font-size: 14px; line-height: 1.2">Extintores El Ejemplo</span>
+</div>
+<sc-for list="{{menu}}" as="m" hint-placeholder-count="9">
+<a href="#" style="{{m.estilo}}">{{m.t}}</a>
+</sc-for>
+<span style="margin-top: auto; font-size: 11px; color: #A8A29E; padding: 0 8px">DATATEK Fuego · datos de ejemplo</span>
+</nav>
+
+<main style="flex: 1; min-width: 0; padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 28px">Hoy</h1>
+<span style="font-size: 14px; color: #4B5563">martes 24 de noviembre</span>
+</div>
+<div style="display: flex; gap: 10px">
+<button type="button" style="min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid #D6D3D1; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">Imprimir etiquetas QR</button>
+<button type="button" style="min-height: 44px; padding: 0 16px; border-radius: 10px; border: none; background: #C2410C; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">+ Nueva visita</button>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px">
+<sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+<div style="background: #FFFFFF; border: 1px solid #E7E5E4; border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 13px; color: #4B5563; font-weight: 500">{{k.t}}</span>
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 30px; font-weight: 700">{{k.v}}</span>
+<span style="font-size: 12px; color: #57534E">{{k.d}}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 16px; flex: 1; min-height: 0">
+<section style="background: #FFFFFF; border: 1px solid #E7E5E4; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-size: 17px">Vencen en los próximos 30 días</h2>
+<a href="#" style="font-size: 13px; font-weight: 600">Ver todos</a>
+</div>
+<table style="width: 100%; border-collapse: collapse; font-size: 14px">
+<thead><tr style="text-align: left; color: #4B5563; font-size: 12px">
+<th style="padding: 8px 6px; font-weight: 600; border-bottom: 1px solid #E7E5E4">Cliente · local</th>
+<th style="padding: 8px 6px; font-weight: 600; border-bottom: 1px solid #E7E5E4">Extintores</th>
+<th style="padding: 8px 6px; font-weight: 600; border-bottom: 1px solid #E7E5E4">Vence</th>
+<th style="padding: 8px 6px; font-weight: 600; border-bottom: 1px solid #E7E5E4"></th>
+</tr></thead>
+<tbody>
+<sc-for list="{{vencen}}" as="v" hint-placeholder-count="6">
+<tr>
+<td style="padding: 10px 6px; border-bottom: 1px solid #F5F5F4"><strong>{{v.cliente}}</strong><br><span style="color: #57534E; font-size: 13px">{{v.local}}</span></td>
+<td style="padding: 10px 6px; border-bottom: 1px solid #F5F5F4">{{v.n}}</td>
+<td style="padding: 10px 6px; border-bottom: 1px solid #F5F5F4"><span style="{{v.chip}}">{{v.fecha}}</span></td>
+<td style="padding: 10px 6px; border-bottom: 1px solid #F5F5F4; text-align: right"><button type="button" style="min-height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid #FDBA74; background: #FFF7ED; color: #9A3412; font: inherit; font-size: 13px; font-weight: 600">Avisar por WhatsApp</button></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</section>
+
+<div style="display: flex; flex-direction: column; gap: 16px; min-height: 0">
+<section style="background: #FFFFFF; border: 1px solid #E7E5E4; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 17px">Reportes del público (QR)</h2>
+<sc-for list="{{reportes}}" as="r" hint-placeholder-count="2">
+<div style="display: flex; gap: 10px; align-items: flex-start; padding: 10px; background: #FEF2F2; border-radius: 10px">
+<span style="flex: none; font-size: 12px; font-weight: 700; color: #FFFFFF; background: #B91C1C; border-radius: 6px; padding: 2px 8px">{{r.tipo}}</span>
+<div style="display: flex; flex-direction: column; gap: 2px; font-size: 13px"><strong>{{r.donde}}</strong><span style="color: #57534E">{{r.cuando}}</span></div>
+</div>
+</sc-for>
+</section>
+<section style="background: #FFFFFF; border: 1px solid #E7E5E4; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 17px">Ruta de hoy · Técnico Luis</h2>
+<sc-for list="{{ruta}}" as="p" hint-placeholder-count="4">
+<div style="display: flex; gap: 10px; align-items: center; font-size: 14px">
+<span style="{{p.punto}}">{{p.n}}</span>
+<span style="flex: 1">{{p.lugar}}</span>
+<span style="font-size: 12px; color: #57534E">{{p.estado}}</span>
+</div>
+</sc-for>
+<button type="button" style="min-height: 40px; border-radius: 8px; border: 1px solid #D6D3D1; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600">Mandar ruta por WhatsApp</button>
+</section>
+</div>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const items = ['Hoy', 'Clientes', 'Extintores', 'Vencimientos', 'Ruta del día', 'Órdenes', 'Certificados', 'Préstamos', 'Stock', 'Dinero', 'Equipo'];
+    const menu = items.map((t, i) => ({ t: t, estilo: 'display: block; padding: 10px 10px; border-radius: 8px; font-size: 14px; text-decoration: none; ' + (i === 0 ? 'background: #C2410C; color: #FFFFFF; font-weight: 600' : 'color: #E7E5E4') }));
+    const kpis = [
+      { t: 'Visitas hoy', v: '6', d: '2 terminadas' },
+      { t: 'Vencen en 30 días', v: '41', d: 'extintores en 9 clientes' },
+      { t: 'Reportes del público', v: '2', d: 'sin atender' },
+      { t: 'Certificados del mes', v: '23', d: 'listos en el portal' }
+    ];
+    const chip = (c) => 'font-size: 12px; font-weight: 600; border-radius: 6px; padding: 3px 8px; ' + (c === 'r' ? 'background: #FEE2E2; color: #991B1B' : 'background: #FEF3C7; color: #854D0E');
+    const vencen = [
+      { cliente: 'Restaurante La Ceiba', local: 'Zona 10', n: 8, fecha: 'Vencido', c: 'r' },
+      { cliente: 'Bodegas del Sur', local: 'Villa Nueva · bodega 2', n: 14, fecha: 'en 4 días', c: 'a' },
+      { cliente: 'Colegio San Ejemplo', local: 'Mixco', n: 6, fecha: 'en 11 días', c: 'a' },
+      { cliente: 'Clínica Dental Sonrisa', local: 'Zona 15', n: 3, fecha: 'en 17 días', c: 'a' },
+      { cliente: 'Farmacia Central', local: 'Zona 1', n: 4, fecha: 'en 26 días', c: 'a' }
+    ].map((v) => Object.assign({}, v, { chip: chip(v.c) }));
+    const reportes = [
+      { tipo: 'SE USÓ', donde: 'Restaurante La Ceiba · Cocina', cuando: 'hace 25 min' },
+      { tipo: 'NO ESTÁ', donde: 'Bodegas del Sur · Pasillo 3', cuando: 'ayer 17:40' }
+    ];
+    const ruta = [
+      { lugar: 'Farmacia Central', estado: 'Listo', hecho: true },
+      { lugar: 'Clínica Dental Sonrisa', estado: 'Listo', hecho: true },
+      { lugar: 'Restaurante La Ceiba', estado: 'En camino', hecho: false },
+      { lugar: 'Colegio San Ejemplo', estado: '15:30', hecho: false }
+    ].map((p, i) => Object.assign({}, p, { n: String(i + 1),
+      punto: 'flex: none; width: 26px; height: 26px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; ' + (p.hecho ? 'background: #15803D; color: #FFFFFF' : 'border: 1.5px solid #C2410C; color: #9A3412') }));
+    return { menu: menu, kpis: kpis, vencen: vencen, reportes: reportes, ruta: ruta };
+  }
+}
+</script>
+</body>
+</html>

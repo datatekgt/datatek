@@ -69,7 +69,9 @@ fija la base.
 | Planes | Los fija la estrategia de cada nicho; la base aplica los topes (usuarios, registros), no la pantalla. DtekPro lo tiene pendiente (H1) y conviene resolverlo una vez para todos. |
 | Mensajes de WhatsApp | Incluidos con tope mensual por plan (D2). |
 
-## Pantallas que hay que agregar a las maquetas
+## Pantallas de cobro (ya dibujadas en el lienzo)
+
+Cliente: última pantalla de cada fila en «Herramienta del cliente» (Flota-C5, Obra-C5, Huella-C5, Fuego-C4, Colonia-C4). Negocio: cuarta columna de las filas de «Paneles por rubro» (Admin-*-Cobros), con la cuenta de Recurrente y la suscripción.
 
 | Lado | Pantalla | Nichos |
 |---|---|---|

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Colonia · panel de la administración</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F766E}a:hover{color:#115E59}
+</style>
+</helmet>
+<div style="width: 1280px; height: 820px; box-sizing: border-box; display: flex; font-family: Inter, system-ui, sans-serif; color: #111827; background: #F5F6F8">
+<nav style="width: 220px; flex: none; background: #134E4A; color: #F0FDFA; padding: 20px 14px; display: flex; flex-direction: column; gap: 4px; box-sizing: border-box">
+<div style="display: flex; flex-direction: column; padding: 0 8px 18px">
+<span style="font-weight: 700; font-size: 15px">Administraciones Ejemplo</span>
+<span style="font-size: 12px; color: #99F6E4">Residencial Los Pinos</span>
+</div>
+<sc-for list="{{menu}}" as="m" hint-placeholder-count="9">
+<a href="#" style="{{m.estilo}}">{{m.t}}</a>
+</sc-for>
+<span style="margin-top: auto; font-size: 11px; color: #99F6E4; padding: 0 8px">DATATEK Colonia · datos de ejemplo</span>
+</nav>
+
+<main style="flex: 1; min-width: 0; padding: 28px 32px; display: flex; flex-direction: column; gap: 18px; box-sizing: border-box">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 28px">Órdenes</h1>
+<div style="display: flex; gap: 10px">
+<button type="button" style="min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid #99F6E4; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">Informe del mes para la junta</button>
+<button type="button" style="min-height: 44px; padding: 0 16px; border-radius: 10px; border: none; background: #0F766E; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">+ Nueva orden</button>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 16px; flex: 1; min-height: 0">
+<section style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 6px">
+<h2 style="margin: 0 0 6px; font-size: 15px">Equipos</h2>
+<sc-for list="{{arbol}}" as="a" hint-placeholder-count="10">
+<div style="{{a.estilo}}"><span>{{a.t}}</span><span style="{{a.punto}}"></span></div>
+</sc-for>
+</section>
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; min-height: 0">
+<sc-for list="{{columnas}}" as="c" hint-placeholder-count="4">
+<section style="background: #EEF2F1; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 2px 4px">
+<span style="font-size: 14px; font-weight: 700">{{c.t}}</span>
+<span style="font-size: 12px; font-weight: 600; color: #374151">{{c.n}}</span>
+</div>
+<sc-for list="{{c.tarjetas}}" as="k" hint-placeholder-count="2">
+<article style="background: #FFFFFF; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px; border: 1px solid #E5E7EB">
+<span style="font-size: 14px; font-weight: 600">{{k.equipo}}</span>
+<span style="font-size: 13px; color: #374151">{{k.que}}</span>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 6px">
+<span style="font-size: 12px; color: #4B5563">{{k.proveedor}}</span>
+<span style="{{k.chip}}">{{k.origen}}</span>
+</div>
+</article>
+</sc-for>
+</section>
+</sc-for>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
+<div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 14px 18px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px; color: #4B5563">Gasto de noviembre</span><span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 24px; font-weight: 700">Q 18,450</span><span style="font-size: 12px; color: #374151">63 % del presupuesto del mes</span></div>
+<div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 14px 18px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px; color: #4B5563">Preventivos al día</span><span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 24px; font-weight: 700">11 de 13</span><span style="font-size: 12px; color: #374151">bomba 2 y planta, vencidos</span></div>
+<div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 14px 18px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px; color: #4B5563">Por aprobar de la junta</span><span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 24px; font-weight: 700">1 cotización</span><span style="font-size: 12px; color: #374151">motor del portón · Q 4,500</span></div>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const items = ['Hoy', 'Órdenes', 'Equipos', 'Preventivos', 'Proveedores', 'Cotizaciones', 'Costos', 'Informe del mes', 'Avisos a vecinos', 'Usuarios'];
+    const menu = items.map((t, i) => ({ t: t, estilo: 'display: block; padding: 10px; border-radius: 8px; font-size: 14px; text-decoration: none; ' + (i === 1 ? 'background: #0F766E; color: #FFFFFF; font-weight: 600' : 'color: #CCFBF1') }));
+    const color = { ok: '#15803D', a: '#CA8A04', r: '#B91C1C', no: 'transparent' };
+    const arbol = [
+      ['Entrada', 0, 'no'], ['Portón principal', 1, 'r'], ['Garita', 1, 'ok'],
+      ['Área social', 0, 'no'], ['Piscina', 1, 'ok'], ['Salón', 1, 'ok'], ['Jardín central', 1, 'a'],
+      ['Cuarto de máquinas', 0, 'no'], ['Bomba de pozo 1', 1, 'ok'], ['Bomba de pozo 2', 1, 'r'], ['Planta eléctrica', 1, 'r'], ['Cisterna', 1, 'ok']
+    ].map((a) => ({ t: a[0],
+      estilo: 'display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 5px 6px; ' + (a[1] === 0 ? 'font-weight: 700; color: #134E4A; margin-top: 6px' : 'padding-left: 18px; color: #1F2937'),
+      punto: 'width: 8px; height: 8px; border-radius: 4px; background: ' + color[a[2]] }));
+    const chip = (o) => 'font-size: 11px; font-weight: 700; border-radius: 6px; padding: 2px 6px; ' + (o === 'Vecino' ? 'background: #CCFBF1; color: #115E59' : 'background: #E0E7FF; color: #3730A3');
+    const datos = [
+      { t: 'Reportada', tarjetas: [
+        { equipo: 'Portón principal', que: 'No cierra · casa 14-B y 9-A', proveedor: 'Sin asignar', origen: 'Vecino' } ] },
+      { t: 'Asignada', tarjetas: [
+        { equipo: 'Bomba de pozo 2', que: 'Preventivo trimestral', proveedor: 'Hidro Servicios', origen: 'Preventivo' },
+        { equipo: 'Planta eléctrica', que: 'Cambio de aceite (250 h)', proveedor: 'Energía Total', origen: 'Preventivo' } ] },
+      { t: 'En proceso', tarjetas: [
+        { equipo: 'Jardín central', que: 'Riego dañado junto al salón', proveedor: 'Jardines Verdes', origen: 'Vecino' } ] },
+      { t: 'Por verificar', tarjetas: [
+        { equipo: 'Piscina', que: 'Limpieza semanal y químicos', proveedor: 'Aqua Ejemplo', origen: 'Preventivo' } ] }
+    ];
+    const columnas = datos.map((c) => ({ t: c.t, n: String(c.tarjetas.length), tarjetas: c.tarjetas.map((k) => Object.assign({}, k, { chip: chip(k.origen) })) }));
+    return { menu: menu, arbol: arbol, columnas: columnas };
+  }
+}
+</script>
+</body>
+</html>

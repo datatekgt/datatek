@@ -38,7 +38,7 @@ cuando se decida construir, no quede nada por adivinar.
 | C9 | **Cámara 24/7 en Obra.** | Hardware, internet en la obra y privacidad de vecinos y trabajadores. | Fuera de la primera versión (ya decidido). Si entra, aviso visible en la obra y nunca audio. |
 | C10 | **Constancia de extintores.** | Si no tiene el formato que pide bomberos o la aseguradora, no sirve. | Validar el formato con 2 o 3 clientes antes de construir el PDF. |
 
-## D. Decisiones que tiene que tomar Dominic (resumen de los cuatro documentos)
+## D. Decisiones (todas tomadas: ver `0-decisiones.md`, D1 a D24)
 
 | # | Decisión | Recomendación | Documento |
 |---|---|---|---|

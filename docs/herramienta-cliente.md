@@ -86,6 +86,8 @@ Fuentes de búsqueda; casi todo es descripción del propio proveedor, no prueba 
 
 ## Lo que falta decidir
 
+> Cerrado el 24 nov en `antes-de-construir/0-decisiones.md` (D1 contrato de Obra, D2 WhatsApp, D7 y D8 cobro, D18 transparencia, D21 orden). Se deja la lista original como historia.
+
 1. **Cuánto ve el cliente de los costos de D-TEK.** En Obra y Flota mostramos costos con factura; hay que definir si se ve el margen o solo el precio final.
 2. **Quién confirma cada dato.** Kilometraje (piloto), dosis (veterinaria), fase recibida (supervisor). Cada pantalla dice quién lo anotó; eso hay que llevarlo a la base como en `work_order_events`.
 3. **Notificaciones:** WhatsApp para recordatorios y aprobaciones; ¿se cobra aparte?

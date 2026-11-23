@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Flota · panel del taller D-TEK Flotas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1D4ED8}a:hover{color:#1E3A8A}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; font-family: Inter, system-ui, sans-serif; color: #0F172A; background: #F7F9FC; display: flex; flex-direction: column">
+
+<header style="height: 64px; flex: none; display: flex; align-items: center; gap: 32px; padding: 0 32px; background: #FFFFFF; border-bottom: 1px solid #E2E8F0">
+<div style="display: flex; flex-direction: column">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 18px">D-TEK <span style="color: #1D4ED8">Flotas</span></span>
+<span style="font-size: 12px; color: #475569">Flota de Distribuidora Ejemplo</span>
+</div>
+<nav style="display: flex; gap: 4px; height: 100%">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+<a href="#" style="{{t.estilo}}">{{t.n}}</a>
+</sc-for>
+</nav>
+<div style="margin-left: auto; display: flex; align-items: center; gap: 12px">
+<span style="font-size: 13px; font-weight: 600; color: #854D0E; background: #FEF3C7; border-radius: 8px; padding: 6px 10px">1 cotización esperando al cliente</span>
+<button type="button" style="min-height: 40px; padding: 0 16px; border-radius: 10px; border: none; background: #1D4ED8; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">+ Orden</button>
+</div>
+</header>
+
+<main style="flex: 1; min-height: 0; padding: 24px 32px; display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; box-sizing: border-box">
+
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 22px 24px; display: flex; flex-direction: column; gap: 16px; min-height: 0">
+<div style="display: flex; justify-content: space-between; align-items: flex-end">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 17px; font-weight: 700">Disponibilidad de la flota · noviembre</h1>
+<div style="display: flex; align-items: baseline; gap: 14px">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 44px; font-weight: 700; line-height: 1">{{disp}} %</span>
+<span style="font-size: 14px; color: #475569">{{paradosTxt}}</span>
+</div>
+</div>
+<div style="display: flex; gap: 14px; font-size: 13px; color: #334155">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #DBEAFE"></span>Operando</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #fab219"></span>Servicio programado</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #d03b3b"></span>Parada por falla</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 9px">
+<div style="display: grid; grid-template-columns: 150px minmax(0, 1fr) 70px; gap: 12px; align-items: end">
+<span></span>
+<div style="display: flex; justify-content: space-between; font-size: 11px; color: #64748B"><span>1</span><span>8</span><span>15</span><span>22</span><span>30 nov</span></div>
+<span style="font-size: 11px; color: #64748B; text-align: right">Días parada</span>
+</div>
+<sc-for list="{{unidades}}" as="u" hint-placeholder-count="10">
+<div style="display: grid; grid-template-columns: 150px minmax(0, 1fr) 70px; gap: 12px; align-items: center">
+<div style="display: flex; flex-direction: column"><span style="font-size: 13px; font-weight: 600">{{u.placa}}</span><span style="font-size: 11px; color: #64748B">{{u.modelo}}</span></div>
+<div style="display: grid; grid-template-columns: repeat(30, minmax(0, 1fr)); gap: 2px">
+<sc-for list="{{u.dias}}" as="d" hint-placeholder-count="30"><span style="{{d.estilo}}" title="{{d.tip}}"></span></sc-for>
+</div>
+<span style="font-size: 13px; font-weight: 600; text-align: right">{{u.parados}}</span>
+</div>
+</sc-for>
+</div>
+<p style="margin: auto 0 0; font-size: 13px; color: #475569">C-789GHI estuvo 5 días parada por la caja de cambios: es la unidad que más le cuesta a la flota este mes.</p>
+</section>
+
+<div style="display: flex; flex-direction: column; gap: 20px; min-height: 0">
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 20px 24px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-size: 16px">Costo por unidad · noviembre</h2>
+<span style="font-size: 13px; color: #475569">Q 21,300</span>
+</div>
+<sc-for list="{{costos}}" as="c" hint-placeholder-count="6">
+<div style="display: grid; grid-template-columns: 84px minmax(0, 1fr) 64px; gap: 10px; align-items: center" title="{{c.tip}}">
+<span style="font-size: 13px">{{c.placa}}</span>
+<div style="height: 12px"><div style="{{c.barra}}"></div></div>
+<span style="font-size: 13px; font-weight: 600; text-align: right">{{c.v}}</span>
+</div>
+</sc-for>
+</section>
+
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 20px 24px; display: flex; flex-direction: column; gap: 4px; flex: 1; min-height: 0">
+<h2 style="margin: 0 0 8px; font-size: 16px">Lo que vence en 60 días</h2>
+<sc-for list="{{vence}}" as="v" hint-placeholder-count="5">
+<div style="display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 12px; align-items: center; padding: 8px 0; border-top: 1px solid #F1F5F9">
+<div style="{{v.fechaEstilo}}"><span style="font-size: 16px; font-weight: 700; line-height: 1">{{v.dia}}</span><span style="font-size: 11px">{{v.mes}}</span></div>
+<div style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{v.que}}</span><span style="font-size: 12px; color: #475569">{{v.quien}}</span></div>
+</div>
+</sc-for>
+</section>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tabs = ['Flotas', 'Órdenes', 'Unidades', 'Calendario', 'Más'].map((n, i) => ({ n: n,
+      estilo: 'display: flex; align-items: center; padding: 0 14px; font-size: 14px; text-decoration: none; ' + (i === 0 ? 'color: #1E3A8A; font-weight: 700; box-shadow: inset 0 -3px 0 #1D4ED8' : 'color: #334155; font-weight: 500') }));
+    const color = { o: '#DBEAFE', s: '#fab219', f: '#d03b3b' };
+    const nombre = { o: 'operando', s: 'servicio programado', f: 'parada por falla' };
+    const base = [
+      { placa: 'P-123ABC', modelo: 'Hilux 2019', ev: [[12, 12, 's']] },
+      { placa: 'P-456DEF', modelo: 'Hiace 2018', ev: [[3, 4, 'f'], [26, 26, 's']] },
+      { placa: 'C-789GHI', modelo: 'Isuzu NPR 2017', ev: [[16, 20, 'f']] },
+      { placa: 'P-321JKL', modelo: 'Hilux 2021', ev: [] },
+      { placa: 'P-654MNO', modelo: 'D-Max 2020', ev: [[9, 9, 's']] },
+      { placa: 'C-987PQR', modelo: 'Hino 300 2016', ev: [[22, 23, 'f'], [24, 24, 's']] },
+      { placa: 'P-147STU', modelo: 'Hilux 2022', ev: [] },
+      { placa: 'P-258VWX', modelo: 'Hiace 2020', ev: [[18, 18, 's']] },
+      { placa: 'P-369YZA', modelo: 'L200 2019', ev: [[6, 6, 'f']] },
+      { placa: 'C-741BCD', modelo: 'Canter 2018', ev: [[28, 29, 's']] }
+    ];
+    let total = 0, falla = 0;
+    const unidades = base.map((u) => {
+      let parados = 0;
+      const dias = Array.from({ length: 30 }, (_, i) => {
+        const d = i + 1;
+        const e = u.ev.find((x) => d >= x[0] && d <= x[1]);
+        const t = e ? e[2] : 'o';
+        if (t !== 'o') { parados++; if (t === 'f') falla++; }
+        return { tip: u.placa + ' · ' + d + ' nov: ' + nombre[t], estilo: 'height: 34px; border-radius: 4px; background: ' + color[t] };
+      });
+      total += parados;
+      return { placa: u.placa, modelo: u.modelo, dias: dias, parados: String(parados) };
+    });
+    const disp = Math.round((1 - total / (base.length * 30)) * 100);
+    const datosC = [['C-789GHI', 6200], ['C-987PQR', 4870], ['P-123ABC', 3950], ['P-654MNO', 2480], ['P-456DEF', 2100], ['P-321JKL', 1700]];
+    const costos = datosC.map((c, i) => ({ placa: c[0], v: 'Q ' + c[1].toLocaleString('en-US'), tip: c[0] + ': Q ' + c[1].toLocaleString('en-US'),
+      barra: 'height: 12px; border-radius: 0 4px 4px 0; width: ' + Math.round(c[1] / 6200 * 100) + '%; background: ' + (i === 0 ? '#1D4ED8' : '#93C5FD') }));
+    const fecha = (urg) => 'display: flex; flex-direction: column; align-items: center; justify-content: center; height: 48px; border-radius: 10px; ' + (urg ? 'background: #FDECEC; color: #991B1B' : 'background: #EFF6FF; color: #1E3A8A');
+    const vence = [
+      { dia: '3', mes: 'dic', que: 'Seguro · P-321JKL', quien: 'Vence en 9 días · renovar con la aseguradora', u: true },
+      { dia: '18', mes: 'dic', que: 'Licencia de Ana Gómez', quien: 'Piloto de P-321JKL', u: false },
+      { dia: '20', mes: 'dic', que: 'Servicio de 150,000 km', quien: 'P-123ABC · se agenda con la visita', u: false },
+      { dia: '12', mes: 'ene', que: 'Seguro · P-123ABC', quien: 'Renovación anual', u: false },
+      { dia: '15', mes: 'ene', que: 'Tarjeta de circulación', quien: 'Toda la flota · pago anual', u: false }
+    ].map((v) => Object.assign({}, v, { fechaEstilo: fecha(v.u) }));
+    return { tabs: tabs, unidades: unidades, disp: String(disp), paradosTxt: total + ' días de unidad parada en el mes; ' + falla + ' por falla', costos: costos, vence: vence };
+  }
+}
+</script>
+</body>
+</html>

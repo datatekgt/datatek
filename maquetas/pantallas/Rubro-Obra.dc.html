@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Obra · panel de supervisión D-TEK</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#854D0E}a:hover{color:#713F12}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; font-family: Inter, system-ui, sans-serif; color: #1C1917; background: #FAF9F6; display: flex; flex-direction: column">
+
+<header style="height: 64px; flex: none; display: flex; align-items: center; gap: 32px; padding: 0 32px; background: #FFFFFF; border-bottom: 1px solid #ECE8DF">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 18px">D-TEK <span style="color: #A16207">Obra</span></span>
+<nav style="display: flex; gap: 4px; height: 100%">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+<a href="#" style="{{t.estilo}}">{{t.n}}</a>
+</sc-for>
+</nav>
+<span style="margin-left: auto; font-size: 14px; color: #57534E">5 obras · 2 con atraso · 2 reportes por verificar · 1 cambio esperando al dueño</span>
+</header>
+
+<main style="flex: 1; min-height: 0; padding: 24px 32px; display: grid; grid-template-columns: 400px minmax(0, 1fr); gap: 20px; box-sizing: border-box">
+
+<section style="background: #FFFFFF; border: 1px solid #ECE8DF; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 10px; min-height: 0">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px 6px">
+<h1 style="margin: 0; font-size: 17px">Obras</h1>
+<div style="display: flex; gap: 12px; font-size: 12px; color: #44403C">
+<span style="display: flex; align-items: center; gap: 5px"><span style="width: 12px; height: 8px; border-radius: 2px; background: #A16207"></span>Avance real</span>
+<span style="display: flex; align-items: center; gap: 5px"><span style="width: 2px; height: 12px; background: #1C1917"></span>Plan a hoy</span>
+</div>
+</div>
+<sc-for list="{{obras}}" as="o" hint-placeholder-count="5">
+<a href="#" style="{{o.tarjeta}}">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px">
+<span style="font-size: 14px; font-weight: 700; color: #1C1917">{{o.n}}</span>
+<span style="font-size: 13px; font-weight: 700; color: #1C1917">{{o.real}} %</span>
+</div>
+<span style="font-size: 12px; color: #57534E">{{o.lugar}}</span>
+<div style="position: relative; height: 10px; background: #F3EFE6; border-radius: 4px" title="{{o.tip}}">
+<div style="{{o.barra}}"></div>
+<div style="{{o.marca}}"></div>
+</div>
+<span style="{{o.estadoEstilo}}">{{o.estado}}</span>
+</a>
+</sc-for>
+</section>
+
+<div style="display: flex; flex-direction: column; gap: 20px; min-height: 0">
+<section style="background: #FFFFFF; border: 1px solid #ECE8DF; border-radius: 16px; padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; flex: none">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 22px">Casa familia López</h2>
+<span style="font-size: 13px; color: #57534E">San Marcos · semana 14 de 20 · dueño en Los Ángeles · real 58 %, plan 62 %</span>
+</div>
+<div style="display: flex; gap: 14px; font-size: 12px; color: #44403C; flex-wrap: wrap; justify-content: flex-end">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 18px; height: 8px; border-radius: 3px; background: #E7DCC2"></span>Plan</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 18px; height: 8px; border-radius: 3px; background: #A16207"></span>Real</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 2px; height: 14px; background: #1C1917"></span>Hoy</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 9px; height: 9px; transform: rotate(45deg); background: #1C1917"></span>Pago o hito</span>
+</div>
+</div>
+<div style="display: flex; flex-direction: column">
+<div style="display: grid; grid-template-columns: 180px minmax(0, 1fr) 150px; gap: 12px; padding-bottom: 4px">
+<span style="font-size: 11px; color: #78716C">Fase</span>
+<div style="position: relative; height: 14px; font-size: 11px; color: #78716C">
+<span style="position: absolute; left: 0">Sem. 0</span><span style="position: absolute; left: 25%; transform: translateX(-50%)">5</span><span style="position: absolute; left: 50%; transform: translateX(-50%)">10</span><span style="position: absolute; left: 70%; transform: translateX(-50%); font-weight: 700; color: #1C1917">Hoy · 14</span><span style="position: absolute; right: 0">20</span>
+</div>
+<span style="font-size: 11px; color: #78716C">Estado</span>
+</div>
+<sc-for list="{{fases}}" as="f" hint-placeholder-count="8">
+<div style="display: grid; grid-template-columns: 180px minmax(0, 1fr) 150px; gap: 12px; align-items: center; border-top: 1px solid #F3EFE6">
+<span style="font-size: 13px; font-weight: 600">{{f.n}}</span>
+<div style="{{f.pista}}" title="{{f.tip}}">
+<div style="position: absolute; left: 70%; top: 0; bottom: 0; width: 2px; background: #1C1917"></div>
+<div style="{{f.planBarra}}"></div>
+<sc-if value="{{f.hayReal}}"><div style="{{f.realBarra}}"></div></sc-if>
+</div>
+<span style="{{f.estadoEstilo}}">{{f.estado}}</span>
+</div>
+</sc-for>
+<div style="display: grid; grid-template-columns: 180px minmax(0, 1fr) 150px; gap: 12px; align-items: center; border-top: 1px solid #ECE8DF">
+<span style="font-size: 13px; font-weight: 600">Pagos e hitos</span>
+<div style="position: relative; height: 46px">
+<div style="position: absolute; left: 70%; top: 0; bottom: 0; width: 2px; background: #1C1917"></div>
+<sc-for list="{{hitos}}" as="h" hint-placeholder-count="3">
+<div style="{{h.caja}}" title="{{h.tip}}"><span style="{{h.rombo}}"></span><span style="font-size: 11px; font-weight: 600; color: #44403C; white-space: nowrap">{{h.n}}</span></div>
+</sc-for>
+</div>
+<span style="font-size: 12px; font-weight: 700; color: #854D0E">Pago 3 espera la losa</span>
+</div>
+</div>
+</section>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 20px; flex: 1; min-height: 0">
+<section style="background: #FFFFFF; border: 1px solid #ECE8DF; border-radius: 16px; padding: 20px 24px; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 16px">Reportes de esta semana</h2>
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 84px 84px 84px; gap: 8px; font-size: 11px; color: #78716C; padding-bottom: 4px; border-bottom: 1px solid #F3EFE6">
+<span>Obra</span><span style="text-align: center">Subido</span><span style="text-align: center">Verificado</span><span style="text-align: center">Publicado</span>
+</div>
+<sc-for list="{{reportes}}" as="r" hint-placeholder-count="5">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 84px 84px 84px; gap: 8px; align-items: center">
+<span style="font-size: 13px; font-weight: 600">{{r.n}}</span>
+<sc-for list="{{r.pasos}}" as="p" hint-placeholder-count="3"><span style="{{p.estilo}}">{{p.t}}</span></sc-for>
+</div>
+</sc-for>
+</section>
+
+<section style="background: #FFFFFF; border: 1px solid #ECE8DF; border-radius: 16px; padding: 20px 24px; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 16px">Gasto contra avance · López</h2>
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 32px; font-weight: 700; line-height: 1">Q 182,000</span>
+<span style="font-size: 13px; color: #57534E">de Q 310,000 presupuestados</span>
+<div style="position: relative; height: 16px; background: #F3EFE6; border-radius: 4px; margin-top: 6px" title="Gastado 59 % del presupuesto con 58 % de avance">
+<div style="width: 59%; height: 16px; background: #A16207; border-radius: 4px"></div>
+<div style="position: absolute; left: 58%; top: -4px; width: 2px; height: 24px; background: #1C1917"></div>
+</div>
+<span style="font-size: 13px; color: #44403C">59 % gastado con 58 % de avance: el gasto va parejo con la obra.</span>
+<a href="#" style="margin-top: auto; font-size: 13px; font-weight: 600">Revisar hito «Losa» con el dueño</a>
+</section>
+</div>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tabs = ['Obras', 'Visitas', 'Reportes', 'Calendario', 'Más'].map((n, i) => ({ n: n,
+      estilo: 'display: flex; align-items: center; padding: 0 14px; font-size: 14px; text-decoration: none; ' + (i === 0 ? 'color: #854D0E; font-weight: 700; box-shadow: inset 0 -3px 0 #A16207' : 'color: #44403C; font-weight: 500') }));
+    const est = {
+      ok: 'font-size: 12px; font-weight: 600; color: #166534',
+      a: 'font-size: 12px; font-weight: 700; color: #854D0E',
+      r: 'font-size: 12px; font-weight: 700; color: #991B1B'
+    };
+    const obras = [
+      { n: 'Casa familia López', lugar: 'San Marcos', real: 58, plan: 62, estado: '2 semanas de atraso', s: 'a', sel: true },
+      { n: 'Remodelación familia Gómez', lugar: 'Escuintla', real: 22, plan: 35, estado: '4 semanas de atraso', s: 'r' },
+      { n: 'Segundo nivel familia Pérez', lugar: 'Quetzaltenango', real: 34, plan: 33, estado: 'A tiempo', s: 'ok' },
+      { n: 'Casa familia Ajú', lugar: 'Totonicapán', real: 81, plan: 80, estado: 'A tiempo', s: 'ok' },
+      { n: 'Casa familia Chávez', lugar: 'Huehuetenango', real: 9, plan: 10, estado: 'A tiempo', s: 'ok' }
+    ].map((o) => Object.assign({}, o, {
+      real: String(o.real),
+      tip: 'Real ' + o.real + ' %, plan a hoy ' + o.plan + ' %',
+      tarjeta: 'display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 12px; text-decoration: none; ' + (o.sel ? 'background: #FEF9EC; border: 1.5px solid #A16207' : 'background: #FFFFFF; border: 1px solid #ECE8DF'),
+      barra: 'height: 10px; border-radius: 4px; background: #A16207; width: ' + o.real + '%',
+      marca: 'position: absolute; top: -3px; width: 2px; height: 16px; background: #1C1917; left: ' + o.plan + '%',
+      estadoEstilo: est[o.s]
+    }));
+    const pct = (w) => (w / 20 * 100).toFixed(2) + '%';
+    const barra = (ini, fin, top, color) => 'position: absolute; top: ' + top + 'px; height: 9px; border-radius: 4px; left: ' + pct(ini) + '; width: ' + pct(fin - ini) + '; background: ' + color;
+    const estF = { ok: 'font-size: 12px; font-weight: 600; color: #166534', a: 'font-size: 12px; font-weight: 700; color: #854D0E', r: 'font-size: 12px; font-weight: 700; color: #991B1B', n: 'font-size: 12px; color: #78716C' };
+    const fases = [
+      { n: 'Trazo y preliminares', p: [0, 1], r: [0, 1], estado: 'Listo', s: 'ok' },
+      { n: 'Cimentación', p: [1, 4], r: [1, 5], estado: 'Listo · 1 sem. tarde', s: 'ok' },
+      { n: 'Levantado de muros', p: [4, 8], r: [5, 10], estado: 'Listo · 2 sem. tarde', s: 'a' },
+      { n: 'Losa', p: [8, 11], r: [10, 14], estado: 'En curso · 60 %', s: 'a' },
+      { n: 'Instalaciones', p: [9, 13], r: [11, 14], estado: 'En curso · 50 %', s: 'a' },
+      { n: 'Repello y cernido', p: [12, 15], r: null, estado: 'Debió empezar sem. 12', s: 'r' },
+      { n: 'Pisos y azulejo', p: [15, 18], r: null, estado: 'Por iniciar', s: 'n' },
+      { n: 'Acabados y pintura', p: [17, 20], r: null, estado: 'Por iniciar', s: 'n' }
+    ].map((f) => ({ n: f.n, estado: f.estado, estadoEstilo: estF[f.s], hayReal: !!f.r,
+      tip: f.n + ' · plan sem. ' + f.p[0] + ' a ' + f.p[1] + (f.r ? ' · real sem. ' + f.r[0] + ' a ' + f.r[1] : ' · sin empezar'),
+      pista: 'position: relative; height: 40px; background: repeating-linear-gradient(to right, #F3EFE6 0 1px, transparent 1px 25%)',
+      planBarra: barra(f.p[0], f.p[1], 9, '#E7DCC2'),
+      realBarra: f.r ? barra(f.r[0], f.r[1], 22, '#A16207') : '' }));
+    const hitos = [
+      { n: 'Pago 2 · pagado', w: 4, tip: 'Pago 2 al terminar cimentación: pagado en la semana 5' },
+      { n: 'Pago 3 · losa', w: 11, tip: 'Pago 3 al terminar la losa: planeado semana 11, la losa va al 60 %' },
+      { n: 'Entrega', w: 20, tip: 'Entrega planeada en la semana 20' }
+    ].map((h) => Object.assign({}, h, {
+      caja: 'position: absolute; top: 8px; display: flex; flex-direction: column; gap: 5px; ' + (h.w === 20 ? 'right: 0; align-items: flex-end' : 'left: ' + pct(h.w) + '; transform: translateX(-6px); align-items: flex-start'),
+      rombo: 'width: 11px; height: 11px; transform: rotate(45deg); background: ' + (h.w === 4 ? '#1C1917' : '#FFFFFF') + '; border: 2px solid #1C1917; box-sizing: border-box' }));
+    const paso = (t) => ({ t: t === 1 ? 'Listo' : t === 0 ? 'Falta' : '—',
+      estilo: 'text-align: center; font-size: 12px; font-weight: 600; border-radius: 6px; padding: 4px 0; ' + (t === 1 ? 'background: #DCFCE7; color: #166534' : t === 0 ? 'background: #FEF3C7; color: #854D0E' : 'color: #A8A29E') });
+    const reportes = [
+      ['López', [1, 1, 0]], ['Gómez', [1, 0, -1]], ['Pérez', [1, 0, -1]], ['Ajú', [1, 1, 1]], ['Chávez', [0, -1, -1]]
+    ].map((r) => ({ n: r[0], pasos: r[1].map(paso) }));
+    return { tabs: tabs, obras: obras, fases: fases, hitos: hitos, reportes: reportes };
+  }
+}
+</script>
+</body>
+</html>
