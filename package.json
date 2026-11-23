@@ -7,14 +7,15 @@
     "apps/flota/web",
     "apps/huella/web",
     "apps/fuego/web",
-    "apps/obra/web"
+    "apps/obra/web",
+    "apps/colonia/web"
   ],
   "scripts": {
     "sql": "node scripts/probar-sql.mjs",
     "sql:flota": "node scripts/probar-sql.mjs flota",
     "ataque:flota": "node apps/flota/tests/seguridad/ataque.mjs --estricto",
     "build:flota": "npm --workspace apps/flota/web run build",
-    "test": "node scripts/probar-sql.mjs && node scripts/probar-sql.mjs flota && node scripts/probar-sql.mjs huella && node scripts/probar-sql.mjs flota --juntos && node scripts/probar-sql.mjs huella --juntos && node scripts/probar-sql.mjs fuego && node scripts/probar-sql.mjs fuego --juntos && node scripts/probar-sql.mjs obra && node scripts/probar-sql.mjs obra --juntos && node apps/flota/tests/seguridad/ataque.mjs --estricto && node apps/huella/tests/seguridad/ataque.mjs --estricto && node apps/fuego/tests/seguridad/ataque.mjs --estricto && node apps/obra/tests/seguridad/ataque.mjs --estricto && node scripts/probar-verificaciones.mjs flota && node scripts/probar-verificaciones.mjs huella && node scripts/probar-verificaciones.mjs fuego && node scripts/probar-verificaciones.mjs obra && node scripts/capacidades-iguales.mjs && node scripts/probar-funciones.mjs && node --test nucleo/importador/motor.test.mjs",
+    "test": "node scripts/probar-sql.mjs && node scripts/probar-sql.mjs flota && node scripts/probar-sql.mjs huella && node scripts/probar-sql.mjs flota --juntos && node scripts/probar-sql.mjs huella --juntos && node scripts/probar-sql.mjs fuego && node scripts/probar-sql.mjs fuego --juntos && node scripts/probar-sql.mjs obra && node scripts/probar-sql.mjs obra --juntos && node scripts/probar-sql.mjs colonia && node scripts/probar-sql.mjs colonia --juntos && node apps/flota/tests/seguridad/ataque.mjs --estricto && node apps/huella/tests/seguridad/ataque.mjs --estricto && node apps/fuego/tests/seguridad/ataque.mjs --estricto && node apps/obra/tests/seguridad/ataque.mjs --estricto && node apps/colonia/tests/seguridad/ataque.mjs --estricto && node scripts/probar-verificaciones.mjs flota && node scripts/probar-verificaciones.mjs huella && node scripts/probar-verificaciones.mjs fuego && node scripts/probar-verificaciones.mjs obra && node scripts/probar-verificaciones.mjs colonia && node scripts/capacidades-iguales.mjs && node scripts/probar-funciones.mjs && node --test nucleo/importador/motor.test.mjs",
     "pantallas:flota": "VITE_SUPABASE_URL=http://supa.local VITE_SUPABASE_ANON_KEY=x npm --workspace apps/flota/web run build && node apps/flota/tests/pantallas/recorrido.mjs",
     "capacidades": "node scripts/capacidades-iguales.mjs",
     "funciones": "node scripts/probar-funciones.mjs",
@@ -34,7 +35,12 @@
     "ataque:obra": "node apps/obra/tests/seguridad/ataque.mjs --estricto",
     "build:obra": "npm --workspace apps/obra/web run build",
     "salida:obra": "npm run build:obra && node scripts/revisar-salida.mjs apps/obra/web/dist",
-    "pantallas:obra": "VITE_SUPABASE_URL=http://supa.local VITE_SUPABASE_ANON_KEY=x npm --workspace apps/obra/web run build && node apps/obra/tests/pantallas/recorrido.mjs"
+    "pantallas:obra": "VITE_SUPABASE_URL=http://supa.local VITE_SUPABASE_ANON_KEY=x npm --workspace apps/obra/web run build && node apps/obra/tests/pantallas/recorrido.mjs",
+    "sql:colonia": "node scripts/probar-sql.mjs colonia",
+    "ataque:colonia": "node apps/colonia/tests/seguridad/ataque.mjs --estricto",
+    "build:colonia": "npm --workspace apps/colonia/web run build",
+    "salida:colonia": "npm run build:colonia && node scripts/revisar-salida.mjs apps/colonia/web/dist",
+    "pantallas:colonia": "VITE_SUPABASE_URL=http://supa.local VITE_SUPABASE_ANON_KEY=x npm --workspace apps/colonia/web run build && node apps/colonia/tests/pantallas/recorrido.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.3.0"

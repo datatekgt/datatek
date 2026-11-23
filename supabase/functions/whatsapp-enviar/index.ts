@@ -16,7 +16,7 @@ export function baseDe(entorno: Entorno, producto: string | undefined): string {
 }
 
 // El enlace de cada aviso lleva a la pantalla de lo avisado (siempre con sesión: el mensaje no trae datos sensibles).
-export function enlaceDe(base: string, objeto: string | null, id: string | null): string {
+export function enlaceDe(base: string, objeto: string | null, id: string | null, vars: Record<string, unknown> = {}): string {
   const b = (base || "").replace(/\/$/, "");
   if (objeto === "orden" && id) return `${b}/mi/orden/${id}`;
   if (objeto === "cobro") return `${b}/mi/cuenta`;
@@ -29,6 +29,10 @@ export function enlaceDe(base: string, objeto: string | null, id: string | null)
   if (objeto === "constancia" && id) return `${b}/mi/constancia/${id}`;
   if (objeto === "reporte" && id) return `${b}/mi/reporte/${id}`;
   if (objeto === "visita" || objeto === "obra" || objeto === "cambio") return `${b}/mi`;
+  // Colonia: el objeto_id es un md5 por destinatario (para que el freno de 4 h no bloquee al segundo vecino); el reporte viene en las variables.
+  if (objeto === "colonia_reporte" && vars.reporte) return `${b}/mi/reporte/${vars.reporte}`;
+  if (objeto === "colonia_publicacion") return `${b}/mi/gasto`;
+  if (objeto === "colonia_aviso") return `${b}/mi/avisos`;
   return `${b}/`;
 }
 
@@ -59,6 +63,10 @@ export const PLANTILLAS: Record<string, string[]> = {
   obra_decision: ["obra", "cambio", "monto", "enlace"],
   obra_fase_recibida: ["fase", "obra", "hito", "monto", "enlace"],
   obra_visita: ["obra", "fecha", "enlace"],
+  colonia_cuota: ["nombre", "mes", "monto", "fecha", "enlace"],
+  colonia_reporte_paso: ["titulo", "paso", "detalle", "enlace"],
+  colonia_aviso: ["condominio", "aviso", "fecha", "hora_inicio", "hora_fin"],
+  colonia_gasto_publicado: ["mes", "enlace"],
 };
 
 const API = "https://graph.facebook.com/v21.0";
@@ -66,7 +74,7 @@ const API = "https://graph.facebook.com/v21.0";
 export function armarMensaje(r: { plantilla: string; telefono: string; variables: Record<string, unknown>; objeto?: string | null; objeto_id?: string | null }, base = "") {
   const orden = PLANTILLAS[r.plantilla];
   if (!orden) return null;
-  const vars: Record<string, unknown> = { enlace: enlaceDe(base, r.objeto ?? null, r.objeto_id ?? null), ...(r.variables || {}) };
+  const vars: Record<string, unknown> = { enlace: enlaceDe(base, r.objeto ?? null, r.objeto_id ?? null, r.variables || {}), ...(r.variables || {}) };
   const parametros = orden.map((k) => ({ type: "text", text: String(vars[k] ?? "").slice(0, 300) || "—" }));
   return {
     messaging_product: "whatsapp",
