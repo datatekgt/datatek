@@ -75,6 +75,8 @@ textarea.entrada { padding: 10px 12px; min-height: 72px; resize: vertical; }
 
 .lista-filas > * + * { border-top: 1px solid var(--linea-suave); }
 .fila-dato { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; }
+a.fila-dato { color: inherit; text-decoration: none; }
+a.fila-dato:hover .titulo { color: var(--acento); }
 .fila-dato .titulo { font-size: 14px; font-weight: 600; }
 .fila-dato .sub { font-size: 12px; color: var(--tinta-2); }
 
