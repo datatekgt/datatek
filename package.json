@@ -4,7 +4,8 @@
   "license": "UNLICENSED",
   "type": "module",
   "workspaces": [
-    "apps/flota/web"
+    "apps/flota/web",
+    "apps/huella/web"
   ],
   "scripts": {
     "sql": "node scripts/probar-sql.mjs",
@@ -17,7 +18,9 @@
     "funciones": "node scripts/probar-funciones.mjs",
     "salida:flota": "npm run build:flota && node scripts/revisar-salida.mjs apps/flota/web/dist",
     "sql:huella": "node scripts/probar-sql.mjs huella",
-    "ataque:huella": "node apps/huella/tests/seguridad/ataque.mjs --estricto"
+    "ataque:huella": "node apps/huella/tests/seguridad/ataque.mjs --estricto",
+    "build:huella": "npm --workspace apps/huella/web run build",
+    "salida:huella": "npm run build:huella && node scripts/revisar-salida.mjs apps/huella/web/dist"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.3.0"
