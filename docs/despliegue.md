@@ -4,9 +4,11 @@ Lo hace Dominic una vez por producto; el código ya está listo. Nada de esto co
 
 ## 1. Supabase (un proyecto por producto, D20)
 
-1. Crear el proyecto «datatek-flota» en Supabase.
-2. SQL Editor: correr en orden `database/nucleo/01…06` y después `apps/flota/database/100…106`. Cada archivo trae su
-   consulta de verificación al final (comentada): correrla y revisar que todo dé `true`.
+1. Proyecto de Flota: `xlhaktvymmbnpotkmdct` (creado el 23 nov 2026).
+2. `node scripts/juntar-migraciones.mjs flota para-supabase` arma dos archivos (antes los corre dos veces en una base limpia):
+   `flota-1-migraciones.sql` (núcleo 01…06 y Flota 100…106 en orden) se pega entero en el SQL Editor y se corre;
+   `flota-2-verificacion.sql` devuelve una fila por migración: todo tiene que venir en `true` (la 106 da 6). Ese resultado
+   es el que se pega en el chat.
 3. Authentication → Phone: activar el proveedor de SMS/WhatsApp (D4).
 4. Edge Functions: desplegar `recurrente-cobro`, `recurrente-aviso` y `whatsapp-enviar` (carpeta `supabase/functions`).
    Secretos: `DATATEK_APP_URL` (la dirección pública de Flota, para los enlaces de WhatsApp), `DATATEK_ORIGENES` (esa misma
@@ -19,10 +21,10 @@ Lo hace Dominic una vez por producto; el código ya está listo. Nada de esto co
 
 1. Proyecto nuevo desde este repo con **Root Directory = `apps/flota/web`** (deja activado «incluir archivos fuera del
    directorio raíz», porque usa `nucleo/`). El resto lo dice `apps/flota/web/vercel.json`.
-2. Variables: `VITE_SUPABASE_URL=https://<proyecto>.supabase.co` y `VITE_SUPABASE_ANON_KEY`. Si faltan o no son https,
+2. Variables (Vite, no Next): `VITE_SUPABASE_URL=https://xlhaktvymmbnpotkmdct.supabase.co` y `VITE_SUPABASE_ANON_KEY` = la
+   llave publicable (`sb_publishable_…`; es pública por diseño, la protege RLS). Si faltan o no son https,
    `scripts/revisar-salida.mjs` detiene el despliegue de producción.
-3. Ya con el proyecto creado: en `vercel.json` cambiar `https://*.supabase.co` y `wss://*.supabase.co` por la dirección
-   exacta del proyecto (el comodín es solo hasta que exista).
+3. El CSP de `vercel.json` ya apunta solo a `xlhaktvymmbnpotkmdct.supabase.co`. Si el proyecto cambia, se cambia ahí.
 
 ## Qué revisa cada despliegue
 

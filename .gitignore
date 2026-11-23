@@ -3,3 +3,4 @@ dist/
 *.log
 .env*
 apps/flota/tests/pantallas/capturas/
+para-supabase/
