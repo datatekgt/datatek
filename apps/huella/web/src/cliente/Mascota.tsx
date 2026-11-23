@@ -6,7 +6,7 @@ import { Chip } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
 import { hora } from '@nucleo/formato'
 import { Huella } from '../datos'
-import { Avatar, ChipVacuna, ESPECIE, Error, useFamiliaDecide, dia } from '../comun'
+import { Avatar, ChipVacuna, ESPECIE, Error, FotoPrivada, useFamiliaDecide, dia } from '../comun'
 
 export function MascotaFamilia() {
   const { id = '' } = useParams()
@@ -70,7 +70,8 @@ export function MascotaFamilia() {
             {(linea.datos || []).map((e) => (
               <li key={e.tipo + e.id} className={`evento evento-${e.tipo}`}>
                 <span className="evento-fecha">{dia(e.cuando)}</span>
-                <div style={{ minWidth: 0 }}><div className="titulo">{e.tipo === 'consulta' ? 'Consulta: ' : e.tipo === 'peso' ? 'Peso: ' : e.tipo === 'medicamento' ? 'Medicamento: ' : 'Vacuna: '}{e.tipo === 'peso' ? `${Number(e.extra.kg)} kg` : e.titulo}</div>{e.detalle && <div className="sub">{e.detalle}</div>}</div>
+                <div style={{ minWidth: 0 }}><div className="titulo">{e.tipo === 'consulta' ? 'Consulta: ' : e.tipo === 'peso' ? 'Peso: ' : e.tipo === 'medicamento' ? 'Medicamento: ' : 'Vacuna: '}{e.tipo === 'peso' ? `${Number(e.extra.kg)} kg` : e.titulo}</div>{e.detalle && <div className="sub">{e.detalle}</div>}
+                  {Array.isArray(e.extra?.fotos) && e.extra.fotos.length > 0 && <div className="fotos-fila">{(e.extra.fotos as string[]).map((f, i) => <FotoPrivada key={f} ruta={f} texto={`Foto ${i + 1} de la consulta`} />)}</div>}</div>
               </li>
             ))}
           </ol>

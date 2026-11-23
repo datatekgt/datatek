@@ -3,12 +3,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useSesion } from '@nucleo/acceso/Sesion'
-import { BotonesSel, Fecha, Filtros } from '@nucleo/controles'
+import { BotonesSel, Filtros } from '@nucleo/controles'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
 import { Nucleo, type Cliente } from '@nucleo/datos/nucleo'
-import { hoyGT } from '@nucleo/formato'
 import { Huella, type Especie, type MascotaFila } from '../datos'
-import { Avatar, ChipVacuna, ESPECIE, Error } from '../comun'
+import { Avatar, ChipVacuna, ESPECIE, Error, Nacimiento } from '../comun'
 import { Importar } from './Importar'
 
 type F = 'todas' | 'vencidas' | 'pronto'
@@ -74,13 +73,13 @@ function AltaMascota({ alCrear }: { alCrear: (id: string) => void }) {
   const [especie, setEspecie] = useState<Especie>('perro')
   const [sexo, setSexo] = useState<'hembra' | 'macho' | null>(null)
   const [raza, setRaza] = useState('')
-  const [nac, setNac] = useState<string | null>(null)
+  const [nac, setNac] = useState<{ nacimiento: string | null; aprox: boolean }>({ nacimiento: null, aprox: false })
   const [chip, setChip] = useState('')
   const clientes = useCarga(() => (modo === 'existe' && bq.trim().length >= 2 ? Nucleo.clientes(neg, bq.trim()) : Promise.resolve([] as Cliente[])), [bq, modo])
   const acc = useAccion()
   const crear = () => acc.correr(async () => {
     const cliente = modo === 'existe' ? dueno!.id : await Nucleo.crearCliente(neg, nombreDueno.trim(), tel.trim() || null)
-    const id = await Huella.crearMascota(neg, cliente, { nombre: nombre.trim(), especie, raza: raza.trim() || null, sexo, nacimiento: nac, aprox: false, microchip: chip.trim() || null })
+    const id = await Huella.crearMascota(neg, cliente, { nombre: nombre.trim(), especie, raza: raza.trim() || null, sexo, nacimiento: nac.nacimiento, aprox: nac.aprox, microchip: chip.trim() || null })
     alCrear(id)
   })
   const listo = nombre.trim() && (modo === 'existe' ? !!dueno : nombreDueno.trim().length >= 2)
@@ -107,9 +106,9 @@ function AltaMascota({ alCrear }: { alCrear: (id: string) => void }) {
         <BotonesSel rotulo="Especie" valor={especie} alCambiar={setEspecie} opciones={[{ valor: 'perro', texto: 'Perro' }, { valor: 'gato', texto: 'Gato' }, { valor: 'otro', texto: 'Otra' }]} />
         <BotonesSel rotulo="Sexo" valor={sexo} alCambiar={setSexo} opciones={[{ valor: 'hembra', texto: 'Hembra' }, { valor: 'macho', texto: 'Macho' }]} />
         <div className="campo"><label htmlFor="raza">Raza (opcional)</label><input id="raza" className="entrada" value={raza} onChange={(e) => setRaza(e.target.value)} placeholder="Mestiza" /></div>
-        <Fecha rotulo="Nacimiento (opcional)" valor={nac} alCambiar={setNac} max={hoyGT()} atajos="pasado" />
         <div className="campo"><label htmlFor="chip">Microchip (opcional)</label><input id="chip" className="entrada" inputMode="numeric" value={chip} onChange={(e) => setChip(e.target.value)} placeholder="15 dígitos" /></div>
       </div>
+      <Nacimiento valor={nac.nacimiento} aprox={nac.aprox} alCambiar={setNac} />
       <Error texto={acc.error || clientes.error} />
       <div><button className="btn" disabled={acc.ocupado || !listo} onClick={crear}>Registrar mascota</button></div>
     </section>

@@ -1,6 +1,7 @@
 // Acceso a datos de Huella: un wrapper por función de la base (como DtekBackend en DtekPro). Ninguna pantalla llama a Supabase
-// directo. Las funciones y sus reglas están en apps/huella/database/200..206 (la fuente de verdad).
+// directo. Las funciones y sus reglas están en apps/huella/database/200..207 (la fuente de verdad).
 import { supabase, ErrorDeBase, enEspanol } from '@nucleo/datos/supabase'
+import { comprimirImagen } from '@nucleo/datos/fotos'
 
 // Los códigos propios de Huella en español; lo demás lo traduce el núcleo (sin permiso, solo lectura, etc.).
 const MENSAJES: [RegExp, string][] = [
@@ -29,8 +30,48 @@ const MENSAJES: [RegExp, string][] = [
   [/demasiadas_mascotas/, 'Son demasiadas a la vez (máximo 300).'],
   [/rango_invalido/, 'Elegí un rango de hasta 31 días.'],
   [/rol_invalido/, 'Elegí cómo entra esa persona.'],
+  [/archivo_invalido/, 'Esa foto no es de esta mascota. Subila otra vez.'],
+  [/demasiadas_fotos/, 'Son demasiadas fotos (máximo 8 por consulta).'],
   [/no_existe/, 'No encontramos eso. Recargá la página.'],
 ]
+
+// Fotos: bucket privado «huella-fotos», ruta <negocio>/<mascota>/<tipo>/<archivo> (207). Nunca hay enlace público: para
+// mostrarlas se pide un enlace firmado que vence en una hora. Los pedidos que llegan juntos (una lista de mascotas) salen en
+// una sola llamada.
+export type TipoFoto = 'perfil' | 'consulta' | 'etiqueta'
+const BUCKET = 'huella-fotos'
+const firmadas = new Map<string, Promise<string | null>>()
+let porFirmar: { ruta: string; listo: (u: string | null) => void }[] = []
+export function urlFoto(ruta: string): Promise<string | null> {
+  if (/^(https?:|blob:|data:)/.test(ruta)) return Promise.resolve(ruta)
+  const ya = firmadas.get(ruta)
+  if (ya) return ya
+  const p = new Promise<string | null>((listo) => {
+    porFirmar.push({ ruta, listo })
+    if (porFirmar.length > 1) return
+    setTimeout(async () => {
+      const lote = porFirmar; porFirmar = []
+      const { data } = await supabase.storage.from(BUCKET).createSignedUrls(lote.map((x) => x.ruta), 3600).catch(() => ({ data: null }))
+      for (const x of lote) {
+        const url = data?.find((d) => d.path === x.ruta)?.signedUrl ?? null
+        if (!url) firmadas.delete(x.ruta)
+        x.listo(url)
+      }
+    }, 0)
+  })
+  firmadas.set(ruta, p)
+  setTimeout(() => firmadas.delete(ruta), 50 * 60 * 1000)
+  return p
+}
+
+async function subirFoto(negocio: string, mascota: string, tipo: TipoFoto, archivo: Blob): Promise<string> {
+  const foto = await comprimirImagen(archivo)
+  const ext = foto.type === 'image/png' ? 'png' : foto.type === 'image/webp' ? 'webp' : 'jpg'
+  const ruta = `${negocio}/${mascota}/${tipo}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const { error } = await supabase.storage.from(BUCKET).upload(ruta, foto, { upsert: false, contentType: foto.type || 'image/jpeg' })
+  if (error) throw new ErrorDeBase('No pudimos subir la foto. Revisá la señal y probá otra vez.')
+  return ruta
+}
 
 async function rpc<T>(fn: string, args: Record<string, unknown> = {}): Promise<T> {
   const { data, error } = await supabase.rpc(fn, args)
@@ -96,15 +137,30 @@ export const Huella = {
     rpc<string>('dt_huella_crear_mascota', { p_negocio: negocio, p_cliente: cliente, p_nombre: m.nombre, p_especie: m.especie, p_raza: m.raza, p_sexo: m.sexo, p_nacimiento: m.nacimiento, p_aprox: m.aprox, p_esterilizada: null, p_microchip: m.microchip }),
   editarMascota: (id: string, datos: Record<string, unknown>) => rpc<void>('dt_huella_editar_mascota', { p_mascota: id, p_datos: datos }),
   anotarPeso: (id: string, kg: number) => rpc<string>('dt_huella_anotar_peso', { p_mascota: id, p_kg: kg, p_fecha: null }),
-  registrarDosis: (mascota: string, vacuna: string, fecha: string, lote: string | null) =>
-    rpc<string>('dt_huella_registrar_dosis', { p_mascota: mascota, p_vacuna: vacuna, p_realizada_en: fecha, p_lote: lote, p_laboratorio: null, p_foto: null }),
+  // Foto de perfil (207): se sube y después se pone en la mascota.
+  ponerFoto: async (negocio: string, mascota: string, archivo: Blob) => {
+    const ruta = await subirFoto(negocio, mascota, 'perfil', archivo)
+    await rpc<void>('dt_huella_poner_foto', { p_mascota: mascota, p_archivo: ruta })
+    return ruta
+  },
+  registrarDosis: async (negocio: string, mascota: string, vacuna: string, fecha: string, lote: string | null, etiqueta: Blob | null = null) => {
+    const foto = etiqueta ? await subirFoto(negocio, mascota, 'etiqueta', etiqueta) : null
+    return rpc<string>('dt_huella_registrar_dosis', { p_mascota: mascota, p_vacuna: vacuna, p_realizada_en: fecha, p_lote: lote, p_laboratorio: null, p_foto: foto })
+  },
   corregirDosis: (dosis: string, motivo: string) => rpc<void>('dt_huella_corregir_dosis', { p_dosis: dosis, p_motivo: motivo }),
   plan: (negocio: string, especie: Especie) => rpc<VacunaPlan[]>('dt_huella_plan_de', { p_negocio: negocio, p_especie: especie }),
   guardarVacuna: (negocio: string, v: { especie: Especie; nombre: string; tipo: string; intervalo_dias: number; cachorro_dosis: number; cachorro_cada_dias: number | null; activa: boolean }) =>
     rpc<string>('dt_huella_guardar_vacuna', { p_negocio: negocio, p_especie: v.especie, p_nombre: v.nombre, p_tipo: v.tipo, p_intervalo_dias: v.intervalo_dias, p_cachorro_dosis: v.cachorro_dosis, p_cachorro_cada_dias: v.cachorro_cada_dias, p_activa: v.activa }),
   // Consultas, línea de tiempo y carné (201)
-  registrarConsulta: (mascota: string, c: { motivo: string; diagnostico: string; tratamiento: string; notas: string; mensaje: string; peso: number | null; lugar: 'clinica' | 'domicilio'; medicamentos: Medicamento[] }) =>
-    rpc<string>('dt_huella_registrar_consulta', { p_mascota: mascota, p_motivo: c.motivo, p_diagnostico: c.diagnostico, p_tratamiento: c.tratamiento, p_notas_internas: c.notas, p_mensaje_familia: c.mensaje, p_peso_kg: c.peso, p_temperatura: null, p_lugar: c.lugar, p_fotos: [], p_medicamentos: c.medicamentos }),
+  // Las fotos se suben primero; la consulta guarda sus rutas. Si la clínica quiere, la familia titular las ve (207).
+  registrarConsulta: async (negocio: string, mascota: string, c: { motivo: string; diagnostico: string; tratamiento: string; notas: string; mensaje: string; peso: number | null; lugar: 'clinica' | 'domicilio'; medicamentos: Medicamento[]; fotos: Blob[]; fotosVisibles: boolean }) => {
+    const fotos: string[] = []
+    for (const f of c.fotos) fotos.push(await subirFoto(negocio, mascota, 'consulta', f))
+    const id = await rpc<string>('dt_huella_registrar_consulta', { p_mascota: mascota, p_motivo: c.motivo, p_diagnostico: c.diagnostico, p_tratamiento: c.tratamiento, p_notas_internas: c.notas, p_mensaje_familia: c.mensaje, p_peso_kg: c.peso, p_temperatura: null, p_lugar: c.lugar, p_fotos: fotos, p_medicamentos: c.medicamentos })
+    if (fotos.length && c.fotosVisibles) await rpc<void>('dt_huella_fotos_visibles', { p_consulta: id, p_visibles: true })
+    return id
+  },
+  fotosVisibles: (consulta: string, visibles: boolean) => rpc<void>('dt_huella_fotos_visibles', { p_consulta: consulta, p_visibles: visibles }),
   lineaTiempo: (mascota: string) => rpc<EventoLinea[]>('dt_huella_linea_tiempo', { p_mascota: mascota }),
   medicamentosHoy: (mascota: string) => rpc<MedicamentoHoy[]>('dt_huella_medicamentos_hoy', { p_mascota: mascota }),
   carne: (mascota: string) => rpc<Carne>('dt_huella_carne', { p_mascota: mascota }),
