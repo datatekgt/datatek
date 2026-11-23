@@ -375,11 +375,11 @@ begin
     select estado into v_estado from public.colonia_publicaciones where condominio_id = g.condominio_id and mes = g.mes;
     if v_estado in ('en_revision', 'aprobada', 'rechazada', 'publicada') and public.dt_colonia_soy_junta(g.condominio_id) then return true; end if;
     -- Ataque 20: el vecino ve la factura solo publicada, visible y con la transparencia encendida.
-    return v_estado = 'publicada' and g.visible and g.anulado_en is null and public.dt_colonia_soy_vecino(g.condominio_id)
-      and (select publicar_gasto from public.colonia_condominios where id = g.condominio_id);
+    return coalesce(v_estado = 'publicada' and g.visible and g.anulado_en is null and public.dt_colonia_soy_vecino(g.condominio_id)
+      and (select publicar_gasto from public.colonia_condominios where id = g.condominio_id), false);
   elsif v_partes[2] = 'reportes' then
     select * into r from public.colonia_reportes where id = v_id and negocio_id = v_neg;
-    return r.id is not null and (r.autor_id = auth.uid() or public.dt_tengo_capacidad(v_neg, 'ver_condominio'));
+    return coalesce(r.id is not null and (r.autor_id = auth.uid() or public.dt_tengo_capacidad(v_neg, 'ver_condominio')), false);
   end if;
   return false;
 end $$;
@@ -391,7 +391,7 @@ begin
   if array_length(v_partes, 1) <> 4 or p_nombre like '%..%' or v_partes[4] !~ '^[A-Za-z0-9._-]{1,80}$' then return false; end if;
   begin v_neg := v_partes[1]::uuid; v_id := v_partes[3]::uuid; exception when others then return false; end;
   if v_partes[2] = 'gastos' then
-    return public.dt_tengo_capacidad(v_neg, 'registrar_gasto') and exists (select 1 from public.colonia_gastos g where g.id = v_id and g.negocio_id = v_neg and g.anulado_en is null
+    return coalesce(public.dt_tengo_capacidad(v_neg, 'registrar_gasto'), false) and exists (select 1 from public.colonia_gastos g where g.id = v_id and g.negocio_id = v_neg and g.anulado_en is null
       and not exists (select 1 from public.colonia_publicaciones p where p.condominio_id = g.condominio_id and p.mes = g.mes and p.estado in ('en_revision', 'aprobada', 'publicada')));
   elsif v_partes[2] = 'reportes' then
     return exists (select 1 from public.colonia_reportes r where r.id = v_id and r.negocio_id = v_neg
