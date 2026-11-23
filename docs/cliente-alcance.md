@@ -143,3 +143,25 @@ para los demás.
 3. **Fuego:** ¿qué documento exige la inspección o la aseguradora en Guatemala?
 4. **Obra:** ¿el dueño pagaría más por cámara 24/7, o le basta el reporte semanal con fotos?
 5. **Huella:** ¿la veterinaria captura lote y fecha real de cada dosis? Sin eso la línea de tiempo no sirve.
+
+## El lado del negocio que alimenta al cliente
+
+Cada función del cliente necesita una herramienta del negocio que produzca el dato. Maqueta: página «Paneles por
+rubro», filas de abajo (dos pantallas por nicho, con un recuadro «así lo ve el cliente»).
+
+| Nicho | Herramienta del negocio | Alimenta en el cliente | Decisión | Reutiliza |
+|---|---|---|---|---|
+| Flota | Orden de trabajo: recepción firmada, diagnóstico, cotización por línea con su tipo, bitácora | Orden en vivo y aprobación por línea | V1 | Panel del taller de DtekPro (órdenes, `moveOrder`, cotización) |
+| Flota | Unidades de una flota: salud, último km y quién lo reportó, documentos | Mi flota y Garage de la unidad | V1 | `saludVehiculo`, vehículos de DtekPro |
+| Flota | Pedir kilometraje por WhatsApp a pilotos que no reportan | Radar de salud confiable | V1 | recordatorios |
+| Obra | Plan de la obra: fases con semanas y presupuesto, pagos atados a hitos, publicar al dueño | Gantt y pagos | V1 | — (nuevo) |
+| Obra | Visita del supervisor: checklist, avance por fase, fotos con fase, recibos, verificar y publicar, recibir fase | Fase por dentro y reporte semanal | V1 | checklist de recepción |
+| Huella | Registrar vacuna en la consulta: fecha real, lote, laboratorio, foto, próxima dosis calculada | Línea de tiempo y carné | V1 | historial y agenda |
+| Huella | Atrasadas y recordatorios: lista con último aviso, plantilla y cuántos avisos terminan en cita | «Lo que toca primero» | V1 | recordatorios |
+| Fuego | Visita de recarga: cada extintor se marca escaneando su QR, con sello y foto; la constancia se arma sola | Vida del extintor y constancia | V1 | N-03 página QR, PDF |
+| Fuego | Clientes y constancias, sugerencia de juntar recargas, cola de reportes del QR | Mis extintores | V1 (juntar recargas: después) | — |
+| Colonia | Gasto del mes: factura con foto, rubro, visible para vecinos, revisión de la junta antes de publicar | En qué se va mi cuota | V1 si la administración acepta | — |
+| Colonia | Reportes de vecinos por pasos, proveedor, cotización, aviso automático a quienes reportaron | Seguimiento de mi reporte | V1 | `OrdenEnVivo` |
+
+**Cambio de enfoque en Flota:** el panel de Flota era el portal de la empresa; ahora es el panel del taller D-TEK
+Flotas, porque el portal de la empresa pasó a ser la herramienta del cliente.
