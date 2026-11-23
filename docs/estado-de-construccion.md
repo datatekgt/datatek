@@ -1,8 +1,10 @@
 # Estado de la construcción
 
-Actualizado: 23 nov 2026. Plan: `docs/antes-de-construir/6-plan-de-construccion.md`. Nada de esto se ha corrido todavía en
-Supabase: por eso las migraciones se pudieron cambiar en su lugar mientras se construía. Desde que Dominic corra la primera,
-los cambios van en archivos nuevos.
+Actualizado: 23 nov 2026. Plan: `docs/antes-de-construir/6-plan-de-construccion.md`.
+
+**Supabase de Flota (`xlhaktvymmbnpotkmdct`): núcleo 01–06 y Flota 100–106 corridas el 23 nov 2026, las 13 verificaciones en
+true.** Desde aquí esas migraciones NO se cambian en su lugar: todo cambio va en un archivo nuevo (núcleo 07+, Flota 107+).
+Huella (200+) todavía no se ha corrido en ningún lado (va en su propio proyecto, D20).
 
 ## Etapa 0 · Núcleo
 
@@ -38,7 +40,7 @@ Pruebas al cierre de Flota: núcleo 102 comprobaciones, Flota 194, 37 ataques (0
 
 ## Lo que necesita a Dominic para publicar Flota
 
-1. Crear el proyecto de Supabase y correr las migraciones en orden (`docs/despliegue.md`); pegar las verificaciones.
+1. ~~Crear el proyecto de Supabase y correr las migraciones~~ Hecho el 23 nov 2026.
 2. Sandbox de Recurrente para probar un cobro real de punta a punta (N-03 «terminado cuando»).
 3. Cuenta de Meta para WhatsApp Business y las plantillas de `docs/antes-de-construir/8-plantillas-whatsapp.md` aprobadas.
 4. Dos archivos reales de flotas (anonimizados) para afinar el importador.
