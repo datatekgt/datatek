@@ -40,7 +40,7 @@ export function Placa() {
       <div className={`tarjeta placa-caja${p.perdida ? ' perdida' : ''}`}>
         {p.perdida && <div className="placa-alerta" role="alert">Me perdí: ayudame a volver a casa</div>}
         <div className="columna" style={{ alignItems: 'center', gap: 8, textAlign: 'center' }}>
-          <Avatar nombre={p.nombre} foto={p.foto} tam={112} />
+          <Avatar nombre={p.nombre} tam={112} />
           <h1 className="num" style={{ fontSize: 28 }}>{p.nombre}</h1>
           <span className="suave">{ESPECIE[p.especie]}{p.raza ? ` · ${p.raza}` : ''}</span>
           {p.perdida && p.mensaje ? <p className="placa-mensaje">«{p.mensaje}»</p> : !p.perdida && <p className="suave" style={{ margin: 0 }}>Hola, soy {p.nombre}. Mi familia me cuida.</p>}

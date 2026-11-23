@@ -69,8 +69,9 @@ const iso = (a: number, m: number, d: number) => `${a}-${String(m + 1).padStart(
 const sumarDias = (s: string, n: number) => { const d = new Date(s + 'T12:00:00'); d.setDate(d.getDate() + n); return iso(d.getFullYear(), d.getMonth(), d.getDate()) }
 export const textoFecha = (s: string) => new Date(s + 'T12:00:00').toLocaleDateString('es-GT', { weekday: 'long', day: 'numeric', month: 'long' })
 
-// Calendario desplegable con atajos. Valor 'YYYY-MM-DD' (día de Guatemala).
-export function Fecha({ rotulo, valor, alCambiar, min, max, atajos = 'futuro' }: { rotulo: string; valor: string | null; alCambiar: (v: string) => void; min?: string; max?: string; atajos?: 'futuro' | 'pasado' }) {
+// Calendario desplegable con atajos. Valor 'YYYY-MM-DD' (día de Guatemala). Con conAnio, el encabezado trae un selector de
+// año (para fechas lejanas, como un nacimiento, sin pasar mes por mes).
+export function Fecha({ rotulo, valor, alCambiar, min, max, atajos = 'futuro', conAnio = false }: { rotulo: string; valor: string | null; alCambiar: (v: string) => void; min?: string; max?: string; atajos?: 'futuro' | 'pasado'; conAnio?: boolean }) {
   const hoy = hoyGT()
   const base = valor || hoy
   const [abierto, setAbierto] = useState(false)
@@ -90,6 +91,9 @@ export function Fecha({ rotulo, valor, alCambiar, min, max, atajos = 'futuro' }:
   const fuera = (d: string) => (min != null && d < min) || (max != null && d > max)
   const rapidos = atajos === 'futuro' ? [['Hoy', hoy], ['Mañana', sumarDias(hoy, 1)], ['En una semana', sumarDias(hoy, 7)]] : [['Hoy', hoy], ['Ayer', sumarDias(hoy, -1)], ['Hace una semana', sumarDias(hoy, -7)]]
   const elegir = (d: string) => { alCambiar(d); setAbierto(false) }
+  useEffect(() => { if (conAnio && valor) setMes({ a: Number(valor.slice(0, 4)), m: Number(valor.slice(5, 7)) - 1 }) }, [valor, conAnio])
+  const anioHoy = Number(hoy.slice(0, 4))
+  const anios = conAnio ? Array.from({ length: 1 + (max ? Number(max.slice(0, 4)) : anioHoy + 5) - (min ? Number(min.slice(0, 4)) : anioHoy - 30) }, (_, i) => (max ? Number(max.slice(0, 4)) : anioHoy + 5) - i) : []
   return (
     <div className="campo" ref={caja} style={{ position: 'relative' }}>
       <span className="rotulo" id={id}>{rotulo}</span>
@@ -102,7 +106,14 @@ export function Fecha({ rotulo, valor, alCambiar, min, max, atajos = 'futuro' }:
         <div className="pop" role="dialog" aria-label={rotulo} style={{ top: 70, left: 0, width: 300 }}>
           <div className="fila-entre">
             <button type="button" className="btn-texto" aria-label="Mes anterior" onClick={() => setMes(({ a, m }) => (m === 0 ? { a: a - 1, m: 11 } : { a, m: m - 1 }))}>‹</button>
-            <strong>{MESES[mes.m]} {mes.a}</strong>
+            {conAnio ? (
+              <span className="fila" style={{ gap: 6 }}>
+                <strong>{MESES[mes.m]}</strong>
+                <select className="entrada" aria-label="Año" value={mes.a} onChange={(e) => setMes({ a: Number(e.target.value), m: mes.m })} style={{ width: 'auto', minHeight: 36, padding: '4px 8px' }}>
+                  {anios.map((a) => <option key={a} value={a}>{a}</option>)}
+                </select>
+              </span>
+            ) : <strong>{MESES[mes.m]} {mes.a}</strong>}
             <button type="button" className="btn-texto" aria-label="Mes siguiente" onClick={() => setMes(({ a, m }) => (m === 11 ? { a: a + 1, m: 0 } : { a, m: m + 1 }))}>›</button>
           </div>
           <div className="cal-grilla">

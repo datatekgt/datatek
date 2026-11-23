@@ -41,6 +41,7 @@ async function como(db, uid, fn) {
     } catch (e) { await db.exec('rollback').catch(() => {}); throw e }
   })
 }
+const PNG_1x1 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
 const J = (status, cuerpo) => ({ status, headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' }, body: cuerpo === undefined ? '' : JSON.stringify(cuerpo) })
 
 export function manejador(db, registro = []) {
@@ -68,6 +69,29 @@ export function manejador(db, registro = []) {
         const r = await como(db, uid, () => db.query('select * from public.dt_recurrente_pedir_enlace($1)', [cobro_id]))
         registro.push({ tipo: 'funcion', fn: 'recurrente-cobro', enlace: r.rows[0]?.enlace_id })
         return route.fulfill(J(200, { checkout_url: 'https://pago.falso/' + r.rows[0].enlace_id }))
+      }
+      // Storage mínimo: subir (INSERT en storage.objects, con las reglas reales del bucket), firmar (SELECT con las reglas: si
+      // la persona no puede abrirla, no hay enlace) y servir el enlace firmado con una imagen de 1×1. El contenido no se guarda.
+      const st = u.pathname.match(/^\/storage\/v1\/object\/(sign\/)?([\w-]+)(?:\/(.+))?$/)
+      if (st) {
+        const [, firma, bucket, rutaCod] = st
+        const ruta = rutaCod ? decodeURIComponent(rutaCod) : null
+        if (!firma && req.method() === 'POST' && ruta) {
+          await como(db, uid, () => db.query('insert into storage.objects (bucket_id, name, owner) values ($1, $2, $3)', [bucket, ruta, uid]))
+          registro.push({ tipo: 'subida', bucket, ruta })
+          return route.fulfill(J(200, { Key: `${bucket}/${ruta}`, Id: ruta }))
+        }
+        if (firma && req.method() === 'POST') {
+          const rutas = ruta ? [ruta] : (req.postDataJSON?.() ?? {}).paths || []
+          const vistas = await como(db, uid, async () => (await db.query('select name from storage.objects where bucket_id = $1 and name = any($2::text[])', [bucket, rutas])).rows.map((r) => r.name))
+          const enlace = (p) => `/object/sign/${bucket}/${p}?token=falso`
+          registro.push({ tipo: 'firma', bucket, rutas: rutas.length, vistas: vistas.length })
+          if (ruta) return route.fulfill(vistas.length ? J(200, { signedURL: enlace(ruta) }) : J(400, { statusCode: '404', error: 'not_found', message: 'Object not found' }))
+          return route.fulfill(J(200, rutas.map((p) => (vistas.includes(p) ? { path: p, error: null, signedURL: enlace(p) } : { path: p, error: 'Either the object does not exist or you do not have access to it', signedURL: null }))))
+        }
+        if (firma && req.method() === 'GET') {
+          return route.fulfill({ status: 200, headers: { 'content-type': 'image/png', 'access-control-allow-origin': '*' }, body: Buffer.from(PNG_1x1, 'base64') })
+        }
       }
       const rpc = u.pathname.match(/^\/rest\/v1\/rpc\/(\w+)/)
       if (rpc) {

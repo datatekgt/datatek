@@ -1,7 +1,9 @@
 // Expediente de una mascota (/panel/mascotas/:id): datos, vacunas con «Aplicar» (fecha REAL, hoy por defecto, y lote),
 // corregir una dosis con motivo (solo con corregir_dosis), consulta con medicamentos, peso, línea de tiempo, placa (asignar
-// del stock y modo perdido), carné e invitar a la familia. Cada botón aparece según la capacidad; la base vuelve a decidir.
-import { useState } from 'react'
+// del stock y modo perdido), carné e invitar a la familia. Fotos (207): la de perfil, las de la consulta (la clínica decide si
+// la familia titular las ve) y la de la etiqueta del frasco al aplicar, con «Escanear» el lote si el navegador sabe leer
+// códigos. Cada botón aparece según la capacidad; la base vuelve a decidir.
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { BotonesSel, Chip, Contador, Fecha, useAvisoDeshacer } from '@nucleo/controles'
@@ -9,7 +11,7 @@ import { useAccion, useCarga } from '@nucleo/datos/useCarga'
 import { Nucleo } from '@nucleo/datos/nucleo'
 import { hoyGT } from '@nucleo/formato'
 import { Huella, type Dosis, type Expediente as TExp, type Medicamento, type VacunaEstado } from '../datos'
-import { AgendarCita, Avatar, ChipVacuna, ESPECIE, Error, dia } from '../comun'
+import { AgendarCita, Avatar, ChipVacuna, ElegirFotos, ESPECIE, Error, FotoPrivada, Nacimiento, dia } from '../comun'
 
 export function Expediente() {
   const { id = '' } = useParams()
@@ -22,6 +24,7 @@ export function Expediente() {
   const m = exp.datos
   if (!m) return <><Error texto={exp.error} />{!exp.error && <p className="cargando">Cargando expediente…</p>}</>
   const ultimoPeso = m.pesos.length ? Number(m.pesos[m.pesos.length - 1].kg) : null
+  const etiquetas = Object.fromEntries((linea.datos || []).filter((e) => e.tipo === 'dosis' && typeof e.extra?.foto_etiqueta === 'string').map((e) => [e.id, e.extra.foto_etiqueta as string]))
   return (
     <>
       <Link to="/panel/mascotas" className="chico">‹ Mascotas</Link>
@@ -35,6 +38,7 @@ export function Expediente() {
           </div>
         </div>
         <div className="fila envolver">
+          {puede('ver_clientes') && <FotoPerfil m={m} alCambiar={(t) => { aviso.mostrar(t); recargar() }} />}
           <Link className="btn btn-sec" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }} to={`/carne/${m.id}`}>Carné</Link>
           {puede('ver_agenda') && !m.fallecida_en && <button className="btn" onClick={() => setAgendando((v) => !v)}>{agendando ? 'Cerrar' : 'Agendar cita'}</button>}
         </div>
@@ -43,7 +47,7 @@ export function Expediente() {
       {agendando && <section className="tarjeta" style={{ marginBottom: 16 }}><h2>Agendar cita para {m.nombre}</h2><AgendarCita mascota={m.id} alAgendar={(t) => { setAgendando(false); aviso.mostrar(t) }} alCancelar={() => setAgendando(false)} /></section>}
       <div className="grilla-2">
         <div className="columna" style={{ gap: 16 }}>
-          <Vacunas m={m} alCambiar={(t) => { aviso.mostrar(t); recargar() }} />
+          <Vacunas m={m} etiquetas={etiquetas} alCambiar={(t) => { aviso.mostrar(t); recargar() }} />
           {puede('registrar_consulta') && !m.fallecida_en && <Consulta m={m} ultimoPeso={ultimoPeso} alGuardar={(t) => { aviso.mostrar(t); recargar() }} />}
           <section className="tarjeta">
             <h2>Línea de tiempo</h2>
@@ -58,6 +62,8 @@ export function Expediente() {
                       {e.detalle && <div className="sub">{e.detalle}</div>}
                       {e.tipo === 'consulta' && typeof e.extra?.notas_internas === 'string' && <div className="sub"><b>Nota interna:</b> {e.extra.notas_internas}</div>}
                       {e.tipo === 'consulta' && typeof e.extra?.mensaje_familia === 'string' && <div className="sub"><b>A la familia:</b> {e.extra.mensaje_familia}</div>}
+                      {e.tipo === 'consulta' && Array.isArray(e.extra?.fotos) && e.extra.fotos.length > 0 && <FotosConsulta consulta={e.id} fotos={e.extra.fotos as string[]} visibles={e.extra.fotos_visibles === true} alCambiar={(t) => { aviso.mostrar(t); linea.recargar() }} />}
+                      {e.tipo === 'dosis' && typeof e.extra?.foto_etiqueta === 'string' && <div className="fotos-fila"><FotoPrivada ruta={e.extra.foto_etiqueta} texto={`Etiqueta de ${e.titulo}`} /></div>}
                     </div>
                   </li>
                 ))}
@@ -77,7 +83,38 @@ export function Expediente() {
   )
 }
 
-function Vacunas({ m, alCambiar }: { m: TExp; alCambiar: (t: string) => void }) {
+// Poner o cambiar la foto de perfil: se elige (o se toma), se achica y se sube en el momento.
+function FotoPerfil({ m, alCambiar }: { m: TExp; alCambiar: (t: string) => void }) {
+  const { negocio } = useSesion()
+  const entrada = useRef<HTMLInputElement>(null)
+  const acc = useAccion()
+  return (
+    <>
+      <input ref={entrada} type="file" accept="image/*" capture="environment" className="oculto-archivo" aria-label={`Foto de ${m.nombre}`}
+        onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) acc.correr(async () => { await Huella.ponerFoto(negocio!.negocio_id, m.id, f); alCambiar(`Foto de ${m.nombre} guardada.`) }) }} />
+      <button className="btn btn-sec" disabled={acc.ocupado} onClick={() => entrada.current?.click()}>{acc.ocupado ? 'Subiendo foto…' : m.foto ? 'Cambiar foto' : 'Poner foto'}</button>
+      {acc.error && <Error texto={acc.error} />}
+    </>
+  )
+}
+
+// Fotos de una consulta en la línea de tiempo; quien registra consultas decide si la familia titular las ve.
+function FotosConsulta({ consulta, fotos, visibles, alCambiar }: { consulta: string; fotos: string[]; visibles: boolean; alCambiar: (t: string) => void }) {
+  const { puede } = useSesion()
+  const acc = useAccion()
+  return (
+    <div className="columna" style={{ gap: 4 }}>
+      <div className="fotos-fila">{fotos.map((f, i) => <FotoPrivada key={f} ruta={f} texto={`Foto ${i + 1} de la consulta`} />)}</div>
+      <div className="fila envolver chico">
+        <span className="suave">{visibles ? 'La familia titular ve estas fotos.' : 'Solo la clínica ve estas fotos.'}</span>
+        {puede('registrar_consulta') && <button className="btn-texto chico" disabled={acc.ocupado} onClick={() => acc.correr(async () => { await Huella.fotosVisibles(consulta, !visibles); alCambiar(visibles ? 'Las fotos quedaron solo para la clínica.' : 'La familia titular ya ve las fotos.') })}>{visibles ? 'Ocultar a la familia' : 'Mostrar a la familia'}</button>}
+      </div>
+      <Error texto={acc.error} />
+    </div>
+  )
+}
+
+function Vacunas({ m, etiquetas, alCambiar }: { m: TExp; etiquetas: Record<string, string>; alCambiar: (t: string) => void }) {
   const { puede } = useSesion()
   const [aplicando, setAplicando] = useState<VacunaEstado | null>(null)
   const [corrigiendo, setCorrigiendo] = useState<Dosis | null>(null)
@@ -110,6 +147,7 @@ function Vacunas({ m, alCambiar }: { m: TExp; alCambiar: (t: string) => void }) 
               <div key={d.id}>
                 <div className={`fila-dato${d.anulada ? ' anulado' : ''}`}>
                   <div style={{ minWidth: 0 }}><div className="titulo">{d.nombre} · {dia(d.realizada_en)}</div><div className="sub">{d.anulada ? `Corregida: ${d.anulada_motivo}` : [d.lote && `Lote ${d.lote}`, d.laboratorio].filter(Boolean).join(' · ') || 'Sin lote'}</div></div>
+                  {etiquetas[d.id] && <FotoPrivada ruta={etiquetas[d.id]} texto={`Etiqueta de ${d.nombre} del ${dia(d.realizada_en)}`} />}
                   {d.anulada ? <Chip tono="neutro">Corregida</Chip> : puede('corregir_dosis') && corrigiendo?.id !== d.id && <button className="btn-texto chico" onClick={() => setCorrigiendo(d)} aria-label={`Corregir ${d.nombre} del ${dia(d.realizada_en)}`}>Corregir</button>}
                 </div>
                 {corrigiendo?.id === d.id && <Corregir d={d} alTerminar={(t) => { setCorrigiendo(null); if (t) alCambiar(t) }} />}
@@ -124,8 +162,10 @@ function Vacunas({ m, alCambiar }: { m: TExp; alCambiar: (t: string) => void }) 
 }
 
 function Aplicar({ m, v, alTerminar }: { m: TExp; v: VacunaEstado; alTerminar: (t?: string) => void }) {
+  const { negocio } = useSesion()
   const [fecha, setFecha] = useState(hoyGT())
   const [lote, setLote] = useState('')
+  const [etiqueta, setEtiqueta] = useState<File[]>([])
   const acc = useAccion()
   return (
     <div className="columna sub-caja">
@@ -134,9 +174,70 @@ function Aplicar({ m, v, alTerminar }: { m: TExp; v: VacunaEstado; alTerminar: (
         <Fecha rotulo="Se aplicó el" valor={fecha} alCambiar={setFecha} max={hoyGT()} min={m.nacimiento || undefined} atajos="pasado" />
         <div className="campo"><label htmlFor={`lote-${v.vacuna_id}`}>Lote del frasco (opcional)</label><input id={`lote-${v.vacuna_id}`} className="entrada" value={lote} onChange={(e) => setLote(e.target.value.toUpperCase())} placeholder="AB1234" /></div>
       </div>
+      <EscanearLote alLeer={(l) => setLote(l.toUpperCase())} />
+      <ElegirFotos rotulo="Foto de la etiqueta (opcional)" fotos={etiqueta} alCambiar={setEtiqueta} ayuda="Solo la clínica la ve. Sirve si después hay que revisar el lote." />
       <span className="suave chico">Se guarda la fecha en que se aplicó de verdad; la próxima sale sola de esa fecha.</span>
       <Error texto={acc.error} />
-      <div className="fila envolver"><button className="btn btn-chico" disabled={acc.ocupado} onClick={() => acc.correr(async () => { await Huella.registrarDosis(m.id, v.vacuna_id, fecha, lote.trim() || null); alTerminar(`${v.nombre} anotada el ${dia(fecha)}.`) })}>Guardar dosis</button><button className="btn btn-chico btn-sec" onClick={() => alTerminar()}>Cancelar</button></div>
+      <div className="fila envolver"><button className="btn btn-chico" disabled={acc.ocupado} onClick={() => acc.correr(async () => { await Huella.registrarDosis(negocio!.negocio_id, m.id, v.vacuna_id, fecha, lote.trim() || null, etiqueta[0] ?? null); alTerminar(`${v.nombre} anotada el ${dia(fecha)}.`) })}>{acc.ocupado && etiqueta.length ? 'Subiendo la foto…' : 'Guardar dosis'}</button><button className="btn btn-chico btn-sec" onClick={() => alTerminar()}>Cancelar</button></div>
+    </div>
+  )
+}
+
+// «Escanear» el código del frasco con la cámara si el navegador trae BarcodeDetector (Chrome en Android); si no, el botón no
+// aparece y el lote se escribe a mano. Un DataMatrix GS1 trae el lote en el campo (10): se saca solo ese dato.
+type Detector = { detect: (v: HTMLVideoElement) => Promise<{ rawValue: string }[]> }
+const ClaseDetector = () => (window as unknown as { BarcodeDetector?: new (o: { formats: string[] }) => Detector }).BarcodeDetector
+function loteDe(crudo: string): string {
+  const s = crudo.replace(/^\][A-Za-z]\d/, '')
+  const conParentesis = s.match(/\(10\)([^()]+)/)
+  if (conParentesis) return conParentesis[1].trim()
+  if (/^01\d{14}/.test(s)) {
+    const FIJOS: Record<string, number> = { '00': 18, '01': 14, '02': 14, '11': 6, '12': 6, '13': 6, '15': 6, '16': 6, '17': 6 }
+    let i = 0
+    for (let vueltas = 0; i < s.length && vueltas < 12; vueltas++) {
+      const ai = s.slice(i, i + 2)
+      if (FIJOS[ai]) { i += 2 + FIJOS[ai]; continue }
+      if (ai === '10' || ai === '21') {
+        const fin = s.indexOf('\u001d', i + 2)
+        if (ai === '10') return s.slice(i + 2, fin < 0 ? undefined : fin)
+        i = fin < 0 ? s.length : fin + 1
+        continue
+      }
+      break
+    }
+  }
+  return s.trim()
+}
+function EscanearLote({ alLeer }: { alLeer: (lote: string) => void }) {
+  const [camara, setCamara] = useState(false)
+  const [error, setError] = useState('')
+  const video = useRef<HTMLVideoElement>(null)
+  useEffect(() => {
+    if (!camara) return
+    const Clase = ClaseDetector()
+    if (!Clase) return
+    let flujo: MediaStream | null = null; let vivo = true
+    const detector = new Clase({ formats: ['data_matrix', 'code_128', 'qr_code', 'ean_13', 'code_39'] })
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(async (s) => {
+      flujo = s
+      if (!video.current) return
+      video.current.srcObject = s; await video.current.play()
+      while (vivo) {
+        const r = await detector.detect(video.current).catch(() => [])
+        const lote = r.length ? loteDe(r[0].rawValue) : ''
+        if (lote) { vivo = false; setCamara(false); alLeer(lote.slice(0, 40)); break }
+        await new Promise((ok) => setTimeout(ok, 300))
+      }
+    }).catch(() => { setError('No pudimos abrir la cámara. Escribí el lote.'); setCamara(false) })
+    return () => { vivo = false; flujo?.getTracks().forEach((t) => t.stop()) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [camara])
+  if (!ClaseDetector()) return null
+  return (
+    <div className="columna" style={{ gap: 6 }}>
+      {camara ? <><video ref={video} className="escaner-video" muted playsInline aria-label="Cámara apuntando al código del frasco" /><div><button type="button" className="btn btn-chico btn-sec" onClick={() => setCamara(false)}>Cerrar la cámara</button></div></>
+        : <div><button type="button" className="btn btn-chico btn-sec" onClick={() => { setError(''); setCamara(true) }}>Escanear el lote</button></div>}
+      <Error texto={error} />
     </div>
   )
 }
@@ -167,11 +268,14 @@ function Consulta({ m, ultimoPeso, alGuardar }: { m: TExp; ultimoPeso: number | 
   const [peso, setPeso] = useState(ultimoPeso ?? 5)
   const [lugar, setLugar] = useState<'clinica' | 'domicilio'>('clinica')
   const [meds, setMeds] = useState<Medicamento[]>([])
+  const [fotos, setFotos] = useState<File[]>([])
+  const [fotosVisibles, setFotosVisibles] = useState(false)
+  const { negocio } = useSesion()
   const acc = useAccion()
   const cambiarMed = (i: number, c: Partial<Medicamento>) => setMeds((xs) => xs.map((x, k) => (k === i ? { ...x, ...c } : x)))
   if (!abierta) return <div><button className="btn btn-sec" onClick={() => setAbierta(true)}>+ Consulta</button></div>
   const guardar = () => acc.correr(async () => {
-    await Huella.registrarConsulta(m.id, { motivo, diagnostico, tratamiento, notas, mensaje, peso: anotarPeso ? peso : null, lugar, medicamentos: meds.filter((x) => x.nombre.trim().length >= 2) })
+    await Huella.registrarConsulta(negocio!.negocio_id, m.id, { motivo, diagnostico, tratamiento, notas, mensaje, peso: anotarPeso ? peso : null, lugar, medicamentos: meds.filter((x) => x.nombre.trim().length >= 2), fotos, fotosVisibles })
     setAbierta(false)
     alGuardar(`Consulta de ${m.nombre} guardada.${mensaje ? ' La familia ve el mensaje.' : ''}`)
   })
@@ -208,8 +312,10 @@ function Consulta({ m, ultimoPeso, alGuardar }: { m: TExp; ultimoPeso: number | 
         </div>
       ))}
       <div><button className="btn btn-chico btn-sec" onClick={() => setMeds((xs) => [...xs, { nombre: '', dosis: '', cada_horas: 12, dias: 7, indicaciones: '' }])}>+ Medicamento</button></div>
+      <ElegirFotos rotulo="Fotos (opcional, hasta 8)" fotos={fotos} alCambiar={setFotos} max={8} />
+      {fotos.length > 0 && <label className="fila chico casilla"><input type="checkbox" checked={fotosVisibles} onChange={(e) => setFotosVisibles(e.target.checked)} /> La familia titular puede ver estas fotos</label>}
       <Error texto={acc.error} />
-      <div className="fila envolver"><button className="btn" disabled={acc.ocupado || motivo.trim().length < 3} onClick={guardar}>Guardar consulta</button><button className="btn btn-sec" onClick={() => setAbierta(false)}>Cancelar</button></div>
+      <div className="fila envolver"><button className="btn" disabled={acc.ocupado || motivo.trim().length < 3} onClick={guardar}>{acc.ocupado && fotos.length ? 'Subiendo fotos…' : 'Guardar consulta'}</button><button className="btn btn-sec" onClick={() => setAbierta(false)}>Cancelar</button></div>
       <span className="suave chico">Una consulta no se edita después: si algo faltó, se agrega otra.</span>
     </section>
   )
@@ -218,6 +324,7 @@ function Consulta({ m, ultimoPeso, alGuardar }: { m: TExp; ultimoPeso: number | 
 function Datos({ m, alGuardar }: { m: TExp; alGuardar: (t: string) => void }) {
   const [editando, setEditando] = useState(false)
   const [v, setV] = useState({ raza: m.raza || '', color: m.color || '', alergias: m.alergias || '', microchip: m.microchip || '', notas: m.notas || '' })
+  const [nac, setNac] = useState({ nacimiento: m.nacimiento, aprox: m.nacimiento_aprox })
   const acc = useAccion()
   const campo = (k: keyof typeof v, t: string, ph = '') => <div className="campo"><label htmlFor={`d-${k}`}>{t}</label><input id={`d-${k}`} className="entrada" value={v[k]} onChange={(e) => setV({ ...v, [k]: e.target.value })} placeholder={ph} /></div>
   return (
@@ -225,9 +332,10 @@ function Datos({ m, alGuardar }: { m: TExp; alGuardar: (t: string) => void }) {
       <div className="fila-entre"><h2>Datos</h2>{!editando && <button className="btn-texto chico" onClick={() => setEditando(true)}>Editar</button>}</div>
       {editando ? (
         <>
+          <Nacimiento valor={nac.nacimiento} aprox={nac.aprox} alCambiar={setNac} />
           {campo('raza', 'Raza')}{campo('color', 'Color', 'Café con blanco')}{campo('alergias', 'Alergias', 'Ninguna conocida')}{campo('microchip', 'Microchip', '15 dígitos')}{campo('notas', 'Notas de la clínica')}
           <Error texto={acc.error} />
-          <div className="fila envolver"><button className="btn btn-chico" disabled={acc.ocupado} onClick={() => acc.correr(async () => { await Huella.editarMascota(m.id, v); setEditando(false); alGuardar('Datos guardados.') })}>Guardar</button><button className="btn btn-chico btn-sec" onClick={() => setEditando(false)}>Cancelar</button></div>
+          <div className="fila envolver"><button className="btn btn-chico" disabled={acc.ocupado} onClick={() => acc.correr(async () => { await Huella.editarMascota(m.id, { ...v, ...(nac.nacimiento !== m.nacimiento || nac.aprox !== m.nacimiento_aprox ? { nacimiento: nac.nacimiento, nacimiento_aprox: nac.aprox } : {}) }); setEditando(false); alGuardar('Datos guardados.') })}>Guardar</button><button className="btn btn-chico btn-sec" onClick={() => setEditando(false)}>Cancelar</button></div>
         </>
       ) : (
         <dl className="datos">
