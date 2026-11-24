@@ -1,6 +1,7 @@
 // La placa del collar (/p/<código>): lo único público de Huella. Sin cuenta. Muestra el nombre, la foto y un botón para
 // avisar a la familia (con la ubicación, si quien la encontró da permiso; si no, avisa igual). El teléfono solo aparece en
-// modo perdido. Nunca muestra dirección ni apellido (la base tampoco los manda).
+// modo perdido, y la foto también (208: la base solo manda la ruta y solo firma esa foto si está perdida). Nunca muestra
+// dirección ni apellido (la base tampoco los manda).
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAccion, useCarga } from '@nucleo/datos/useCarga'
@@ -40,7 +41,7 @@ export function Placa() {
       <div className={`tarjeta placa-caja${p.perdida ? ' perdida' : ''}`}>
         {p.perdida && <div className="placa-alerta" role="alert">Me perdí: ayudame a volver a casa</div>}
         <div className="columna" style={{ alignItems: 'center', gap: 8, textAlign: 'center' }}>
-          <Avatar nombre={p.nombre} tam={112} />
+          <Avatar nombre={p.nombre} foto={p.foto} tam={112} />
           <h1 className="num" style={{ fontSize: 28 }}>{p.nombre}</h1>
           <span className="suave">{ESPECIE[p.especie]}{p.raza ? ` · ${p.raza}` : ''}</span>
           {p.perdida && p.mensaje ? <p className="placa-mensaje">«{p.mensaje}»</p> : !p.perdida && <p className="suave" style={{ margin: 0 }}>Hola, soy {p.nombre}. Mi familia me cuida.</p>}

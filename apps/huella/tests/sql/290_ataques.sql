@@ -37,7 +37,7 @@ reset role;
 select prueba.como(:'atacante'); set role authenticated;
 select prueba.afirmar((select count(*) from public.mascotas) + (select count(*) from public.dosis) + (select count(*) from public.citas) + (select count(*) from public.consultas)
   + (select count(*) from public.placas) + (select count(*) from public.clientes) = 0, '1d · una cuenta nueva no lee nada');
-select prueba.debe_fallar($$ insert into public.dosis (mascota_id, vacuna_id, nombre, realizada_en) values ('$$ || :'canela' || $$', '$$ || :'rabia' || $$', 'X', current_date) $$, '1e · no inserta dosis');
+select prueba.debe_fallar($$ insert into public.dosis (mascota_id, vacuna_id, nombre, realizada_en) values ('$$ || :'canela' || $$', '$$ || :'rabia' || $$', 'X', (now() at time zone 'America/Guatemala')::date) $$, '1e · no inserta dosis');
 select prueba.debe_fallar($$ update public.placas set modo_perdido = true $$, '1f · no edita placas');
 select prueba.debe_fallar($$ delete from public.citas $$, '1g · no borra citas');
 -- 2 y 3
@@ -48,9 +48,9 @@ reset role;
 -- 4. Cruces con ids de otra clínica
 select prueba.como(:'dueno2'); set role authenticated;
 select prueba.debe_fallar($$ select public.dt_huella_mascota('$$ || :'canela' || $$') $$, '4a · la clínica B no ve el expediente de A');
-select prueba.debe_fallar($$ select public.dt_huella_registrar_dosis('$$ || :'canela' || $$', '$$ || :'rabia' || $$', current_date) $$, '4b · ni le pone vacunas');
+select prueba.debe_fallar($$ select public.dt_huella_registrar_dosis('$$ || :'canela' || $$', '$$ || :'rabia' || $$', (now() at time zone 'America/Guatemala')::date) $$, '4b · ni le pone vacunas');
 select prueba.debe_fallar($$ select public.dt_huella_registrar_consulta('$$ || :'canela' || $$', 'Consulta falsa') $$, '4c · ni consultas');
-select prueba.debe_fallar($$ select * from public.dt_huella_agenda('$$ || :'neg' || $$', current_date, current_date + 20) $$, '4d · ni ve su agenda');
+select prueba.debe_fallar($$ select * from public.dt_huella_agenda('$$ || :'neg' || $$', (now() at time zone 'America/Guatemala')::date, (now() at time zone 'America/Guatemala')::date + 20) $$, '4d · ni ve su agenda');
 select prueba.debe_fallar($$ select public.dt_huella_mover_cita('$$ || :'cita' || $$', now() + interval '3 days') $$, '4e · ni le mueve citas');
 select prueba.debe_fallar($$ select public.dt_huella_crear_mascota('$$ || :'neg2' || $$', '$$ || :'cli' || $$', 'Robada', 'perro') $$, '4f · ni registra mascotas a un cliente de A');
 select prueba.debe_fallar($$ select public.dt_huella_importar('$$ || :'neg' || $$', '[{"mascota":"X","dueno":"Y","especie":"perro"}]') $$, '4g · ni importa a la clínica A');
@@ -65,7 +65,7 @@ select prueba.como(:'dueno'); set role authenticated;
 select public.dt_huella_avisar(array[:'canela']::uuid[]);
 select prueba.afirmar((public.dt_huella_avisar(array[:'canela']::uuid[]) ->> 'enviados')::int = 0, '8 · el mismo aviso no se repite y no gasta el tope');
 reset role;
--- 9. Funciones abiertas a anon: solo la lista blanca de la placa
+-- 9. Funciones abiertas a anon: solo la lista blanca de la placa (dt_placa_foto_perdida: la regla del bucket, 208)
 select prueba.afirmar(prueba.abiertas_a_anon() <@ prueba.lista_blanca_anon() and array['dt_placa_avisar', 'dt_placa_ver'] <@ prueba.abiertas_a_anon()
   and not exists (select 1 from unnest(prueba.abiertas_a_anon()) f where f like 'dt\_huella%'), '9 · de Huella solo dt_placa_ver y dt_placa_avisar están abiertas a anon (y nada fuera de la lista blanca)');
 -- 10. XSS: lo que escribe la gente se guarda como texto y vuelve igual (la pantalla de React lo escapa; nunca se arma HTML en la base)
@@ -104,7 +104,7 @@ select prueba.debe_fallar($$ select * from public.dt_huella_mascotas('$$ || :'ne
 reset role;
 -- 18. Cambiar la fecha real de una dosis ya registrada
 select prueba.como(:'vet'); set role authenticated;
-select prueba.debe_fallar($$ update public.dosis set realizada_en = current_date where id = '$$ || :'dosis' || $$' $$, '18a · nadie cambia la fecha en la tabla');
+select prueba.debe_fallar($$ update public.dosis set realizada_en = (now() at time zone 'America/Guatemala')::date where id = '$$ || :'dosis' || $$' $$, '18a · nadie cambia la fecha en la tabla');
 select prueba.debe_fallar($$ select public.dt_huella_corregir_dosis('$$ || :'dosis' || $$', 'Cambio la fecha') $$, '18b · la veterinaria no corrige (solo jefe o dueño)');
 reset role;
 select prueba.como(:'dueno'); set role authenticated;
