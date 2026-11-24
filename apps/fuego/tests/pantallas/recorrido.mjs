@@ -307,6 +307,10 @@ const inicioRegistro = registro.length
   await pagina.getByRole('heading', { name: 'Importación lista' }).waitFor()
   ok((await q(`select count(*)::int n from public.fuego_extintores where etiqueta like 'HF-%'`))[0].n === 3, 'se vuelve a importar limpio')
   ok(await sinScrollLateral(pagina), 'Importar no se sale de lado a 1024 px')
+  await pagina.getByRole('link', { name: 'Imprimir sus etiquetas QR' }).click()
+  await pagina.getByRole('article', { name: 'Etiqueta HF-03' }).waitFor()
+  ok(await pagina.getByLabel(/Hotel Las Flores · Hotel Zona 9/).isChecked() && (await pagina.getByRole('article').count()) === 3,
+    'desde la importación, la hoja abre con su local marcado y sus 3 etiquetas (310)')
 
   // Calendario del mes
   await pagina.getByRole('link', { name: 'Ruta' }).click()

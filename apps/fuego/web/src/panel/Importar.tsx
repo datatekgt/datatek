@@ -77,7 +77,7 @@ export function Importar() {
           <Error texto={acc.error} />
           <div className="fila envolver">
             <Link className="btn" to="/panel/clientes">Listo</Link>
-            <Link className="btn btn-sec" to="/panel/etiquetas">Imprimir sus etiquetas QR</Link>
+            <Link className="btn btn-sec" to={`/panel/etiquetas?importacion=${resultado.importacion}`}>Imprimir sus etiquetas QR</Link>
             <button className="btn btn-sec" disabled={acc.ocupado} onClick={deshacer}>Deshacer la importación</button>
           </div>
           <span className="suave chico">Se puede deshacer durante 24 horas. Deshacer borra lo que se creó y todavía no se usó; lo que se actualizó no vuelve atrás.</span>

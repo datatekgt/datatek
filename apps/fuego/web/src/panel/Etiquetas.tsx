@@ -2,7 +2,7 @@
 // de la página pública del extintor (<origen>/q/<código>), el nombre de la recargadora, la etiqueta y la ubicación.
 // El QR se arma aquí mismo como SVG (qrcode-generator): nada sale a un servicio externo y el CSP no tiene que abrir nada.
 // Se imprime en hoja carta, 10 por hoja de 4 × 2 pulgadas (el formato de las hojas de stickers comunes, tipo Avery 5163).
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import qrcode from 'qrcode-generator'
 import { useSesion } from '@nucleo/acceso/Sesion'
@@ -59,6 +59,10 @@ export function Etiquetas() {
   const [elegidos, setElegidos] = useState<string[]>(() => params.getAll('local'))
   const [propios, setPropios] = useState(params.get('propios') === '1')
   const [quitadas, setQuitadas] = useState<Set<string>>(new Set())
+  // Recién importado: deja marcados los locales de esa importación (310) para imprimir todo de una vez.
+  const importacion = params.get('importacion')
+  const deImportacion = useCarga(() => (importacion ? Fuego.localesDeImportacion(importacion) : Promise.resolve(null)), [importacion])
+  useEffect(() => { if (deImportacion.datos?.length) setElegidos((xs) => [...new Set([...xs, ...deImportacion.datos!])]) }, [deImportacion.datos])
   const clave = [...elegidos].sort().join(',')
   const hay = elegidos.length > 0 || propios
   const etq = useCarga(() => (hay ? Fuego.etiquetas(neg, elegidos.length ? elegidos : [], propios) : Promise.resolve([])), [neg, clave, propios])
@@ -85,7 +89,7 @@ export function Etiquetas() {
           ))}
           <label className="fila chico"><input type="checkbox" checked={propios} onChange={(x) => setPropios(x.target.checked)} /> Extintores de préstamo de la recargadora</label>
         </div>
-        <Error texto={locales.error || etq.error} />
+        <Error texto={locales.error || etq.error || deImportacion.error} />
       </section>
       {!hay ? <p className="vacio no-imprimir">Elegí uno o más locales para armar la hoja.</p>
         : etq.cargando ? <p className="cargando">Cargando…</p>

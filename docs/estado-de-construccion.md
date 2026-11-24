@@ -4,8 +4,8 @@ Actualizado: 23 nov 2026. Plan: `docs/antes-de-construir/6-plan-de-construccion.
 
 **Supabase compartido (`xlhaktvymmbnpotkmdct`), corrido el 23 y 24 nov 2026 con todas las verificaciones en true:** núcleo 01–09,
 Flota 100–106, Huella 200–207, Fuego 300–309, Colonia 400–407 y Obra 500–507 (lista exacta en `database/corridas-en-supabase.txt`). Lo corrido
-NO se cambia en su lugar: todo cambio va en un archivo nuevo (núcleo 10+, Flota 107+, Huella 208+, Fuego 310+, Colonia 408+,
-Obra 508+). No hay nada pendiente de correr; `npm run supabase:pendientes` arma un solo archivo con lo que falte y su verificación.
+NO se cambia en su lugar: todo cambio va en un archivo nuevo (núcleo 10+, Flota 107+, Huella 209+, Fuego 311+, Colonia 408+,
+Obra 508+). **Pendiente de correr: Huella 208 (foto en la placa perdida) y Fuego 310 (locales de una importación).** `npm run supabase:pendientes` arma un solo archivo con lo que falte y su verificación.
 
 ## Etapa 0 · Núcleo
 

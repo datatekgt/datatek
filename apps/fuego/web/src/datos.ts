@@ -129,6 +129,7 @@ export const Fuego = {
     rpc<ResultadoImportar>('dt_fuego_importar', { p_negocio: negocio, p_filas: filas, p_archivo: archivo, p_cuenta: cuenta }),
   deshacerImportacion: (imp: string) => rpc<{ servicios: number; extintores: number; locales: number; clientes: number }>('dt_fuego_deshacer_importacion', { p_importacion: imp }),
   // 309 · etiquetas, extintores de préstamo y calendario
+  localesDeImportacion: (imp: string) => rpc<string[]>('dt_fuego_locales_de_importacion', { p_importacion: imp }),
   etiquetas: (negocio: string, locales: string[] | null, propios: boolean) => rpc<EtiquetaQR[]>('dt_fuego_etiquetas', { p_negocio: negocio, p_locales: locales, p_propios: propios }),
   propios: (negocio: string) => rpc<Propio[]>('dt_fuego_extintores_propios', { p_negocio: negocio }),
   calendario: (negocio: string, desde: string, hasta: string) => rpc<VisitaMes[]>('dt_fuego_calendario', { p_negocio: negocio, p_desde: desde, p_hasta: hasta }),
