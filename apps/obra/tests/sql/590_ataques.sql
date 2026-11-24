@@ -56,9 +56,9 @@ select public.dt_cobro_crear(:'neg', :'cli', 'hito', :'h_cim', 'Casa familia Ló
 update public.obra_hitos set estado = 'liberado', liberado_en = now() - interval '9 weeks', cobro_id = :'cobro_cim' where id = :'h_cim';
 select prueba.crear_usuario('+50255550066') as atacante \gset
 select prueba.como(:'campo'); set role authenticated;
-select public.dt_obra_registrar_visita(:'obra', current_date, '[{"punto": "Hierro", "ok": true}]', jsonb_build_array(jsonb_build_object('fase', :'f_losa', 'avance', 70))) as vis \gset
+select public.dt_obra_registrar_visita(:'obra', public.dt_obra_hoy(), '[{"punto": "Hierro", "ok": true}]', jsonb_build_array(jsonb_build_object('fase', :'f_losa', 'avance', 70))) as vis \gset
 select public.dt_obra_subir_foto(:'obra', :'f_losa', :'obra' || '/' || :'f_losa' || '/a.jpg', 'Losa', now(), true, :'vis') as foto \gset
-select public.dt_obra_cargar_recibo(:'obra', :'f_losa', 'materiales', 'Ferretería', 'Hierro', 5600, current_date, :'obra' || '/recibos/r.jpg') as recibo \gset
+select public.dt_obra_cargar_recibo(:'obra', :'f_losa', 'materiales', 'Ferretería', 'Hierro', 5600, public.dt_obra_hoy(), :'obra' || '/recibos/r.jpg') as recibo \gset
 select public.dt_obra_subir_reporte(:'obra', 14, 'Semana de hierro') as rep \gset
 select public.dt_obra_proponer_cambio(:'obra', 'Ventana más grande', 3400) as cambio \gset
 reset role;
@@ -88,7 +88,7 @@ select prueba.debe_fallar($$ select public.dt_obra_obra('$$ || :'obra' || $$') $
 select prueba.debe_fallar($$ select public.dt_obra_fase('$$ || :'f_losa' || $$') $$, '4b · ni una fase');
 select prueba.debe_fallar($$ select public.dt_obra_guardar_fase('$$ || :'obra' || $$', '$$ || :'f_losa' || $$', 'Losa', 0, 20) $$, '4c · ni cambia el plan');
 select prueba.debe_fallar($$ select public.dt_obra_guardar_hito('$$ || :'obra' || $$', '$$ || :'h_losa' || $$', 'fase', '$$ || :'f_losa' || $$', 'Pago 3', 1) $$, '4d · ni el monto de un hito');
-select prueba.debe_fallar($$ select public.dt_obra_registrar_visita('$$ || :'obra' || $$', current_date, '[]', '[]') $$, '4e · ni registra visitas');
+select prueba.debe_fallar($$ select public.dt_obra_registrar_visita('$$ || :'obra' || $$', public.dt_obra_hoy(), '[]', '[]') $$, '4e · ni registra visitas');
 select prueba.debe_fallar($$ select public.dt_obra_subir_foto('$$ || :'obra' || $$', '$$ || :'f_losa' || $$', '$$ || :'obra' || '/' || :'f_losa' || $$/x.jpg', 'X', now()) $$, '4f · ni sube fotos');
 select prueba.debe_fallar($$ select public.dt_obra_verificar_reporte('$$ || :'rep' || $$') $$, '4g · ni verifica reportes');
 select prueba.debe_fallar($$ select public.dt_obra_publicar_reporte('$$ || :'rep' || $$') $$, '4h · ni publica');
@@ -144,7 +144,7 @@ select prueba.debe_fallar($$ select public.dt_obra_cobrar_anticipo('$$ || :'h_lo
 select prueba.debe_fallar($$ insert into public.cobros (negocio_id, cliente_id, origen, origen_id, concepto, monto) values ('$$ || :'neg' || $$', '$$ || :'cli' || $$', 'hito', '$$ || :'h_losa' || $$', 'Pago 3', 62000) $$, '28d · ni lo escribe en la tabla de cobros');
 reset role;
 select prueba.como(:'campo'); set role authenticated;
-select public.dt_obra_registrar_visita(:'obra', current_date, '[]', jsonb_build_array(jsonb_build_object('fase', :'f_losa', 'avance', 100)));
+select public.dt_obra_registrar_visita(:'obra', public.dt_obra_hoy(), '[]', jsonb_build_array(jsonb_build_object('fase', :'f_losa', 'avance', 100)));
 select prueba.debe_fallar($$ select public.dt_obra_recibir_fase('$$ || :'f_losa' || $$') $$, '28e · el supervisor de campo no recibe (le falta recibir_fase)');
 reset role;
 select prueba.como(:'dueno_obra'); set role authenticated;
@@ -181,12 +181,12 @@ select prueba.como(:'jefe'); set role authenticated;
 select public.dt_obra_programar_visita(:'obra2', now() + interval '2 days') as ev_ajeno \gset
 reset role;
 select prueba.como(:'campo'); set role authenticated;
-select prueba.afirmar(not exists (select 1 from public.dt_obra_calendario(:'neg', current_date, current_date + 14) where obra_id = :'obra2'), '31a · el supervisor de campo no ve las visitas de una obra que no tiene asignada');
+select prueba.afirmar(not exists (select 1 from public.dt_obra_calendario(:'neg', public.dt_obra_hoy(), public.dt_obra_hoy() + 14) where obra_id = :'obra2'), '31a · el supervisor de campo no ve las visitas de una obra que no tiene asignada');
 select prueba.debe_fallar($$ select public.dt_evento_mover('$$ || :'ev_ajeno' || $$', now() + interval '9 days', true) $$, '31b · ni la mueve (y no le manda un aviso al dueño)');
 select prueba.debe_fallar($$ select * from public.dt_obra_equipo('$$ || :'neg' || $$') $$, '31c · ni lista al equipo');
 reset role;
 select prueba.como(:'dueno2'); set role authenticated;
-select prueba.debe_fallar($$ select * from public.dt_obra_calendario('$$ || :'neg' || $$', current_date, current_date + 14) $$, '31d · otra supervisora no lee nuestro calendario');
+select prueba.debe_fallar($$ select * from public.dt_obra_calendario('$$ || :'neg' || $$', public.dt_obra_hoy(), public.dt_obra_hoy() + 14) $$, '31d · otra supervisora no lee nuestro calendario');
 select prueba.debe_fallar($$ select * from public.dt_obra_equipo('$$ || :'neg' || $$') $$, '31e · ni nuestro equipo');
 select prueba.debe_fallar($$ select public.dt_obra_asignar_supervisor('$$ || :'obra' || $$', '$$ || :'dueno2' || $$') $$, '31f · ni se asigna como supervisor de nuestra obra');
 reset role;

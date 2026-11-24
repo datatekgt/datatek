@@ -70,11 +70,11 @@ select prueba.afirmar((select estado from public.eventos where id = :'ev') = 'he
 reset role;
 select prueba.afirmar((select count(*) from public.bitacora where objeto = 'visita' and objeto_id = :'vis') = 1, 'la visita va a la bitácora');
 select prueba.como(:'campo'); set role authenticated;
-select prueba.debe_fallar($$ select public.dt_obra_registrar_visita('$$ || :'obra' || $$', current_date + 2, '[]', '[]') $$, 'una visita no se anota en el futuro (D11)');
-select prueba.debe_fallar($$ select public.dt_obra_registrar_visita('$$ || :'obra' || $$', current_date, '[]', '[{"fase": "$$ || :'f_losa' || $$", "avance": 120}]') $$, 'el avance no pasa de 100');
-select prueba.debe_fallar($$ select public.dt_obra_registrar_visita('$$ || :'obra' || $$', current_date, '[]', '[{"fase": "$$ || :'g_col' || $$", "avance": 50}]') $$, 'ni toca una fase de otra obra');
-select prueba.debe_fallar($$ select public.dt_obra_registrar_visita('$$ || :'obra' || $$', current_date, '[]', '[{"fase": "$$ || :'f_muros' || $$", "avance": 90}]') $$, 'una fase recibida ya no cambia su avance');
-select prueba.debe_fallar($$ select public.dt_obra_registrar_visita('$$ || :'obra2' || $$', current_date, '[]', '[]') $$, 'el supervisor de campo no registra visitas en una obra que no es suya');
+select prueba.debe_fallar($$ select public.dt_obra_registrar_visita('$$ || :'obra' || $$', public.dt_obra_hoy() + 2, '[]', '[]') $$, 'una visita no se anota en el futuro (D11)');
+select prueba.debe_fallar($$ select public.dt_obra_registrar_visita('$$ || :'obra' || $$', public.dt_obra_hoy(), '[]', '[{"fase": "$$ || :'f_losa' || $$", "avance": 120}]') $$, 'el avance no pasa de 100');
+select prueba.debe_fallar($$ select public.dt_obra_registrar_visita('$$ || :'obra' || $$', public.dt_obra_hoy(), '[]', '[{"fase": "$$ || :'g_col' || $$", "avance": 50}]') $$, 'ni toca una fase de otra obra');
+select prueba.debe_fallar($$ select public.dt_obra_registrar_visita('$$ || :'obra' || $$', public.dt_obra_hoy(), '[]', '[{"fase": "$$ || :'f_muros' || $$", "avance": 90}]') $$, 'una fase recibida ya no cambia su avance');
+select prueba.debe_fallar($$ select public.dt_obra_registrar_visita('$$ || :'obra2' || $$', public.dt_obra_hoy(), '[]', '[]') $$, 'el supervisor de campo no registra visitas en una obra que no es suya');
 -- Fotos: solo rutas del bucket de ESTA obra y fase.
 select public.dt_obra_subir_foto(:'obra', :'f_losa', :'obra' || '/' || :'f_losa' || '/losa-hierro-1.jpg', 'Losa · hierro', now(), true, :'vis') as foto1 \gset
 select public.dt_obra_subir_foto(:'obra', :'f_inst', :'obra' || '/' || :'f_inst' || '/tuberia.jpg', 'Instalaciones', now(), true) as foto2 \gset
@@ -82,8 +82,8 @@ select prueba.afirmar((select semana from public.obra_fotos where id = :'foto1')
 select prueba.debe_fallar($$ select public.dt_obra_subir_foto('$$ || :'obra' || $$', '$$ || :'f_losa' || $$', 'https://fotos.publicas.com/losa.jpg', 'X', now()) $$, 'un enlace público no se acepta como foto');
 select prueba.debe_fallar($$ select public.dt_obra_subir_foto('$$ || :'obra' || $$', '$$ || :'f_losa' || $$', '$$ || :'obra2' || $$/x/y.jpg', 'X', now()) $$, 'ni una ruta de otra obra');
 select prueba.debe_fallar($$ select public.dt_obra_subir_foto('$$ || :'obra' || $$', '$$ || :'f_losa' || $$', '$$ || :'obra' || '/' || :'f_losa' || $$/../../otra.jpg', 'X', now()) $$, 'ni una ruta que se sale de la carpeta');
-select public.dt_obra_cargar_recibo(:'obra', :'f_losa', 'materiales', 'Ferretería El Volcán', 'Hierro de 3/8 · 40 varillas', 5600, current_date, :'obra' || '/recibos/hierro.jpg') as rec \gset
-select prueba.debe_fallar($$ select public.dt_obra_cargar_recibo('$$ || :'obra' || $$', '$$ || :'f_losa' || $$', 'materiales', 'X', 'Y', 10, current_date, '$$ || :'obra' || '/' || :'f_losa' || $$/hierro.jpg') $$, 'la foto de un recibo va en la carpeta de recibos');
+select public.dt_obra_cargar_recibo(:'obra', :'f_losa', 'materiales', 'Ferretería El Volcán', 'Hierro de 3/8 · 40 varillas', 5600, public.dt_obra_hoy(), :'obra' || '/recibos/hierro.jpg') as rec \gset
+select prueba.debe_fallar($$ select public.dt_obra_cargar_recibo('$$ || :'obra' || $$', '$$ || :'f_losa' || $$', 'materiales', 'X', 'Y', 10, public.dt_obra_hoy(), '$$ || :'obra' || '/' || :'f_losa' || $$/hierro.jpg') $$, 'la foto de un recibo va en la carpeta de recibos');
 -- Reporte semanal
 select public.dt_obra_subir_reporte(:'obra', 14, 'Se armó el hierro de la losa y avanzó la tubería eléctrica.', 'Faltan 2 puntales') as rep \gset
 select public.dt_obra_subir_reporte(:'obra', 13, 'Semana sin visita') as rep13 \gset

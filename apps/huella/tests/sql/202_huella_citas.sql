@@ -58,7 +58,7 @@ select prueba.afirmar((select estado || '/' || pedida_por from public.citas wher
 select prueba.debe_fallar($$ select public.dt_huella_agendar('$$ || :'rocky' || $$', '$$ || :'consulta' || $$', '$$ || :'a_las_930' || $$') $$, 'no agenda para la mascota de otra familia');
 select prueba.afirmar((select count(*) from public.dt_huella_mis_citas(:'neg')) = 2, 've sus dos citas');
 select prueba.afirmar((select count(*) from public.citas) = 2, 'leyendo la tabla directo no ve las citas de otros');
-select prueba.debe_fallar($$ select * from public.dt_huella_agenda('$$ || :'neg' || $$', current_date, current_date + 20) $$, 'no ve la agenda de la clínica');
+select prueba.debe_fallar($$ select * from public.dt_huella_agenda('$$ || :'neg' || $$', (now() at time zone 'America/Guatemala')::date, (now() at time zone 'America/Guatemala')::date + 20) $$, 'no ve la agenda de la clínica');
 select public.dt_huella_cerrar_cita(:'c3', 'cancelada', 'Salimos de viaje');
 select prueba.debe_fallar($$ select public.dt_huella_cerrar_cita('$$ || :'c1' || $$', 'atendida') $$, 'la familia no marca atendida');
 reset role;

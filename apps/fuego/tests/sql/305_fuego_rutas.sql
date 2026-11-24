@@ -39,7 +39,7 @@ select prueba.debe_fallar($$ select public.dt_fuego_programar_visita('$$ || :'v1
 select prueba.debe_fallar($$ select * from public.dt_fuego_hoy('$$ || :'neg' || $$') $$, 'ni ve el panel');
 reset role;
 select prueba.como(:'caja'); set role authenticated;
-select prueba.debe_fallar($$ select * from public.dt_fuego_ruta('$$ || :'neg' || $$', current_date) $$, 'caja no ve rutas');
+select prueba.debe_fallar($$ select * from public.dt_fuego_ruta('$$ || :'neg' || $$', (now() at time zone 'America/Guatemala')::date) $$, 'caja no ve rutas');
 reset role;
 
 -- La empresa pide visita; el jefe la programa con Luis y luego la mueve.

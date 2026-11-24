@@ -28,7 +28,7 @@ select prueba.debe_fallar($$ select public.dt_flota_crear_orden('$$ || :'ua' || 
 select prueba.debe_fallar($$ select public.dt_flota_agregar_unidad('$$ || :'flota' || $$', 'P-222BBB', 'Toyota', 'Yaris', 2020, 1) $$, 'no agrega unidades');
 select prueba.debe_fallar($$ select public.dt_flota_crear('$$ || :'neg' || $$', '$$ || :'cli' || $$', 'Otra', 0, 0) $$, 'no crea flotas');
 select prueba.debe_fallar($$ select public.dt_flota_cotizar_linea('$$ || :'o1' || $$', 'Discos', 'Rayados', 'recomendado', 1, 900, null) $$, 'no agrega líneas a la cotización');
-select prueba.debe_fallar($$ select public.dt_flota_documento('$$ || :'ua' || $$', 'seguro', 'S-1', current_date + 100) $$, 'no sube documentos');
+select prueba.debe_fallar($$ select public.dt_flota_documento('$$ || :'ua' || $$', 'seguro', 'S-1', (now() at time zone 'America/Guatemala')::date + 100) $$, 'no sube documentos');
 select prueba.debe_fallar($$ select public.dt_flota_importar('$$ || :'flota' || $$', '[{"fila":2,"placa":"P333CCC","marca":"X","linea":"Y"}]') $$, 'no importa');
 select prueba.afirmar((select count(*) from public.dt_flota_unidades(:'flota')) = 1, 'sigue viendo sus unidades');
 reset role;

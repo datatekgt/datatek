@@ -101,8 +101,8 @@ select prueba.afirmar((select supervisor from public.dt_obra_calendario(:'neg', 
 select prueba.afirmar((select supervisor from public.dt_obra_calendario(:'neg', :'hoy', (:'hoy'::date + 30)) where obra_id = :'obra2') = 'Sin nombre · 0008', 'el supervisor sin nombre se ve como en el equipo');
 select prueba.afirmar((select obra from public.dt_obra_calendario(:'neg', :'hoy', (:'hoy'::date + 30)) where id = :'ev_gomez') = 'Casa Gómez', 'y el nombre de la obra');
 select prueba.afirmar((select count(*) from public.dt_obra_calendario(:'neg', (:'hoy'::date + 10), (:'hoy'::date + 30))) = 0, 'solo el rango pedido');
-select prueba.debe_fallar($$ select * from public.dt_obra_calendario('$$ || :'neg' || $$', current_date, current_date + 90) $$, 'rango de más de 62 días: no');
-select prueba.debe_fallar($$ select * from public.dt_obra_calendario('$$ || :'neg' || $$', current_date, current_date - 1) $$, 'rango al revés: no');
+select prueba.debe_fallar($$ select * from public.dt_obra_calendario('$$ || :'neg' || $$', public.dt_obra_hoy(), public.dt_obra_hoy() + 90) $$, 'rango de más de 62 días: no');
+select prueba.debe_fallar($$ select * from public.dt_obra_calendario('$$ || :'neg' || $$', public.dt_obra_hoy(), public.dt_obra_hoy() - 1) $$, 'rango al revés: no');
 -- Mover desde el calendario: la función del núcleo, sin avisar y avisando.
 select public.dt_evento_mover(:'ev_gomez', ((:'hoy'::date + 5)::timestamp + time '10:00') at time zone 'America/Guatemala', false);
 select prueba.afirmar((select (programada_para at time zone 'America/Guatemala')::date from public.dt_obra_calendario(:'neg', :'hoy', (:'hoy'::date + 30)) where id = :'ev_gomez') = :'hoy'::date + 5,
@@ -128,12 +128,12 @@ select prueba.debe_fallar($$ select public.dt_evento_mover('$$ || :'ev_gomez' ||
 select prueba.debe_fallar($$ select public.dt_obra_programar_visita('$$ || :'obra' || $$', now() + interval '4 days') $$, 'ni las programa');
 reset role;
 select prueba.como(:'dueno2'); set role authenticated;
-select prueba.debe_fallar($$ select * from public.dt_obra_calendario('$$ || :'neg' || $$', current_date, current_date + 7) $$, 'otra supervisora no ve nuestro calendario');
+select prueba.debe_fallar($$ select * from public.dt_obra_calendario('$$ || :'neg' || $$', public.dt_obra_hoy(), public.dt_obra_hoy() + 7) $$, 'otra supervisora no ve nuestro calendario');
 reset role;
 select prueba.como(:'familia'); set role authenticated;
-select prueba.debe_fallar($$ select * from public.dt_obra_calendario('$$ || :'neg' || $$', current_date, current_date + 7) $$, 'el lado del dueño de la obra tampoco');
+select prueba.debe_fallar($$ select * from public.dt_obra_calendario('$$ || :'neg' || $$', public.dt_obra_hoy(), public.dt_obra_hoy() + 7) $$, 'el lado del dueño de la obra tampoco');
 reset role;
 select prueba.anonimo(); set role anon;
-select prueba.debe_fallar($$ select * from public.dt_obra_calendario('$$ || :'neg' || $$', current_date, current_date + 7) $$, 'anon: no');
+select prueba.debe_fallar($$ select * from public.dt_obra_calendario('$$ || :'neg' || $$', public.dt_obra_hoy(), public.dt_obra_hoy() + 7) $$, 'anon: no');
 select prueba.debe_fallar($$ select * from public.dt_obra_equipo('$$ || :'neg' || $$') $$, 'anon: tampoco el equipo');
 reset role;

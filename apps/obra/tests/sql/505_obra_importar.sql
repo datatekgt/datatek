@@ -54,7 +54,7 @@ update public.obra_fases set avance = 50, real_ini = 11 where id = :'f_inst';
 select public.dt_cobro_crear(:'neg', :'cli', 'hito', :'h_cim', 'Casa familia López · Pago 2 · cimentación', 62000, null) as cobro_cim \gset
 update public.obra_hitos set estado = 'liberado', liberado_en = now() - interval '9 weeks', cobro_id = :'cobro_cim' where id = :'h_cim';
 select prueba.como(:'dueno'); set role authenticated;
-select public.dt_obra_crear(:'neg', :'cli2', 'Casa Gómez, segundo nivel', null, 'Quetzaltenango', 'segundo_nivel', 'precio_cerrado', 90000, null, current_date) as nueva \gset
+select public.dt_obra_crear(:'neg', :'cli2', 'Casa Gómez, segundo nivel', null, 'Quetzaltenango', 'segundo_nivel', 'precio_cerrado', 90000, null, public.dt_obra_hoy()) as nueva \gset
 select prueba.debe_fallar($$ select public.dt_obra_importar_plan('$$ || :'nueva' || $$', '[{"fase": "Columnas", "semana_inicio": 0, "semana_fin": 2, "pago": 50000}, {"fase": "Losa", "semana_inicio": 2, "semana_fin": 5, "pago": 50000}]') $$, 'si los pagos pasan el contrato no entra nada');
 select prueba.afirmar((select count(*) from public.obra_fases where obra_id = :'nueva') = 0 and (select count(*) from public.importaciones where que = 'plan_obra') = 0, 'todo o nada: no quedó ni una fase a medias');
 select prueba.debe_fallar($$ select public.dt_obra_importar_plan('$$ || :'nueva' || $$', '[{"fase": "Al revés", "semana_inicio": 4, "semana_fin": 2}]') $$, 'una fase con semanas al revés se rechaza');
@@ -71,7 +71,7 @@ select prueba.debe_fallar($$ select public.dt_obra_deshacer_importacion('$$ || (
 select public.dt_obra_importar_plan(:'nueva', '[{"fase": "Columnas", "semana_inicio": 0, "semana_fin": 2}]') as r2 \gset
 reset role;
 select prueba.como(:'jefe'); set role authenticated;
-select public.dt_obra_registrar_visita(:'nueva', current_date, '[]', jsonb_build_array(jsonb_build_object('fase', (select id from public.obra_fases where obra_id = :'nueva'), 'avance', 20)));
+select public.dt_obra_registrar_visita(:'nueva', public.dt_obra_hoy(), '[]', jsonb_build_array(jsonb_build_object('fase', (select id from public.obra_fases where obra_id = :'nueva'), 'avance', 20)));
 select prueba.debe_fallar($$ select public.dt_obra_deshacer_importacion('$$ || (:'r2'::jsonb ->> 'importacion') || $$') $$, 'con visitas encima el plan ya no se deshace');
 reset role;
 select prueba.como(:'campo'); set role authenticated;

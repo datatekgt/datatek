@@ -24,8 +24,8 @@ select public.dt_colonia_guardar_proveedor(:'neg', null, 'Guardianes Ejemplo', n
 select public.dt_colonia_registrar_gasto(:'cond', :'hoy', 'seguridad', 'Seguridad del mes', 8300, :'guard') as g1 \gset
 select public.dt_colonia_registrar_gasto(:'cond', :'hoy', 'mantenimiento', 'Motor del portón', 1850, null, 'Portones Seguros', 'A-123') as g2 \gset
 select public.dt_colonia_registrar_gasto(:'cond', :'hoy', 'administracion', 'Honorarios de abogado', 1200, null, 'Lic. Pérez', null, false) as g3 \gset
-select prueba.debe_fallar($$ select public.dt_colonia_registrar_gasto('$$ || :'cond' || $$', current_date + 3, 'otro', 'Futuro', 10) $$, 'un gasto no se fecha en el futuro');
-select prueba.debe_fallar($$ select public.dt_colonia_registrar_gasto('$$ || :'cond' || $$', current_date, 'otro', 'Cero', 0) $$, 'ni en cero');
+select prueba.debe_fallar($$ select public.dt_colonia_registrar_gasto('$$ || :'cond' || $$', (now() at time zone 'America/Guatemala')::date + 3, 'otro', 'Futuro', 10) $$, 'un gasto no se fecha en el futuro');
+select prueba.debe_fallar($$ select public.dt_colonia_registrar_gasto('$$ || :'cond' || $$', (now() at time zone 'America/Guatemala')::date, 'otro', 'Cero', 0) $$, 'ni en cero');
 select prueba.afirmar((select proveedor from public.dt_colonia_gastos(:'cond', :'mes') where id = :'g1') = 'Guardianes Ejemplo', 'el proveedor del directorio queda en el gasto');
 select public.dt_colonia_guardar_presupuesto(:'cond', :'mes', 'seguridad', 8500);
 select public.dt_colonia_guardar_presupuesto(:'cond', :'mes', 'mantenimiento', 3000);
@@ -40,7 +40,7 @@ select public.dt_colonia_configurar(:'cond', '{"publicar_gasto": true}');
 select prueba.debe_fallar($$ select public.dt_colonia_publicar('$$ || :'cond' || $$', '$$ || :'mes' || $$') $$, 'con la junta revisando, no se publica sin su aprobación (ataque 21)');
 select public.dt_colonia_enviar_a_junta(:'cond', :'mes') as pub \gset
 select prueba.debe_fallar($$ select public.dt_colonia_editar_gasto('$$ || :'g1' || $$', '{"monto": 9000}') $$, 'con el mes en la junta, los gastos no se tocan');
-select prueba.debe_fallar($$ select public.dt_colonia_registrar_gasto('$$ || :'cond' || $$', current_date, 'otro', 'Colado después', 50) $$, 'ni se agregan');
+select prueba.debe_fallar($$ select public.dt_colonia_registrar_gasto('$$ || :'cond' || $$', (now() at time zone 'America/Guatemala')::date, 'otro', 'Colado después', 50) $$, 'ni se agregan');
 select prueba.debe_fallar($$ select public.dt_colonia_junta_revisar('$$ || :'pub' || $$', true) $$, 'la administración no se aprueba a sí misma');
 reset role;
 
@@ -89,7 +89,7 @@ select prueba.afirmar((select count(*) from public.colonia_gastos) = 0, 'la tabl
 reset role;
 select prueba.como(:'tecnico'); set role authenticated;
 select prueba.debe_fallar($$ select * from public.dt_colonia_gastos('$$ || :'cond' || $$', '$$ || :'mes' || $$') $$, 'el técnico no ve los gastos');
-select prueba.debe_fallar($$ select public.dt_colonia_registrar_gasto('$$ || :'cond' || $$', current_date, 'otro', 'Mío', 10) $$, 'ni los registra');
+select prueba.debe_fallar($$ select public.dt_colonia_registrar_gasto('$$ || :'cond' || $$', (now() at time zone 'America/Guatemala')::date, 'otro', 'Mío', 10) $$, 'ni los registra');
 reset role;
 -- Archivos: el vecino no sube facturas y nadie borra lo subido.
 insert into storage.objects (bucket_id, name) values ('colonia', :'neg' || '/gastos/' || :'g2' || '/factura.jpg');

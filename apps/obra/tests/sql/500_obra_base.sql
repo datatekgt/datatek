@@ -63,7 +63,7 @@ select prueba.debe_fallar($$ select public.dt_obra_guardar_hito('$$ || :'obra' |
 select prueba.debe_fallar($$ select public.dt_obra_guardar_hito('$$ || :'obra' || $$', null, 'anticipo', null, 'Otro anticipo', 1) $$, 'un solo anticipo por obra');
 select prueba.debe_fallar($$ select public.dt_obra_guardar_hito('$$ || :'obra2' || $$', null, 'fase', '$$ || :'f_losa' || $$', 'Pago cruzado', 1000) $$, 'un hito no apunta a la fase de otra obra');
 select prueba.debe_fallar($$ select public.dt_obra_guardar_fase('$$ || :'obra' || $$', null, 'Al revés', 6, 4) $$, 'una fase que termina antes de empezar se rechaza');
-select prueba.debe_fallar($$ select public.dt_obra_crear('$$ || :'neg' || $$', '$$ || :'cli' || $$', 'Sin honorario', null, null, null, 'costo_mas_honorario', 100000, null, current_date) $$, 'costo más honorario pide el porcentaje');
+select prueba.debe_fallar($$ select public.dt_obra_crear('$$ || :'neg' || $$', '$$ || :'cli' || $$', 'Sin honorario', null, null, null, 'costo_mas_honorario', 100000, null, public.dt_obra_hoy()) $$, 'costo más honorario pide el porcentaje');
 select prueba.debe_fallar($$ select public.dt_obra_editar('$$ || :'obra' || $$', '{"monto_contrato": 200000}') $$, 'el contrato no baja de lo que suman los pagos');
 select public.dt_obra_editar(:'obra', '{"monto_contrato": 315600}');
 select prueba.afirmar((select count(*) from public.bitacora where objeto = 'obra' and objeto_id = :'obra' and accion = 'contrato_cambiado') = 1, 'cambiar el contrato queda en la bitácora');
@@ -83,7 +83,7 @@ select prueba.como(:'campo'); set role authenticated;
 select prueba.afirmar((select count(*) from public.dt_obra_obras(:'neg')) = 1, 'el supervisor de campo ve solo la obra que tiene asignada');
 select prueba.afirmar((select count(*) from public.obra_obras) = 1 and (select count(*) from public.obra_fases where obra_id = :'obra2') = 0, 'y leyendo la tabla igual');
 select prueba.debe_fallar($$ select public.dt_obra_guardar_fase('$$ || :'obra' || $$', null, 'Fase de campo', 18, 20) $$, 'no edita el plan (no tiene editar_plan)');
-select prueba.debe_fallar($$ select public.dt_obra_crear('$$ || :'neg' || $$', '$$ || :'cli' || $$', 'Obra nueva', null, null, null, null, 1000, null, current_date) $$, 'ni crea obras');
+select prueba.debe_fallar($$ select public.dt_obra_crear('$$ || :'neg' || $$', '$$ || :'cli' || $$', 'Obra nueva', null, null, null, null, 1000, null, public.dt_obra_hoy()) $$, 'ni crea obras');
 select public.dt_obra_motivo_atraso(:'f_losa', 'Llovió tres días');
 select prueba.afirmar((select motivo_atraso from public.obra_fases where id = :'f_losa') = 'Llovió tres días', 'pero sí escribe por qué se atrasó una fase de su obra');
 select prueba.debe_fallar($$ select public.dt_obra_motivo_atraso('$$ || :'g_col' || $$', 'X') $$, 'no en una obra que no es suya');
@@ -95,7 +95,7 @@ reset role;
 
 -- Otro negocio: nada de lo mío.
 select prueba.como(:'dueno2'); set role authenticated;
-select prueba.debe_fallar($$ select public.dt_obra_crear('$$ || :'neg2' || $$', '$$ || :'cli' || $$', 'Robada', null, null, null, null, 1000, null, current_date) $$, 'otro negocio no crea obras con mi cliente');
+select prueba.debe_fallar($$ select public.dt_obra_crear('$$ || :'neg2' || $$', '$$ || :'cli' || $$', 'Robada', null, null, null, null, 1000, null, public.dt_obra_hoy()) $$, 'otro negocio no crea obras con mi cliente');
 select prueba.debe_fallar($$ select public.dt_obra_guardar_fase('$$ || :'obra' || $$', null, 'Intrusa', 1, 2) $$, 'ni agrega fases a mi obra');
 select prueba.debe_fallar($$ select * from public.dt_obra_obras('$$ || :'neg' || $$') $$, 'ni ve mi lista');
 select prueba.afirmar((select count(*) from public.obra_obras) = 0, 'ni lee mis obras en la tabla');

@@ -81,8 +81,8 @@ select prueba.debe_fallar($$ select public.dt_fuego_plano('$$ || :'local2' || $$
 select prueba.debe_fallar($$ select public.dt_fuego_visita('$$ || :'vis2' || $$') $$, 'ni su visita');
 select prueba.afirmar((select count(*) from public.fuego_planos) = 1, 'leyendo la tabla de planos solo sale el suyo');
 select public.dt_fuego_pedir_visita(:'local', (:'hoy'::date + 10), 'Vienen los bomberos el 15') as pedida \gset
-select prueba.debe_fallar($$ select public.dt_fuego_pedir_visita('$$ || :'local' || $$', current_date + 11) $$, 'una pedida a la vez por local');
-select prueba.debe_fallar($$ select public.dt_fuego_pedir_visita('$$ || :'local2' || $$', current_date + 11) $$, 'no pide visitas para el local de otro');
+select prueba.debe_fallar($$ select public.dt_fuego_pedir_visita('$$ || :'local' || $$', (now() at time zone 'America/Guatemala')::date + 11) $$, 'una pedida a la vez por local');
+select prueba.debe_fallar($$ select public.dt_fuego_pedir_visita('$$ || :'local2' || $$', (now() at time zone 'America/Guatemala')::date + 11) $$, 'no pide visitas para el local de otro');
 select prueba.debe_fallar($$ select public.dt_fuego_escanear('$$ || :'vis' || $$', '$$ || :'cod1' || $$') $$, 'no registra servicios');
 reset role;
 select prueba.como(:'otro_cliente'); set role authenticated;

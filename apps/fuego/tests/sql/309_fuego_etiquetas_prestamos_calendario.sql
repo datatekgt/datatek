@@ -59,7 +59,7 @@ select prueba.debe_fallar($$ select * from public.dt_fuego_extintores_propios('$
 reset role;
 select prueba.anonimo(); set role anon;
 select prueba.debe_fallar($$ select * from public.dt_fuego_etiquetas('$$ || :'neg' || $$') $$, 'anon no recibe códigos');
-select prueba.debe_fallar($$ select * from public.dt_fuego_calendario('$$ || :'neg' || $$', current_date, current_date + 30) $$, 'ni el calendario');
+select prueba.debe_fallar($$ select * from public.dt_fuego_calendario('$$ || :'neg' || $$', (now() at time zone 'America/Guatemala')::date, (now() at time zone 'America/Guatemala')::date + 30) $$, 'ni el calendario');
 reset role;
 
 -- Préstamos: los propios con su préstamo abierto
@@ -85,15 +85,15 @@ select prueba.afirmar((select count(*) from public.dt_fuego_calendario(:'neg', :
 select prueba.afirmar((select dia from public.dt_fuego_calendario(:'neg', :'hoy'::date - 1, :'hoy'::date + 30) where estado = 'pedida') = :'hoy'::date + 5, 'la pedida sale en el día que pidió la empresa');
 select prueba.afirmar((select tecnico from public.dt_fuego_calendario(:'neg', :'hoy'::date, :'hoy'::date)) = 'Juan Técnico', 'cada visita dice quién va');
 select prueba.afirmar((select count(*) from public.dt_fuego_calendario(:'neg', :'hoy'::date + 10, :'hoy'::date + 20)) = 0, 'fuera del rango no sale nada');
-select prueba.debe_fallar($$ select * from public.dt_fuego_calendario('$$ || :'neg' || $$', current_date, current_date + 90) $$, 'más de 62 días no se pide de un golpe');
-select prueba.debe_fallar($$ select * from public.dt_fuego_calendario('$$ || :'neg' || $$', current_date, current_date - 1) $$, 'ni un rango al revés');
+select prueba.debe_fallar($$ select * from public.dt_fuego_calendario('$$ || :'neg' || $$', (now() at time zone 'America/Guatemala')::date, (now() at time zone 'America/Guatemala')::date + 90) $$, 'más de 62 días no se pide de un golpe');
+select prueba.debe_fallar($$ select * from public.dt_fuego_calendario('$$ || :'neg' || $$', (now() at time zone 'America/Guatemala')::date, (now() at time zone 'America/Guatemala')::date - 1) $$, 'ni un rango al revés');
 reset role;
 select prueba.como(:'juan'); set role authenticated;
 select prueba.afirmar((select array_agg(visita_id) from public.dt_fuego_calendario(:'neg', :'hoy'::date - 1, :'hoy'::date + 30)) = array[:'vis_juan']::uuid[], 'el técnico ve solo su visita, ni la de Pedro ni la pedida');
 reset role;
 select prueba.como(:'encargado'); set role authenticated;
-select prueba.debe_fallar($$ select * from public.dt_fuego_calendario('$$ || :'neg' || $$', current_date, current_date + 30) $$, 'la empresa no ve el calendario de la recargadora');
+select prueba.debe_fallar($$ select * from public.dt_fuego_calendario('$$ || :'neg' || $$', (now() at time zone 'America/Guatemala')::date, (now() at time zone 'America/Guatemala')::date + 30) $$, 'la empresa no ve el calendario de la recargadora');
 reset role;
 select prueba.como(:'otro_dueno'); set role authenticated;
-select prueba.debe_fallar($$ select * from public.dt_fuego_calendario('$$ || :'neg' || $$', current_date, current_date + 30) $$, 'ni otra recargadora');
+select prueba.debe_fallar($$ select * from public.dt_fuego_calendario('$$ || :'neg' || $$', (now() at time zone 'America/Guatemala')::date, (now() at time zone 'America/Guatemala')::date + 30) $$, 'ni otra recargadora');
 reset role;

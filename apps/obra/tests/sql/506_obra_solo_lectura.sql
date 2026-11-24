@@ -55,13 +55,13 @@ select public.dt_cobro_crear(:'neg', :'cli', 'hito', :'h_cim', 'Casa familia Ló
 update public.obra_hitos set estado = 'liberado', liberado_en = now() - interval '9 weeks', cobro_id = :'cobro_cim' where id = :'h_cim';
 update public.negocios set suscripcion = 'solo_lectura' where id = :'neg';
 select prueba.como(:'dueno'); set role authenticated;
-select prueba.debe_fallar($$ select public.dt_obra_crear('$$ || :'neg' || $$', '$$ || :'cli' || $$', 'Obra nueva', null, null, null, null, 1000, null, current_date) $$, 'no crea obras');
+select prueba.debe_fallar($$ select public.dt_obra_crear('$$ || :'neg' || $$', '$$ || :'cli' || $$', 'Obra nueva', null, null, null, null, 1000, null, public.dt_obra_hoy()) $$, 'no crea obras');
 select prueba.debe_fallar($$ select public.dt_obra_guardar_fase('$$ || :'obra' || $$', null, 'Jardín', 19, 20) $$, 'ni fases');
 select prueba.debe_fallar($$ select public.dt_obra_guardar_hito('$$ || :'obra2' || $$', null, 'fase', '$$ || :'g_col' || $$', 'Pago', 1000) $$, 'ni pagos');
 select prueba.debe_fallar($$ select public.dt_obra_proponer_cambio('$$ || :'obra' || $$', 'Portón', 8000) $$, 'ni propone cambios');
 reset role;
 select prueba.como(:'campo'); set role authenticated;
-select public.dt_obra_registrar_visita(:'obra', current_date, '[]', jsonb_build_array(jsonb_build_object('fase', :'f_losa', 'avance', 100))) as vis \gset
+select public.dt_obra_registrar_visita(:'obra', public.dt_obra_hoy(), '[]', jsonb_build_array(jsonb_build_object('fase', :'f_losa', 'avance', 100))) as vis \gset
 select public.dt_obra_subir_foto(:'obra', :'f_losa', :'obra' || '/' || :'f_losa' || '/f.jpg', 'Losa', now(), true, :'vis');
 select public.dt_obra_subir_reporte(:'obra', 14, 'Losa fundida');
 select prueba.afirmar(true, 'la visita, las fotos y el reporte siguen (el dueño ya pagó su servicio)');

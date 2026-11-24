@@ -54,7 +54,7 @@ select prueba.como(:'atacante'); set role authenticated;
 select prueba.afirmar((select count(*) from public.colonia_condominios) + (select count(*) from public.colonia_casas) + (select count(*) from public.colonia_cuotas)
   + (select count(*) from public.colonia_gastos) + (select count(*) from public.colonia_reportes) + (select count(*) from public.colonia_publicaciones)
   + (select count(*) from public.colonia_reservas) + (select count(*) from public.colonia_equipos) + (select count(*) from public.colonia_avisos) = 0, '1e · una cuenta nueva no lee nada');
-select prueba.debe_fallar($$ insert into public.colonia_gastos (negocio_id, condominio_id, mes, fecha, rubro, concepto, monto) values ('$$ || :'neg' || $$', '$$ || :'cond' || $$', current_date, current_date, 'otro', 'Falso', 1) $$, '1f · no inserta gastos');
+select prueba.debe_fallar($$ insert into public.colonia_gastos (negocio_id, condominio_id, mes, fecha, rubro, concepto, monto) values ('$$ || :'neg' || $$', '$$ || :'cond' || $$', (now() at time zone 'America/Guatemala')::date, (now() at time zone 'America/Guatemala')::date, 'otro', 'Falso', 1) $$, '1f · no inserta gastos');
 select prueba.debe_fallar($$ update public.colonia_condominios set junta_revisa = false $$, '1g · no apaga la junta por la tabla');
 select prueba.debe_fallar($$ delete from public.colonia_reportes $$, '1h · no borra reportes');
 -- 2 y 3
@@ -65,7 +65,7 @@ reset role;
 -- 4. Cruces con ids de otra administración
 select prueba.como(:'admin2'); set role authenticated;
 select prueba.debe_fallar($$ select * from public.dt_colonia_casas('$$ || :'cond' || $$') $$, '4a · B no ve las casas de A');
-select prueba.debe_fallar($$ select public.dt_colonia_registrar_gasto('$$ || :'cond' || $$', current_date, 'otro', 'Colado', 10) $$, '4b · ni le carga gastos');
+select prueba.debe_fallar($$ select public.dt_colonia_registrar_gasto('$$ || :'cond' || $$', (now() at time zone 'America/Guatemala')::date, 'otro', 'Colado', 10) $$, '4b · ni le carga gastos');
 select prueba.debe_fallar($$ select public.dt_colonia_publicar('$$ || :'cond' || $$', '$$ || :'mes' || $$') $$, '4c · ni publica');
 select prueba.debe_fallar($$ select public.dt_colonia_generar_cuotas('$$ || :'cond' || $$') $$, '4d · ni genera cuotas');
 select prueba.debe_fallar($$ select public.dt_colonia_mover_reporte('$$ || :'rep' || $$', 'descartado', 'No me importa') $$, '4e · ni mueve sus reportes');
@@ -112,7 +112,7 @@ select prueba.afirmar((select count(*) from public.colonia_cuotas where casa_id 
 select prueba.afirmar((select count(*) from public.cobros where cliente_id = :'cli14') = 0, '19c · ni sus cobros del núcleo');
 select prueba.afirmar((select count(*) from public.colonia_casas) = 1, '19d · solo ve su casa');
 select prueba.debe_fallar($$ select * from public.dt_colonia_casas('$$ || :'cond' || $$') $$, '19e · ni la lista con saldos');
-select prueba.afirmar((select count(*) from public.dt_colonia_disponibilidad(:'salon', current_date, current_date + 30) where mia) = 0, '19f · lo reservado por otros no dice de quién');
+select prueba.afirmar((select count(*) from public.dt_colonia_disponibilidad(:'salon', (now() at time zone 'America/Guatemala')::date, (now() at time zone 'America/Guatemala')::date + 30) where mia) = 0, '19f · lo reservado por otros no dice de quién');
 select prueba.debe_fallar($$ select public.dt_colonia_reporte('$$ || :'rep' || $$') $$, '19g · ni abre el reporte (y la foto) de otra casa');
 select prueba.afirmar(not public.dt_colonia_puedo_ver_archivo(:'neg' || '/reportes/' || :'rep' || '/foto.jpg'), '19h · ni la foto en Storage');
 reset role;
@@ -121,7 +121,7 @@ select prueba.como(:'mendez'); set role authenticated;
 select prueba.afirmar((public.dt_colonia_en_que_se_va(:'cond') ->> 'publicado')::boolean = false, '20a · sin publicar, no hay gasto que ver');
 select prueba.afirmar((select count(*) from public.colonia_gastos) = 0, '20b · ni en la tabla');
 select prueba.afirmar(not public.dt_colonia_puedo_ver_archivo(:'neg' || '/gastos/' || :'g1' || '/f.jpg'), '20c · ni la factura en Storage');
-select prueba.debe_fallar($$ select * from public.dt_colonia_gastos('$$ || :'cond' || $$', current_date) $$, '20d · ni la lista de la administración');
+select prueba.debe_fallar($$ select * from public.dt_colonia_gastos('$$ || :'cond' || $$', (now() at time zone 'America/Guatemala')::date) $$, '20d · ni la lista de la administración');
 select prueba.afirmar(jsonb_array_length(public.dt_colonia_junta_pendientes(:'neg')) = 0, '20e · ni lo que revisa la junta');
 reset role;
 -- 21. La administración que publica sin pasar por la junta (regla encendida)
@@ -143,7 +143,7 @@ select public.dt_colonia_junta_revisar(:'pub', true, 'Visto');
 reset role;
 -- Con el visto bueno, nadie cuela un cambio (ni el dueño de la base): el candado y la huella lo frenan.
 select prueba.debe_fallar($$ update public.colonia_gastos set monto = 1 where id = '$$ || :'g1' || $$' $$, '21g · un gasto aprobado no cambia');
-select prueba.debe_fallar($$ insert into public.colonia_gastos (negocio_id, condominio_id, mes, fecha, rubro, concepto, monto) values ('$$ || :'neg' || $$', '$$ || :'cond' || $$', '$$ || :'mes' || $$', current_date, 'otro', 'Colado', 5000) $$, '21h · ni se agrega uno al mes aprobado');
+select prueba.debe_fallar($$ insert into public.colonia_gastos (negocio_id, condominio_id, mes, fecha, rubro, concepto, monto) values ('$$ || :'neg' || $$', '$$ || :'cond' || $$', '$$ || :'mes' || $$', (now() at time zone 'America/Guatemala')::date, 'otro', 'Colado', 5000) $$, '21h · ni se agrega uno al mes aprobado');
 select prueba.como(:'admin'); set role authenticated;
 select public.dt_colonia_publicar(:'cond', :'mes');
 reset role;

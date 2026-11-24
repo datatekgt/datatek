@@ -38,7 +38,7 @@ select prueba.afirmar((select estado from public.dt_fuego_extintores_de(:'local'
 select prueba.afirmar((select estado || '/' || motivo from public.dt_fuego_extintores_de(:'local') where id = :'e3') = 'vencido/hidrostatica', 'el CO₂ de 2016 recién recargado está vencido por la hidrostática (cada 5 años)');
 select prueba.afirmar((select estado from public.dt_fuego_extintores_de(:'local') where id = :'e4') = 'sin_dato', 'sin recarga conocida: sin dato (nunca vigente)');
 select prueba.afirmar((select estado from public.dt_fuego_extintores_de(:'local2') where id = :'e5') = 'vigente', 'la clase K de 6 kg recargada hace 100 días está vigente');
-select prueba.debe_fallar($$ select public.dt_fuego_crear_extintor('$$ || :'neg' || $$', '$$ || :'local' || $$', 'pqs_abc', 10, 'lb', null, null, null, null, null, current_date + 3) $$, 'una recarga no se anota en el futuro');
+select prueba.debe_fallar($$ select public.dt_fuego_crear_extintor('$$ || :'neg' || $$', '$$ || :'local' || $$', 'pqs_abc', 10, 'lb', null, null, null, null, null, (now() at time zone 'America/Guatemala')::date + 3) $$, 'una recarga no se anota en el futuro');
 select prueba.debe_fallar($$ select public.dt_fuego_crear_extintor('$$ || :'neg' || $$', '$$ || :'local' || $$', 'pqs_abc', 10, 'lb', null, null, 'S-001') $$, 'la serie no se repite en la recargadora');
 select prueba.debe_fallar($$ select public.dt_fuego_crear_extintor('$$ || :'neg' || $$', '$$ || :'local' || $$', 'halon', 10) $$, 'un agente que no existe se rechaza');
 select prueba.afirmar((select count(*) from public.dt_fuego_locales(:'neg')) = 2, 'la recargadora ve sus dos locales');
@@ -62,7 +62,7 @@ select prueba.como(:'tecnico'); set role authenticated;
 select prueba.afirmar((select count(*) from public.dt_fuego_locales(:'neg')) = 2, 'el técnico ve los locales');
 select public.dt_fuego_crear_extintor(:'neg', :'local', 'pqs_abc', 10, 'lb', 'Pasillo 1') as e6 \gset
 select prueba.afirmar((select estado from public.dt_fuego_extintores_de(:'local') where id = :'e6') = 'sin_dato', 'el que da de alta el técnico queda sin dato');
-select prueba.debe_fallar($$ select public.dt_fuego_crear_extintor('$$ || :'neg' || $$', '$$ || :'local' || $$', 'pqs_abc', 10, 'lb', null, null, null, null, null, current_date) $$, '13 · el técnico no da de alta un extintor «recién recargado»');
+select prueba.debe_fallar($$ select public.dt_fuego_crear_extintor('$$ || :'neg' || $$', '$$ || :'local' || $$', 'pqs_abc', 10, 'lb', null, null, null, null, null, (now() at time zone 'America/Guatemala')::date) $$, '13 · el técnico no da de alta un extintor «recién recargado»');
 select prueba.debe_fallar($$ select public.dt_fuego_guardar_regla('$$ || :'neg' || $$', 'pqs_abc', 24, 12, 12) $$, 'ni cambia las reglas');
 reset role;
 select prueba.como(:'caja'); set role authenticated;

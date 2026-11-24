@@ -69,7 +69,7 @@ select prueba.debe_fallar($$ select public.dt_fuego_extintor('$$ || :'e1' || $$'
 select prueba.debe_fallar($$ select public.dt_fuego_crear_visita('$$ || :'local' || $$', now() + interval '1 day', '$$ || :'dueno2' || $$') $$, '4b · ni agenda visitas a sus locales');
 select prueba.debe_fallar($$ select public.dt_fuego_escanear('$$ || :'vis' || $$', '$$ || :'cod1' || $$') $$, '4c · ni escanea en sus visitas');
 select prueba.debe_fallar($$ select public.dt_fuego_cerrar_visita('$$ || :'vis' || $$') $$, '4d · ni cierra sus visitas');
-select prueba.debe_fallar($$ select * from public.dt_fuego_ruta('$$ || :'neg' || $$', current_date) $$, '4e · ni ve su ruta');
+select prueba.debe_fallar($$ select * from public.dt_fuego_ruta('$$ || :'neg' || $$', (now() at time zone 'America/Guatemala')::date) $$, '4e · ni ve su ruta');
 select prueba.debe_fallar($$ select public.dt_fuego_importar('$$ || :'neg' || $$', '[{"cliente":"X","tipo":"ABC","capacidad":"10"}]') $$, '4f · ni importa en A');
 select prueba.debe_fallar($$ select public.dt_fuego_avisar(array['$$ || :'local' || $$']::uuid[]) $$, '4g · ni le escribe a sus clientes');
 select prueba.debe_fallar($$ select public.dt_fuego_guardar_precio('$$ || :'neg' || $$', 'recarga', null, 1, 0) $$, '4h · ni le cambia los precios');
@@ -96,7 +96,7 @@ reset role;
 -- 13. El técnico que marca «recargado» sin escanear
 select prueba.como(:'juan'); set role authenticated;
 select prueba.debe_fallar($$ select public.dt_fuego_registrar_servicio(gen_random_uuid(), 'recarga', 'S-1') $$, '13a · sin escaneo no hay recarga');
-select prueba.debe_fallar($$ select public.dt_fuego_crear_extintor('$$ || :'neg' || $$', '$$ || :'local' || $$', 'pqs_abc', 10, 'lb', null, null, null, null, null, current_date) $$, '13b · ni dando de alta un extintor «recién recargado»');
+select prueba.debe_fallar($$ select public.dt_fuego_crear_extintor('$$ || :'neg' || $$', '$$ || :'local' || $$', 'pqs_abc', 10, 'lb', null, null, null, null, null, (now() at time zone 'America/Guatemala')::date) $$, '13b · ni dando de alta un extintor «recién recargado»');
 select prueba.debe_fallar($$ select public.dt_fuego_escanear('$$ || :'vis' || $$', '$$ || :'cod3' || $$') $$, '13c · el QR de otro local no sirve');
 select prueba.debe_fallar($$ select public.dt_fuego_escanear('$$ || :'vis2' || $$', '$$ || :'cod3' || $$') $$, '13d · ni en la visita de otro técnico');
 select public.dt_fuego_escanear(:'vis', :'cod1') as esc \gset

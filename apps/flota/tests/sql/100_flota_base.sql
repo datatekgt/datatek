@@ -28,7 +28,7 @@ select public.dt_flota_anotar_pieza(:'ua', 'engine_oil', ((now() at time zone 'A
 select public.dt_flota_anotar_pieza(:'ua', 'engine_air_filter', ((now() at time zone 'America/Guatemala')::date - 300), 140000, 'cambiado');
 select public.dt_flota_anotar_pieza(:'ua', 'cabin_air_filter', ((now() at time zone 'America/Guatemala')::date - 30), 147000, 'cambiado');
 select public.dt_flota_anotar_pieza(:'ua', 'front_brakes', ((now() at time zone 'America/Guatemala')::date - 10), 148000, 'atencion');
-select prueba.debe_fallar($$ select public.dt_flota_anotar_pieza('$$ || :'ua' || $$', 'engine_oil', current_date + 10, 1, 'cambiado') $$, 'no se anota una pieza con fecha futura');
+select prueba.debe_fallar($$ select public.dt_flota_anotar_pieza('$$ || :'ua' || $$', 'engine_oil', (now() at time zone 'America/Guatemala')::date + 10, 1, 'cambiado') $$, 'no se anota una pieza con fecha futura');
 select prueba.afirmar((select tono from public.dt_flota_piezas(:'ua') where componente = 'engine_oil') = 'vencido', 'aceite de hace 7 meses está vencido (6 meses)');
 select prueba.afirmar((select tono from public.dt_flota_piezas(:'ua') where componente = 'engine_air_filter') = 'proximo', 'filtro de hace 10 meses está próximo (80 % de 12)');
 select prueba.afirmar((select tono from public.dt_flota_piezas(:'ua') where componente = 'front_brakes') = 'proximo', 'frenos con atención salen próximos');

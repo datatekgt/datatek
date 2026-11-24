@@ -74,7 +74,7 @@ select prueba.como(:'dueno_obra'); set role authenticated;
 select public.dt_obra_responder_cambio(:'c_ventana', true);
 reset role;
 select prueba.como(:'campo'); set role authenticated;
-select public.dt_obra_registrar_visita(:'obra', current_date, '[{"punto": "Fundición completa", "ok": true}]', jsonb_build_array(jsonb_build_object('fase', :'f_losa', 'avance', 100))) as vis \gset
+select public.dt_obra_registrar_visita(:'obra', public.dt_obra_hoy(), '[{"punto": "Fundición completa", "ok": true}]', jsonb_build_array(jsonb_build_object('fase', :'f_losa', 'avance', 100))) as vis \gset
 reset role;
 select prueba.como(:'jefe'); set role authenticated;
 select prueba.debe_fallar($$ select public.dt_obra_recibir_fase('$$ || :'f_losa' || $$') $$, 'sin fotos de la fase no se recibe');
@@ -102,7 +102,7 @@ select prueba.afirmar((select count(*) from public.bitacora where objeto = 'fase
 select prueba.afirmar((select count(*) from public.recordatorios where plantilla = 'obra_fase_recibida') = 1, 'al dueño (no a la familia) le llega «ya podés pagar»');
 
 select prueba.como(:'campo'); set role authenticated;
-select prueba.debe_fallar($$ select public.dt_obra_registrar_visita('$$ || :'obra' || $$', current_date, '[]', '[{"fase": "$$ || :'f_losa' || $$", "avance": 90}]') $$, 'después de recibida, la losa ya no cambia de avance');
+select prueba.debe_fallar($$ select public.dt_obra_registrar_visita('$$ || :'obra' || $$', public.dt_obra_hoy(), '[]', '[{"fase": "$$ || :'f_losa' || $$", "avance": 90}]') $$, 'después de recibida, la losa ya no cambia de avance');
 select public.dt_obra_proponer_cambio(:'obra', 'Pila doble', 1800) as c_pila \gset
 reset role;
 select prueba.como(:'dueno_obra'); set role authenticated;

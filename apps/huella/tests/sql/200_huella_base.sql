@@ -22,7 +22,7 @@ select public.dt_huella_crear_mascota(:'neg', :'cli2', 'Rocky', 'perro') as rock
 select prueba.afirmar((select nombre from public.mascotas where id = :'canela') = 'Canela', 'el nombre se escribe con mayúscula');
 select prueba.afirmar((select microchip from public.mascotas where id = :'canela') = '985112003456789', 'el microchip se guarda solo con dígitos');
 select prueba.debe_fallar($$ select public.dt_huella_crear_mascota('$$ || :'neg' || $$', '$$ || :'cli' || $$', 'Otra', 'perro', null, null, null, false, null, '123') $$, 'un microchip que no tiene 15 dígitos se rechaza');
-select prueba.debe_fallar($$ select public.dt_huella_crear_mascota('$$ || :'neg' || $$', '$$ || :'cli' || $$', 'Futura', 'perro', null, null, current_date + 5) $$, 'no nace en el futuro');
+select prueba.debe_fallar($$ select public.dt_huella_crear_mascota('$$ || :'neg' || $$', '$$ || :'cli' || $$', 'Futura', 'perro', null, null, (now() at time zone 'America/Guatemala')::date + 5) $$, 'no nace en el futuro');
 select prueba.afirmar((select count(*) from public.dt_huella_vacunas_de(:'canela')) = 4, 'el plan de un perro trae 4 vacunas de partida');
 select prueba.afirmar((select bool_and(estado = 'sin_dosis') from public.dt_huella_vacunas_de(:'canela')), 'sin dosis todavía, todas en sin_dosis');
 reset role;
@@ -34,9 +34,9 @@ select (select id from public.huella_vacunas where negocio_id is null and especi
 select public.dt_huella_registrar_dosis(:'canela', :'rabia', ((now() at time zone 'America/Guatemala')::date - 355), 'L-2291', 'Zoetis') as d1 \gset
 select prueba.afirmar((select estado from public.dt_huella_vacunas_de(:'canela') where nombre = 'Antirrábica') = 'pronto', 'aplicada hace 355 días, la antirrábica vence en 10: pronto');
 select prueba.afirmar((select proxima from public.dt_huella_vacunas_de(:'canela') where nombre = 'Antirrábica') = (now() at time zone 'America/Guatemala')::date + 10, 'la próxima sale de la fecha real + 365');
-select prueba.debe_fallar($$ select public.dt_huella_registrar_dosis('$$ || :'canela' || $$', '$$ || :'rabia' || $$', current_date + 1) $$, 'una dosis no se anota en el futuro');
-select prueba.debe_fallar($$ select public.dt_huella_registrar_dosis('$$ || :'tom' || $$', '$$ || :'rabia' || $$', current_date) $$, 'la antirrábica de perro no se le pone a un gato');
-select prueba.debe_fallar($$ select public.dt_huella_registrar_dosis('$$ || :'tom' || $$', '$$ || :'triple' || $$', current_date - 90) $$, 'ni antes de que naciera');
+select prueba.debe_fallar($$ select public.dt_huella_registrar_dosis('$$ || :'canela' || $$', '$$ || :'rabia' || $$', (now() at time zone 'America/Guatemala')::date + 1) $$, 'una dosis no se anota en el futuro');
+select prueba.debe_fallar($$ select public.dt_huella_registrar_dosis('$$ || :'tom' || $$', '$$ || :'rabia' || $$', (now() at time zone 'America/Guatemala')::date) $$, 'la antirrábica de perro no se le pone a un gato');
+select prueba.debe_fallar($$ select public.dt_huella_registrar_dosis('$$ || :'tom' || $$', '$$ || :'triple' || $$', (now() at time zone 'America/Guatemala')::date - 90) $$, 'ni antes de que naciera');
 -- Gatito de 2 meses: serie de cachorro, la segunda dosis es a las 3 semanas, no al año.
 select public.dt_huella_registrar_dosis(:'tom', :'triple', (now() at time zone 'America/Guatemala')::date);
 select prueba.afirmar((select proxima from public.dt_huella_vacunas_de(:'tom') where nombre = 'Triple felina') = (now() at time zone 'America/Guatemala')::date + 21, 'en la serie de cachorro la siguiente es a los 21 días');
@@ -75,7 +75,7 @@ reset role;
 
 select prueba.como(:'recepcion'); set role authenticated;
 select prueba.afirmar((select count(*) from public.dt_huella_mascotas(:'neg')) = 3, 'recepción ve y busca mascotas');
-select prueba.debe_fallar($$ select public.dt_huella_registrar_dosis('$$ || :'rocky' || $$', '$$ || :'rabia2' || $$', current_date) $$, 'recepción no aplica vacunas');
+select prueba.debe_fallar($$ select public.dt_huella_registrar_dosis('$$ || :'rocky' || $$', '$$ || :'rabia2' || $$', (now() at time zone 'America/Guatemala')::date) $$, 'recepción no aplica vacunas');
 reset role;
 
 -- La familia entra con su teléfono: ve solo sus mascotas, sin las notas internas.
@@ -92,7 +92,7 @@ select prueba.debe_fallar($$ select public.dt_huella_mascota('$$ || :'rocky' || 
 select prueba.debe_fallar($$ select * from public.dt_huella_mascotas('$$ || :'neg' || $$') $$, 'no ve la lista de la clínica');
 select prueba.debe_fallar($$ select public.dt_huella_editar_mascota('$$ || :'canela' || $$', '{"nombre":"X"}') $$, 'no edita el expediente');
 select prueba.afirmar((select count(*) from public.mascotas) = 2, 'leyendo la tabla directo solo salen las suyas');
-select prueba.debe_fallar($$ insert into public.dosis (mascota_id, vacuna_id, nombre, realizada_en) values ('$$ || :'canela' || $$', '$$ || :'rabia2' || $$', 'X', current_date) $$, 'no escribe dosis directo en la tabla');
+select prueba.debe_fallar($$ insert into public.dosis (mascota_id, vacuna_id, nombre, realizada_en) values ('$$ || :'canela' || $$', '$$ || :'rabia2' || $$', 'X', (now() at time zone 'America/Guatemala')::date) $$, 'no escribe dosis directo en la tabla');
 reset role;
 select prueba.anonimo();
 select prueba.debe_fallar($$ select * from public.dt_huella_vacunas_de('$$ || :'canela' || $$') $$, 'anónimo no ve vacunas');

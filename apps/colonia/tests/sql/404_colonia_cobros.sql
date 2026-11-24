@@ -32,7 +32,7 @@ select prueba.afirmar((:'gen'::jsonb ->> 'total')::numeric = 1350, 'Q 650 + Q 70
 select prueba.afirmar((:'gen'::jsonb ->> 'vence')::date = :'mes'::date + 4, 'vence el día 5');
 select prueba.afirmar((public.dt_colonia_generar_cuotas(:'cond', :'mes') ->> 'creadas')::int = 0, 'generar dos veces el mismo mes no duplica');
 select prueba.afirmar((select count(*) from public.cobros where origen = 'cuota') = 2, 'cada cuota es un cobro del núcleo con origen cuota');
-select prueba.debe_fallar($$ select public.dt_colonia_generar_cuotas('$$ || :'cond' || $$', current_date + 120) $$, 'no se generan cuotas de meses lejanos');
+select prueba.debe_fallar($$ select public.dt_colonia_generar_cuotas('$$ || :'cond' || $$', (now() at time zone 'America/Guatemala')::date + 120) $$, 'no se generan cuotas de meses lejanos');
 select prueba.afirmar((select estado from public.dt_colonia_cuotas(:'cond', :'mes') where numero = '30') = 'sin_generar', 'la casa sin vecino sale sin generar');
 select prueba.afirmar((public.dt_colonia_recordar_cuotas(:'cond') ->> 'enviados')::int = 2, 'recordar avisa a las 2 casas que deben');
 select prueba.afirmar((public.dt_colonia_recordar_cuotas(:'cond') ->> 'enviados')::int = 0, 'recordar otra vez no repite ni gasta mensajes');
@@ -59,13 +59,13 @@ select prueba.afirmar((select count(*) from public.dt_mis_cobros(:'neg')) = 1, '
 -- Reserva el salón: cobro al reservar y al calendario.
 select public.dt_colonia_reservar(:'salon', :'c14', :'en_semana', '14:00-22:00') as res \gset
 select prueba.afirmar((select monto from public.cobros where origen = 'reserva' and origen_id = :'res') = 300, 'reservar crea el cobro de Q 300');
-select prueba.debe_fallar($$ select public.dt_colonia_reservar('$$ || :'entrada' || $$', '$$ || :'c14' || $$', current_date + 7, '14:00-22:00') $$, 'un área que no se reserva no se reserva');
-select prueba.debe_fallar($$ select public.dt_colonia_reservar('$$ || :'salon' || $$', '$$ || :'c14' || $$', current_date + 7, '23:00-23:30') $$, 'ni en una franja inventada');
-select prueba.debe_fallar($$ select public.dt_colonia_reservar('$$ || :'salon' || $$', '$$ || :'c14' || $$', current_date - 1, '08:00-13:00') $$, 'ni en el pasado');
-select prueba.debe_fallar($$ select public.dt_colonia_reservar('$$ || :'salon' || $$', '$$ || :'c22' || $$', current_date + 8, '08:00-13:00') $$, 'ni a nombre de otra casa');
+select prueba.debe_fallar($$ select public.dt_colonia_reservar('$$ || :'entrada' || $$', '$$ || :'c14' || $$', (now() at time zone 'America/Guatemala')::date + 7, '14:00-22:00') $$, 'un área que no se reserva no se reserva');
+select prueba.debe_fallar($$ select public.dt_colonia_reservar('$$ || :'salon' || $$', '$$ || :'c14' || $$', (now() at time zone 'America/Guatemala')::date + 7, '23:00-23:30') $$, 'ni en una franja inventada');
+select prueba.debe_fallar($$ select public.dt_colonia_reservar('$$ || :'salon' || $$', '$$ || :'c14' || $$', (now() at time zone 'America/Guatemala')::date - 1, '08:00-13:00') $$, 'ni en el pasado');
+select prueba.debe_fallar($$ select public.dt_colonia_reservar('$$ || :'salon' || $$', '$$ || :'c22' || $$', (now() at time zone 'America/Guatemala')::date + 8, '08:00-13:00') $$, 'ni a nombre de otra casa');
 select public.dt_colonia_reservar(:'salon', :'c14', :'en_semana', '08:00-13:00');
 select public.dt_colonia_reservar(:'salon', :'c14', :'en_semana'::date + 1, '08:00-13:00');
-select prueba.debe_fallar($$ select public.dt_colonia_reservar('$$ || :'salon' || $$', '$$ || :'c14' || $$', current_date + 20, '08:00-13:00') $$, 'tope de 3 reservas futuras por casa');
+select prueba.debe_fallar($$ select public.dt_colonia_reservar('$$ || :'salon' || $$', '$$ || :'c14' || $$', (now() at time zone 'America/Guatemala')::date + 20, '08:00-13:00') $$, 'tope de 3 reservas futuras por casa');
 select prueba.afirmar((select count(*) from public.dt_colonia_mis_reservas(:'neg')) = 3, 've sus 3 reservas');
 select public.dt_colonia_cancelar_reserva((select id from public.colonia_reservas where fecha = :'en_semana'::date + 1), 'Cambio de planes');
 select prueba.afirmar((select count(*) from public.dt_mis_cobros(:'neg') where concepto like 'Reserva%') = 2, 'cancelar sin pagar anula el cobro de la reserva');
@@ -83,7 +83,7 @@ select prueba.como(:'inquilino'); set role authenticated;
 select public.dt_aceptar_invitacion(:'iinq');
 select prueba.afirmar((select count(*) from public.dt_colonia_mis_casas(:'neg')) = 1 and not (select titular from public.dt_colonia_mis_casas(:'neg')), 'el inquilino ve su casa sin ser titular');
 select prueba.debe_fallar($$ select public.dt_colonia_mi_cuenta('$$ || :'c14' || $$') $$, 'pero no la cuenta');
-select prueba.debe_fallar($$ select public.dt_colonia_reservar('$$ || :'salon' || $$', '$$ || :'c14' || $$', current_date + 9, '14:00-22:00') $$, 'ni reserva a cuenta de la casa');
+select prueba.debe_fallar($$ select public.dt_colonia_reservar('$$ || :'salon' || $$', '$$ || :'c14' || $$', (now() at time zone 'America/Guatemala')::date + 9, '14:00-22:00') $$, 'ni reserva a cuenta de la casa');
 reset role;
 -- Pagada, solo la administración la cancela y queda «de más» para devolver.
 insert into public.cobro_pagos (cobro_id, monto, metodo) select id, 300, 'transferencia' from public.cobros where origen = 'reserva' and origen_id = :'res';

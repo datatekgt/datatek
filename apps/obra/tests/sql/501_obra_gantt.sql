@@ -100,7 +100,7 @@ reset role;
 -- Con costo más honorario, el dueño (titular) sí ve cada costo. La familia sigue sin verlo.
 select prueba.como(:'dueno'); set role authenticated;
 select public.dt_obra_editar(:'obra', '{"modelo_contrato": "costo_mas_honorario", "honorario_pct": 12}');
-select public.dt_obra_cargar_recibo(:'obra', :'f_muros', 'materiales', 'Ferretería El Volcán', 'Block de 15 × 20 × 40', 44100, current_date - 30) as rec \gset
+select public.dt_obra_cargar_recibo(:'obra', :'f_muros', 'materiales', 'Ferretería El Volcán', 'Block de 15 × 20 × 40', 44100, public.dt_obra_hoy() - 30) as rec \gset
 reset role;
 select prueba.como(:'dueno_obra'); set role authenticated;
 select prueba.afirmar((public.dt_obra_obra(:'obra') -> 'yo' ->> 've_costos')::boolean, 'con costo más honorario el dueño ve costos');

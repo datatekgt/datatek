@@ -10,7 +10,7 @@ reset role;
 insert into public.miembros (negocio_id, persona_id, rol) values (:'neg', :'tec', 'tecnico');
 
 select prueba.como(:'dueno'); set role authenticated;
-select prueba.debe_fallar($$ select public.dt_suscripcion_configurar('$$ || :'neg' || $$', 'completo', 1, current_date) $$, 'el negocio no se pone su propio precio');
+select prueba.debe_fallar($$ select public.dt_suscripcion_configurar('$$ || :'neg' || $$', 'completo', 1, (now() at time zone 'America/Guatemala')::date) $$, 'el negocio no se pone su propio precio');
 select prueba.debe_fallar($$ select public.dt_suscripciones_revisar() $$, 'el negocio no corre la revisión');
 reset role;
 
