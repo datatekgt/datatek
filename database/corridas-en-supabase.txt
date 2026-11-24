@@ -48,3 +48,9 @@
 404_colonia_cobros.sql
 405_colonia_importar.sql
 406_colonia_panel.sql
+# 24 nov 2026 · cuarta corrida (tanda 2), verificación pegada por Dominic, todo true
+09_plataforma.sql
+207_huella_fotos.sql
+309_fuego_etiquetas_prestamos_calendario.sql
+407_colonia_reportes_sin_ver.sql
+507_obra_equipo_calendario.sql
