@@ -1,5 +1,6 @@
-// «Más»: cobros, precios de la recargadora, suscripción, Recurrente, equipo y salir. Las piezas comunes vienen de nucleo/panel.
+// «Más»: herramientas (etiquetas, calendario, importar), cobros, precios de la recargadora, suscripción, Recurrente, equipo y salir. Las piezas comunes vienen de nucleo/panel.
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useSesion } from '@nucleo/acceso/Sesion'
 import { ROLES } from '@nucleo/acceso/capacidades'
 import { BotonesSel, Contador } from '@nucleo/controles'
@@ -17,6 +18,14 @@ export function Mas() {
   const neg = negocio!.negocio_id
   return (
     <div className="columna" style={{ gap: 20 }}>
+      <section className="tarjeta">
+        <h2>Herramientas</h2>
+        <div className="lista-filas">
+          {puede('ver_clientes') && <Link className="fila-dato" to="/panel/etiquetas"><div><div className="titulo">Etiquetas QR</div><div className="sub">Hoja carta para pegar en cada extintor</div></div><span aria-hidden>›</span></Link>}
+          <Link className="fila-dato" to="/panel/calendario"><div><div className="titulo">Calendario</div><div className="sub">Las visitas del mes</div></div><span aria-hidden>›</span></Link>
+          {puede('importar') && <Link className="fila-dato" to="/panel/importar"><div><div className="titulo">Importar desde Excel</div><div className="sub">Clientes, locales y extintores de una vez</div></div><span aria-hidden>›</span></Link>}
+        </div>
+      </section>
       {puede('ver_dinero') && <Cobros />}
       {puede('ver_dinero') && <Precios negocio={neg} editar={puede('configurar_negocio')} />}
       {puede('configurar_negocio') && <Suscripcion negocio={neg} />}
