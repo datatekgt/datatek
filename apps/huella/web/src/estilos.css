@@ -137,3 +137,11 @@ a.cifra:hover { border-color: var(--acento); }
   .carne-tabla th:nth-child(4), .carne-tabla td:nth-child(4) { display: table-cell; }
   .carne-datos { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+
+/* En teléfono las pestañas bajan a una barra fija: arriba no entraban todas y «Más» quedaba fuera de la pantalla. */
+@media (max-width: 640px) {
+  .cabecera .pestanas { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: #fff; border-top: 1px solid var(--linea); gap: 0; overflow: hidden; z-index: 10; }
+  .cabecera .pestanas a { flex: 1 1 0; min-width: 0; justify-content: center; padding: 0 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
+  .cabecera .pestanas a.activa { box-shadow: inset 0 3px 0 var(--acento); }
+  .contenido { padding-bottom: 84px; }
+}
